@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
+/* ===============================
+  Design Tokens (Core)
+================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colors */
+  --color-primary: #136dec;
+  --color-background-light: #f6f7f8;
+  --color-background-dark: #101822;
+
+  /* Font */
+  --font-display: "Lexend", sans-serif;
+
+  /* Radius */
+  --radius-default: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
 }
 
+/* ===============================
+  Theme mapping (Tailwind v4)
+================================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Colors */
+  --color-primary: var(--color-primary);
+  --color-background-light: var(--color-background-light);
+  --color-background-dark: var(--color-background-dark);
+
+  /* Font */
+  --font-sans: var(--font-display);
+
+  /* Radius */
+  --radius: var(--radius-default);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-full: var(--radius-full);
 }
 
+/* ===============================
+  Dark Mode
+================================ */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-background-light: #101822;
+    --color-background-dark: #f6f7f8;
   }
 }
 
+/* ===============================
+  Base styles
+================================ */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background-light);
+  color: var(--color-background-dark);
+  font-family: var(--font-display);
 }
