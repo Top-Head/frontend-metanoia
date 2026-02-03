@@ -22,7 +22,6 @@
   /* Colors */
   --color-primary: var(--color-primary);
   --color-background-light: var(--color-background-light);
-  --color-background-dark: var(--color-background-dark);
 
   /* Font */
   --font-sans: var(--font-display);
@@ -32,14 +31,6 @@
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
   --radius-full: var(--radius-full);
-}
-
-/* Mode escuro */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background-light: #101822;
-    --color-background-dark: #f6f7f8;
-  }
 }
 
 /* Estilo base */
