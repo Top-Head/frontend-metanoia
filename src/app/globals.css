@@ -1,10 +1,8 @@
 @import "tailwindcss";
 
-/* ===============================
-  Design Tokens (Core)
-================================ */
+ /* Design Tokens */
 :root {
-  /* Colors */
+  /* Cores */
   --color-primary: #136dec;
   --color-background-light: #f6f7f8;
   --color-background-dark: #101822;
@@ -19,9 +17,7 @@
   --radius-full: 9999px;
 }
 
-/* ===============================
-  Theme mapping (Tailwind v4)
-================================ */
+/* Mapeamento de temas */
 @theme inline {
   /* Colors */
   --color-primary: var(--color-primary);
@@ -38,9 +34,7 @@
   --radius-full: var(--radius-full);
 }
 
-/* ===============================
-  Dark Mode
-================================ */
+/* Mode escuro */
 @media (prefers-color-scheme: dark) {
   :root {
     --color-background-light: #101822;
@@ -48,9 +42,7 @@
   }
 }
 
-/* ===============================
-  Base styles
-================================ */
+/* Estilo base */
 body {
   background-color: var(--color-background-light);
   color: var(--color-background-dark);
