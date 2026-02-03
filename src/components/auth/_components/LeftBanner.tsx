@@ -8,7 +8,7 @@ export function LeftBanner() {
             'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDSJgGTInIgDd1y5TgXZLJo0-20Sk_6TPNdjP388AUGjTmIKbdJ53bLy-pHYosuQRECZdROGPsF3NWFZ0eNu7ecpTXmzYVpSFhNFF3Db9GeZx0lvtXP4Wphe_tKp91GMqD-1a0n1MDheItuLEnRMiI0-I-ff9lM4Jq564A2M1i5_232CgEIY1-n3CZj9x81foqajwrZOvK6XWxniquTPloHJYk5AP5cvtsGxWcMxz_ULxaj-jZI-hqLJsjxhSD-n6bKQKFkSkNO6-M")',
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-primary/60 to-transparent" />
       <div className="relative z-10 flex flex-col justify-end p-16 text-white">
         <div className="flex items-center gap-3 mb-8">
           <div className="size-10 text-white">
@@ -21,13 +21,13 @@ export function LeftBanner() {
               />
             </svg>
           </div>
-          <span className="text-2xl font-bold tracking-tight">Metanoia Academy</span>
+          <span className="text-2xl font-bold tracking-tight">Academia Metanoia</span>
         </div>
         <h1 className="text-5xl font-black leading-tight mb-4 tracking-[-0.033em]">
-          Ignite your potential with expert mentorship.
+          Desbloquea o seu potencial com mentores expecializados.
         </h1>
-        <p className="text-xl font-light text-[var(--color-background-dark)] max-w-md">
-          Join a community of lifelong learners and industry leaders dedicated to growth and professional excellence.
+        <p className="text-xl font-light text-background-light max-w-md">
+          Junte-se a uma comunidade de aprendizes ao longo da vida e líderes do setor dedicados ao crescimento e à excelência profissional.
         </p>
       </div>
     </div>

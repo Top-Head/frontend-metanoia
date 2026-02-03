@@ -12,7 +12,7 @@ export function MobileLogo() {
         </svg>
       </div>
       <h2 className="text-background-dark dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">
-        Metanoia Academy
+        Academia Metanoia
       </h2>
     </div>
   )

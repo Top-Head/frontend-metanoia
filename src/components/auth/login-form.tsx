@@ -21,17 +21,16 @@ export default function LoginForm() {
                 className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
                 type="submit"
               >
-                <span>Login to Dashboard</span>
-                <span className="material-symbols-outlined">arrow_forward</span>
+                <span>Ir para a Dashbaord</span>
               </button>
             </form>
             <div className="relative my-10">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[var(--color-background-dark)] dark:border-[var(--color-background-light)]" />
+                <div className="w-full border-t border-background-dark dark:border-background-light" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-background-light dark:bg-background-dark px-4 text-[var(--color-background-dark)] dark:text-[var(--color-background-light)] font-medium uppercase tracking-wider">
-                  Or continue with
+                <span className="bg-background-light dark:bg-background-dark px-4 text-background-dark dark:text-background-light font-medium uppercase tracking-wider">
+                  Ou continue com
                 </span>
               </div>
             </div>

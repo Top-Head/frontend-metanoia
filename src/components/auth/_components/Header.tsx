@@ -2,10 +2,10 @@ export function Header() {
   return (
     <div className="mb-10">
       <h2 className="text-background-dark dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] mb-2">
-        Welcome back
+        Bem-vindo
       </h2>
-      <p className="text-[var(--color-background-dark)] dark:text-[var(--color-background-light)] text-base font-normal">
-        Log in to access your mentorship dashboard and courses.
+      <p className="text-background-dark dark:text-background-light text-base font-normal">
+        Entra para ter acesso aos seus dashboard de mentores e cursos.
       </p>
     </div>
   )
