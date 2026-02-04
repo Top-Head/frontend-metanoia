@@ -1,3 +1,3 @@
-## Dashboard
+## Landing page of metanoia 
 
-- onddediededodoem
+- Tive que traduz dos os texto para portugues, isso fiz ontem
