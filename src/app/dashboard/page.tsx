@@ -1,5 +1,5 @@
 export default function Dashboard() {
   return (
-    <span>hello world !</span>
+    <h2 className="text-zinc-50">hello world</h2>
   )
 }
