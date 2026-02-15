@@ -10,7 +10,7 @@ export default function Home() {
           <Link href="/auth/login">Go to Login</Link>
         </Button>
         <Button className="bg-primary text-white px-4 py-2 rounded-md">
-          <Link href="/auth/register">Go to Register</Link>
+          <Link href="/auth/cadastro">Go to Register</Link>
         </Button>
       </div>
     </div>

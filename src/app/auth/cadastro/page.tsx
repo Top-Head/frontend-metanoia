@@ -1,3 +1,4 @@
+import RegistrationPage from "@/components/auth/register-form";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 export default function Cadastro() {
   return (
     <>
-     <h1>Tela de cadastro</h1> 
+     <RegistrationPage />
     </>
   )
 }
