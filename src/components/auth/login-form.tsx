@@ -1,17 +1,11 @@
 "use client";
 
-import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useState, JSX } from "react";
 import SocialButton from "./_components/login-components/social-botton";
 import BrandLogo from "./_components/login-components/brand-logo";
-
-export const metadata: Metadata = {
-  title: "Login | Metanoia Academy",
-  description: "Login to access your mentorship dashboard and courses.",
-};
+import LeftSection from "./_components/login-components/left-section";
 
 export default function LoginPage(): JSX.Element {
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
@@ -21,34 +15,13 @@ export default function LoginPage(): JSX.Element {
   }
 
   return (
-    <main className="flex min-h-screen w-full bg-background-light dark:bg-background-dark">
+    <main className="flex h-screen w-full overflow-hidden bg-background-light dark:bg-background-dark">
       {/* Left Section */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-slate-900">
-        <Image
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSJgGTInIgDd1y5TgXZLJo0-20Sk_6TPNdjP388AUGjTmIKbdJ53bLy-pHYosuQRECZdROGPsF3NWFZ0eNu7ecpTXmzYVpSFhNFF3Db9GeZx0lvtXP4Wphe_tKp91GMqD-1a0n1MDheItuLEnRMiI0-I-ff9lM4Jq564A2M1i5_232CgEIY1-n3CZj9x81foqajwrZOvK6XWxniquTPloHJYk5AP5cvtsGxWcMxz_ULxaj-jZI-hqLJsjxhSD-n6bKQKFkSkNO6-M"
-          alt="Mentor and student discussing ideas"
-          fill
-          priority
-          className="object-cover opacity-80"
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
-
-        <div className="relative z-10 flex flex-col justify-end p-16 text-white">
-          <BrandLogo size="large" />
-          <h1 className="text-5xl font-black leading-tight mb-4 tracking-tight">
-            Ignite your potential with expert mentorship.
-          </h1>
-          <p className="text-xl font-light text-slate-100 max-w-md">
-            Join a community of lifelong learners and industry leaders dedicated
-            to growth and professional excellence.
-          </p>
-        </div>
-      </div>
+      <LeftSection />
 
       {/* Right Section */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 md:p-16 lg:p-24 bg-white dark:bg-background-dark">
-        <div className="w-full max-w-[480px]">
+      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 lg:p-14 bg-white dark:bg-background-dark">
+        <div className="w-full max-w-[420px]">
           {/* Mobile Brand */}
           <div className="flex lg:hidden items-center gap-3 mb-12">
             <BrandLogo size="small" />
@@ -56,7 +29,7 @@ export default function LoginPage(): JSX.Element {
 
           {/* Heading */}
           <div className="mb-10">
-            <h2 className="text-4xl font-black mb-2 text-slate-900 dark:text-white">
+            <h2 className="text-2xl xl:text-3xl font-bold mb-1 text-slate-900 dark:text-white">
               Welcome back
             </h2>
             <p className="text-slate-500 dark:text-slate-400">
@@ -65,7 +38,7 @@ export default function LoginPage(): JSX.Element {
           </div>
 
           {/* Form */}
-          <form className="space-y-6">
+          <form className="space-y-4">
             <div className="flex flex-col gap-2">
               <label className="text-slate-900 dark:text-slate-200 font-medium">
                 Email Address
@@ -73,7 +46,7 @@ export default function LoginPage(): JSX.Element {
               <input
                 type="email"
                 placeholder="e.g. name@email.com"
-                className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 h-14 px-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 h-11 px-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
               />
             </div>
 
@@ -94,7 +67,7 @@ export default function LoginPage(): JSX.Element {
                 <input
                   type={isPasswordVisible ? "text" : "password"}
                   placeholder="••••••••"
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 h-14 px-4 pr-12 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 h-11 px-4 pr-12 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                 />
                 <button
                   type="button"
@@ -108,7 +81,7 @@ export default function LoginPage(): JSX.Element {
 
             <button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
             >
               <span>Login to Dashboard</span>
               <ArrowRight size={18} />
@@ -116,7 +89,7 @@ export default function LoginPage(): JSX.Element {
           </form>
 
           {/* Divider */}
-          <div className="relative my-10">
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-300 dark:border-slate-700" />
             </div>
@@ -134,7 +107,7 @@ export default function LoginPage(): JSX.Element {
           </div>
 
           {/* Footer */}
-          <div className="mt-12 text-center">
+          <div className="mt-6 text-center">
             <p className="text-slate-500 dark:text-slate-400">
               Don't have an account?
               <Link
