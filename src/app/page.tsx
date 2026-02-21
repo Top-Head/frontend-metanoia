@@ -99,7 +99,7 @@ export default function Page() {
                 <path fillRule="evenodd" clipRule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-800">Metanoia Academy</h2>
+            <h2 className="text-xl font-bold tracking-tight text-slate-800">Academia Metanoia</h2>
           </div>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -117,36 +117,61 @@ export default function Page() {
         </div>
       </header>
 
-      <section className="bg-white border-b border-slate-100 py-16 lg:py-24 px-6 overflow-hidden">
-        <div className="max-w-[1000px] mx-auto text-center space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-[1.1]">
-              Aprenda com os Melhores. <br />
-              <span className="text-blue-600">Conecte-se com Mentores Especialistas.</span>
-            </h1>
-            <p className="text-slate-500 text-lg md:text-xl max-w-2xl mx-auto font-medium">
-              Encontre o par perfeito em nosso mercado global de mentores profissionais nas áreas de tecnologia, artes e negócios.
-            </p>
-          </div>
+      <section
+      className="
+        border-b border-slate-100
+        py-16 lg:py-24 px-6
+        relative
+        bg-white
+        overflow-visible
+      "
+     
+    >
+      <div className="max-w-[1000px] mx-auto text-center space-y-8">
+       
+        <div className="space-y-4">
+          <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight md:leading-snug">
+            Aprenda com os Melhores. <br />
+            <span className="text-blue-600">
+              Conecte-se com Mentores Especialistas.
+            </span>
+          </h1>
 
-          <div className="max-w-2xl mx-auto mt-10">
-            <div className="flex items-center bg-white border border-slate-200 p-1.5 rounded-2xl shadow-2xl shadow-slate-200/50">
-              <div className="pl-4 pr-2 text-slate-400">
-                <Search size={20} strokeWidth={2.5} />
-              </div>
-              <input
-                className="flex-1 bg-transparent border-none focus:ring-0 text-slate-900 text-base py-3 outline-none px-2"
-                placeholder="Busque por especialidade (ex. Tecnologia, Psicologia, Artes)"
-                value={termoBusca}
-                onChange={(e) => setTermoBusca(e.target.value)}
-              />
-              <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all active:scale-95">
-                Buscar Mentores
-              </button>
+          <p className="text-slate-500 text-lg md:text-xl max-w-2xl mx-auto font-normal">
+            Encontre o par perfeito em nosso mercado global de mentores profissionais
+            nas áreas de tecnologia, artes e negócios.
+          </p>
+        </div>
+
+      
+        <div className="max-w-2xl mx-auto mt-10">
+          <div className="flex items-center bg-white border border-slate-200 p-2 rounded-2xl shadow-lg shadow-slate-200/50">
+          
+            <div className="pl-4 pr-2 text-slate-400">
+              <Search size={20} strokeWidth={2.5} />
             </div>
+
+            
+            <input
+              type="text"
+              aria-label="Buscar mentores por especialidade"
+              className="flex-1 bg-transparent border-none focus:ring-0 text-slate-900 text-base py-3 px-4 outline-none"
+              placeholder="Busque por especialidade (ex. Tecnologia, Psicologia, Artes)"
+              value={termoBusca}
+              onChange={(e) => setTermoBusca(e.target.value)}
+            />
+
+          
+            <button
+              className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors transform active:scale-95"
+              type="button"
+            >
+              Buscar Mentores
+            </button>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       <main className="max-w-[1440px] mx-auto px-6 lg:px-20 py-16">
         <div className="flex flex-col lg:flex-row gap-12">
@@ -284,7 +309,7 @@ export default function Page() {
                   <path d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fill="currentColor" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold">Metanoia Academy</h3>
+              <h3 className="text-xl font-bold">Academia Metanoia</h3>
             </div>
             <p className="text-slate-400 text-sm leading-relaxed max-w-sm font-medium">
               Capacitando a próxima geração de pensadores, criadores e líderes por meio de mentoria direta com veteranos da indústria.
@@ -295,7 +320,7 @@ export default function Page() {
           <GrupoRodape titulo="Suporte" links={["Central de Ajuda", "Termos de Serviço", "Política de Privacidade"]} />
         </div>
         <div className="max-w-[1440px] mx-auto px-6 lg:px-20 mt-20 pt-8 border-t border-slate-50 text-center">
-          <p className="text-slate-300 text-xs font-bold tracking-widest">© 2024 METANOIA ACADEMY AI - TODOS OS DIREITOS RESERVADOS.</p>
+          <p className="text-slate-300 text-xs font-bold tracking-widest">© 2024 ACADEMIA METANOIA AI - TODOS OS DIREITOS RESERVADOS.</p>
         </div>
       </footer>
     </div>
