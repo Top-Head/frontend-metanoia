@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useEffectEvent } from "react";
+import  { useState, useMemo } from "react";
 import { 
   Search, 
   Filter, 
