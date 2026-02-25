@@ -1,0 +1,50 @@
+import { 
+    Search, 
+    Verified, 
+    Users, 
+    Clock, 
+    Star, 
+    Mail, 
+    Globe, 
+    Link as LinkIcon, 
+    Share2,
+    ChevronLeft,
+    ChevronRight,
+    ShieldCheck
+  } from "lucide-react";
+export default function Header () {
+    return(
+
+        <header className="sticky top-0 z-50 flex items-center justify-between bg-white px-6 md:px-10 py-3 border-b border-[#e7ecf3]">
+        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-2 text-[#136dec]">
+            <svg className="size-8" fill="currentColor" viewBox="0 0 48 48">
+            <path clipRule="evenodd" d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z" fillRule="evenodd" />
+            </svg>
+            <h2 className="text-lg font-bold tracking-tight text-[#0d131b]">Metanoia Academy</h2>
+        </div>
+        
+        <div className="hidden md:flex relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4c6c9a]" size={18} />
+            <input 
+            type="text" 
+            placeholder="Search mentors..." 
+            className="w-full bg-[#e7ecf3] border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[#136dec]/20 outline-none"
+            />
+        </div>
+        </div>
+
+        <nav className="flex items-center gap-4 md:gap-8">
+        <div className="hidden lg:flex gap-6 text-sm font-medium">
+            <a href="#" className="hover:text-[#136dec] transition-colors">Find Mentors</a>
+            <a href="#" className="hover:text-[#136dec] transition-colors">Become a Mentor</a>
+            <a href="#" className="hover:text-[#136dec] transition-colors">My Learning</a>
+        </div>
+        <div className="flex gap-2">
+            <button className="bg-[#136dec] text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#136dec]/90 transition-all">Sign Up</button>
+            <button className="bg-[#e7ecf3] text-[#0d131b] px-4 py-2 rounded-lg font-bold text-sm hidden sm:block">Login</button>
+        </div>
+        </nav>
+        </header>
+    )
+}
