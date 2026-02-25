@@ -1,6 +1,7 @@
-import { 
-    Search, 
-  } from "lucide-react";
+import { Search } from "lucide-react";
+import Link from "next/link";
+
+
 export default function Header () {
     return(
 
@@ -30,8 +31,16 @@ export default function Header () {
             <a href="#" className="hover:text-[#136dec] transition-colors">My Learning</a>
         </div>
         <div className="flex gap-2">
-            <button className="bg-[#136dec] text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#136dec]/90 transition-all">Sign Up</button>
-            <button className="bg-[#e7ecf3] text-[#0d131b] px-4 py-2 rounded-lg font-bold text-sm hidden sm:block">Login</button>
+            <button className="bg-[#136dec] text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#136dec]/90 transition-all">
+            <Link href="/auth/cadastro">
+                cadastrar
+            </Link>
+           </button>
+            <button className="bg-[#e7ecf3] text-[#0d131b] px-4 py-2 rounded-lg font-bold text-sm hidden sm:block">
+                <Link href="/auth/login">
+                    Entrar
+                </Link>
+            </button>
         </div>
         </nav>
         </header>
