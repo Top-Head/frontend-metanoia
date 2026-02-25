@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useEffectEvent } from "react";
 import { 
   Search, 
   Filter, 
@@ -87,6 +87,7 @@ export default function Page() {
       m.role.toLowerCase().includes(termoBusca.toLowerCase())
     );
   }, [termoBusca]);
+ 
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans">
@@ -240,7 +241,7 @@ export default function Page() {
             </div>
 
             {mentoresFiltrados.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"> 
                 {mentoresFiltrados.map((mentor) => (
                   <div key={mentor.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group">
                     <div className="relative h-52 overflow-hidden bg-slate-200">
