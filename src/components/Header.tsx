@@ -28,7 +28,7 @@ export default function Header () {
         <div className="hidden lg:flex gap-6 text-sm font-medium">
             <a className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Encontrar Mentores</a>
             <a className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Tornar-se Mentor</a>
-            <a href="#" className="hover:text-[#136dec] transition-colors">My Learning</a>
+            <a className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Meu Aprendizado</a>
         </div>
         <div className="flex gap-2">
             <button className="bg-[#136dec] text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#136dec]/90 transition-all">

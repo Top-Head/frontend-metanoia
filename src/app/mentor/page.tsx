@@ -40,18 +40,18 @@ const MentorProfile = () => {
               
               <div className="space-y-4 py-6 border-t border-[#e7ecf3]">
                 <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                  <Users size={18} className="text-[#4c6c9a]" /> 500+ Students
+                  <Users size={18} className="text-[#4c6c9a]" /> 500+ Estudantes
                 </div>
                 <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                  <Clock size={18} className="text-[#4c6c9a]" /> 1,200+ Hours Taught
+                  <Clock size={18} className="text-[#4c6c9a]" /> 1,200+ Horas Mentoradas
                 </div>
                 <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                  <Star size={18} className="text-[#4c6c9a]" /> 4.9/5.0 Avg Rating
+                  <Star size={18} className="text-[#4c6c9a]" /> 4.9/5.0 Classificação média
                 </div>
               </div>
 
               <button className="w-full mt-2 bg-[#136dec] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#136dec]/20 transition-all">
-                <Mail size={18} /> Send Message
+                <Mail size={18} /> Enviar Mensagem
               </button>
               
               <div className="flex justify-center gap-6 mt-6 pt-6 border-t border-[#e7ecf3] text-[#4c6c9a]">
@@ -66,11 +66,17 @@ const MentorProfile = () => {
             <section className="bg-white rounded-2xl p-6 md:p-8 border border-[#e7ecf3] shadow-sm">
               <h2 className="text-2xl font-bold mb-4">Sobre Mim</h2>
               <div className="text-[#0d131b] space-y-4 leading-relaxed opacity-90">
-                <p>Passionate educator with over 10 years of experience in UI/UX Design and Advanced Mathematics. I focus on bridging the gap between theory and industry-standard practice.</p>
-                <p>Having mentored at top-tier design firms and taught at global universities, I bring a unique perspective that combines analytical rigor with creative problem-solving.</p>
+                <p>
+                   Educador apaixonado com mais de 10 anos de experiência em Design de UI/UX e Matemática Avançada.
+                   Eu me concentro em preencher a lacuna entre a teoria e a prática padrão da indústria.
+                </p>
+                <p>
+                    Tendo sido mentor em empresas de design de primeira linha e ensinado em universidades globais,
+                    trago uma perspectiva única que combina rigor analítico com resolução criativa de problemas.
+                </p>
               </div>
               
-              <h3 className="font-bold mt-8 mb-4">Core Expertise</h3>
+              <h3 className="font-bold mt-8 mb-4">Experiência principal</h3>
               <div className="flex flex-wrap gap-2">
                 {['UI/UX Design', 'Product Strategy', 'Design Systems', 'Advanced Mathematics', 'Prototyping'].map(skill => (
                   <span key={skill} className="px-3 py-1.5 bg-[#136dec]/10 text-[#136dec] rounded-full text-xs font-semibold">
@@ -82,7 +88,7 @@ const MentorProfile = () => {
 
             <section className="bg-white rounded-2xl p-6 md:p-8 border border-[#e7ecf3] shadow-sm">
               <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-bold">Student Reviews</h2>
+                <h2 className="text-2xl font-bold">Avaliações de estudantes</h2>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold">4.9</span>
                   <div className="flex text-yellow-400">
@@ -108,11 +114,11 @@ const MentorProfile = () => {
                       </div>
                       <div className="flex text-yellow-400"><Star size={14} fill="currentColor" /></div>
                     </div>
-                    <p className="text-sm text-slate-600 italic">"Helena is an incredible mentor. She helped me restructure my portfolio and land my first senior designer role."</p>
+                    <p className="text-sm text-slate-600 italic">"Helena é uma mentora incrível. Ela me ajudou a reestruturar meu portfólio e conseguir meu primeiro cargo de designer sênior."</p>
                   </div>
                 ))}
               </div>
-              <button className="text-[#136dec] font-bold text-sm hover:underline mt-6">View All Reviews</button>
+              <button className="text-[#136dec] font-bold text-sm hover:underline mt-6">Ver todas as avaliações</button>
             </section>
           </div>
 
@@ -127,13 +133,13 @@ const MentorProfile = () => {
                       <div className="size-4 border-2 border-[#136dec] rounded-full flex items-center justify-center">
                         <div className="size-2 bg-[#136dec] rounded-full" />
                       </div>
-                      <span className="text-sm font-semibold">1:1 Mentorship</span>
+                      <span className="text-sm font-semibold">1:1 Mentoria</span>
                     </div>
                     <span className="text-sm font-bold">$50<span className="font-normal text-xs text-slate-500">/hr</span></span>
                   </div>
                   
                   <div className="flex items-center justify-between p-3 border border-[#e7ecf3] rounded-xl hover:border-[#136dec] transition-colors cursor-pointer">
-                    <span className="text-sm font-medium text-slate-600">Project Review</span>
+                    <span className="text-sm font-medium text-slate-600">Revisão do Projecto</span>
                     <span className="text-sm font-bold">$35</span>
                   </div>
                 </div>
@@ -150,16 +156,16 @@ const MentorProfile = () => {
                 </div>
 
                 <button className="w-full bg-[#136dec] text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#136dec]/20 hover:-translate-y-0.5 transition-all">
-                  Book Now
+                  Reserve Agora
                 </button>
-                <p className="text-[10px] text-center text-[#4c6c9a] mt-4 italic">No payment taken until session is confirmed</p>
+                <p className="text-[10px] text-center text-[#4c6c9a] mt-4 italic">Nenhum pagamento será feito até que a sessão seja confirmada</p>
               </div>
 
               <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl flex gap-3">
                 <ShieldCheck className="text-[#136dec] shrink-0" size={20} />
                 <div>
-                  <p className="text-xs font-bold text-blue-900">Money-back Guarantee</p>
-                  <p className="text-[10px] text-blue-700/80 leading-tight mt-0.5">If you aren't satisfied with your first session, we'll refund you 100%.</p>
+                  <p className="text-xs font-bold text-blue-900">Garantia de devolução do dinheiro</p>
+                  <p className="text-[10px] text-blue-700/80 leading-tight mt-0.5">Se você não estiver satisfeito com sua primeira sessão, reembolsaremos você 100%.</p>
                 </div>
               </div>
             </div>
