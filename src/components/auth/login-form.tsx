@@ -56,7 +56,7 @@ export default function LoginPage(): JSX.Element {
                   Password
                 </label>
                 <Link
-                  href="#"
+                  href="/auth/recuperar-senha"
                   className="text-primary text-sm font-semibold hover:underline"
                 >
                   Forgot Password?
@@ -111,7 +111,7 @@ export default function LoginPage(): JSX.Element {
             <p className="text-slate-500 dark:text-slate-400">
               Don't have an account?
               <Link
-                href="#"
+                href="/auth/cadastro"
                 className="text-primary font-bold hover:underline ml-1"
               >
                 Create an account

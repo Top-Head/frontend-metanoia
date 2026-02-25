@@ -15,6 +15,7 @@ import {
   ChevronRight 
 } from "lucide-react";
 import { MENTORES_DATA } from "@/data/mentors";
+import Link from "next/link";
 
 export default function Page() {
   const [termoBusca, setTermoBusca] = useState("");
@@ -48,9 +49,15 @@ export default function Page() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <button className="text-sm font-bold text-slate-700 hover:text-slate-900">Entrar</button>
+            <button className="text-sm font-bold text-slate-700 hover:text-slate-900">
+              <Link href="/auth/login">
+              Entrar
+              </Link>
+            </button>
             <button className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow-md shadow-blue-200">
+              <Link href="/auth/selecionar-papel">
               Cadastre-se Grátis
+              </Link>
             </button>
           </div>
         </div>
@@ -211,7 +218,10 @@ export default function Page() {
                           <p className="text-lg font-black text-slate-900">${mentor.price}<span className="text-xs font-normal text-slate-400">/h</span></p>
                         </div>
                         <button className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black hover:bg-blue-700 transition shadow-lg shadow-blue-100">
-                          Ver Perfil
+                          {/*<Link href={`/mentor/${mentor.id}`} >*/}
+                          <Link href="/mentor">
+                            Ver Perfil
+                          </Link>
                         </button>
                       </div>
                     </div>

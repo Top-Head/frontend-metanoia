@@ -64,7 +64,7 @@ const MentorProfile = () => {
 
           <div className="lg:col-span-6 space-y-8">
             <section className="bg-white rounded-2xl p-6 md:p-8 border border-[#e7ecf3] shadow-sm">
-              <h2 className="text-2xl font-bold mb-4">About Me</h2>
+              <h2 className="text-2xl font-bold mb-4">Sobre Mim</h2>
               <div className="text-[#0d131b] space-y-4 leading-relaxed opacity-90">
                 <p>Passionate educator with over 10 years of experience in UI/UX Design and Advanced Mathematics. I focus on bridging the gap between theory and industry-standard practice.</p>
                 <p>Having mentored at top-tier design firms and taught at global universities, I bring a unique perspective that combines analytical rigor with creative problem-solving.</p>
@@ -119,7 +119,7 @@ const MentorProfile = () => {
           <aside className="lg:col-span-3">
             <div className="sticky top-24 space-y-4">
               <div className="bg-white rounded-2xl p-6 border border-[#e7ecf3] shadow-md">
-                <h2 className="text-xl font-bold mb-6">Book a Session</h2>
+                <h2 className="text-xl font-bold mb-6">Agende uma Sessão</h2>
                 
                 <div className="space-y-3 mb-8">
                   <div className="flex items-center justify-between p-3 border-2 border-[#136dec] bg-[#136dec]/5 rounded-xl cursor-pointer">
@@ -140,7 +140,7 @@ const MentorProfile = () => {
 
                 <div className="mb-6">
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-sm font-bold">November 2024</span>
+                    <span className="text-sm font-bold">Novembero 2024</span>
                     <div className="flex gap-1">
                       <ChevronLeft size={18} className="cursor-pointer text-slate-400 hover:text-[#136dec]" />
                       <ChevronRight size={18} className="cursor-pointer text-slate-400 hover:text-[#136dec]" />

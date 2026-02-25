@@ -79,7 +79,7 @@ export default function RegistrationPage(): JSX.Element {
               <p className="text-center text-slate-600 dark:text-slate-400 text-sm">
                 Already have a mentor account?{" "}
                 <Link
-                  href="#"
+                  href="/auth/login"
                   className="text-primary font-bold hover:underline"
                 >
                   Log in here

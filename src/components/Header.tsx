@@ -36,8 +36,8 @@ export default function Header () {
 
         <nav className="flex items-center gap-4 md:gap-8">
         <div className="hidden lg:flex gap-6 text-sm font-medium">
-            <a href="#" className="hover:text-[#136dec] transition-colors">Find Mentors</a>
-            <a href="#" className="hover:text-[#136dec] transition-colors">Become a Mentor</a>
+            <a className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Encontrar Mentores</a>
+            <a className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Tornar-se Mentor</a>
             <a href="#" className="hover:text-[#136dec] transition-colors">My Learning</a>
         </div>
         <div className="flex gap-2">

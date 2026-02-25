@@ -72,14 +72,16 @@ export default function SelectUserRole(): JSX.Element {
               disabled={!selectedRole}
               className="flex items-center justify-center gap-2 min-w-[260px] h-12 px-6 rounded-lg bg-primary text-white text-sm font-semibold shadow-md hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Continue
+              <Link href="/auth/cadastro">
+                Continue
+              </Link>
               <ArrowRight size={18} />
             </button>
 
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Already have an account?{" "}
               <Link
-                href="/login"
+                href="/auth/login"
                 className="text-primary font-semibold hover:underline"
               >
                 Log in here
