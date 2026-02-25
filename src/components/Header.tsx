@@ -1,16 +1,5 @@
 import { 
     Search, 
-    Verified, 
-    Users, 
-    Clock, 
-    Star, 
-    Mail, 
-    Globe, 
-    Link as LinkIcon, 
-    Share2,
-    ChevronLeft,
-    ChevronRight,
-    ShieldCheck
   } from "lucide-react";
 export default function Header () {
     return(
