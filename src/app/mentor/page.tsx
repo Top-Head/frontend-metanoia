@@ -20,7 +20,7 @@ const MentorProfile = () => {
     <div className="min-h-screen flex flex-col bg-[#f6f7f8] font-sans text-[#0d131b]">
       <Header />
 
-      <main className="flex-1 max-w-[1280px] mx-auto px-6 md:px-10 py-8 w-full">
+      <main className="flex-1 max-w-7xl mx-auto px-6 md:px-10 py-8 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           <aside className="lg:col-span-3">
