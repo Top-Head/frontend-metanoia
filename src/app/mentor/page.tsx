@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { 
   Verified, 
   Users, 
@@ -49,10 +50,11 @@ const MentorProfile = () => {
                   <Star size={18} className="text-[#4c6c9a]" /> 4.9/5.0 Classificação média
                 </div>
               </div>
-
+            <Link href="/messages">
               <button className="w-full mt-2 bg-[#136dec] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#136dec]/20 transition-all">
                 <Mail size={18} /> Enviar Mensagem
               </button>
+            </Link>
               
               <div className="flex justify-center gap-6 mt-6 pt-6 border-t border-[#e7ecf3] text-[#4c6c9a]">
                  <Globe size={20} className="cursor-pointer hover:text-[#136dec]" />
