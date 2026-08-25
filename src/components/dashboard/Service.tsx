@@ -87,7 +87,7 @@ export default function Service() {
             </div>
 
             <div>
-              <h1 className="">Pending</h1>
+            
               <div className="  h-[203.5px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
                 <div className="flex">
                   <img className="w-14 h-16" src="/Margin.png" alt="" />
