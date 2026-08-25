@@ -31,16 +31,18 @@ export default function Header () {
             <a className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">Meu Aprendizado</a>
         </div>
         <div className="flex gap-2">
-            <button className="bg-[#136dec] text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#136dec]/90 transition-all">
-            <Link href="/auth/cadastro">
-                cadastrar
+            <Link
+              href="/auth/cadastro"
+              className="bg-[#136dec] text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#136dec]/90 transition-all"
+            >
+              cadastrar
             </Link>
-           </button>
-            <button className="bg-[#e7ecf3] text-[#0d131b] px-4 py-2 rounded-lg font-bold text-sm hidden sm:block">
-                <Link href="/auth/login">
-                    Entrar
-                </Link>
-            </button>
+            <Link
+              href="/auth/login"
+              className="bg-[#e7ecf3] text-[#0d131b] px-4 py-2 rounded-lg font-bold text-sm hidden sm:block"
+            >
+              Entrar
+            </Link>
         </div>
         </nav>
         </header>

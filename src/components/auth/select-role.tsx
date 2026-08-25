@@ -15,13 +15,6 @@ export default function SelectUserRole(): JSX.Element {
     setSelectedRole(role);
   }
 
-  function handleContinue(): void {
-    if (!selectedRole) return;
-
-    // aqui você pode redirecionar baseado no role
-    console.log("Selected role:", selectedRole);
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
       <Header />
@@ -40,7 +33,7 @@ export default function SelectUserRole(): JSX.Element {
             </h1>
 
             <p className="text-slate-600 dark:text-slate-400 text-base max-w-md mx-auto">
-              Tell us how you'd like to use the platform to get started.
+              Tell us how you&apos;d like to use the platform to get started.
             </p>
           </div>
 
@@ -67,16 +60,19 @@ export default function SelectUserRole(): JSX.Element {
 
           {/* Continue Button */}
           <div className="flex flex-col items-center gap-4 w-full">
-            <button
-              onClick={handleContinue}
-              disabled={!selectedRole}
-              className="flex items-center justify-center gap-2 min-w-[260px] h-12 px-6 rounded-lg bg-primary text-white text-sm font-semibold shadow-md hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            <Link
+              href="/auth/cadastro"
+              aria-disabled={!selectedRole}
+              onClick={(e) => {
+                if (!selectedRole) e.preventDefault();
+              }}
+              className={`flex items-center justify-center gap-2 min-w-[260px] h-12 px-6 rounded-lg bg-primary text-white text-sm font-semibold shadow-md hover:bg-primary/90 transition-all ${
+                !selectedRole ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              <Link href="/auth/cadastro">
-                Continue
-              </Link>
+              Continue
               <ArrowRight size={18} />
-            </button>
+            </Link>
 
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Already have an account?{" "}
