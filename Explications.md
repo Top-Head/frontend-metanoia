@@ -38,6 +38,10 @@ Os utilizadores podem escolher o seu papel, criar uma nova conta, iniciar sessã
 5. **Componentes de UI Partilhados**
    - Diversos componentes menores (headers, cards, inputs de formulário, etc.) estão em `src/components/auth/_components` e `src/components/ui`. Esses elementos são reutilizados em todo o fluxo de autenticação.
 
+6. **Rota de mensagem**
+   - Componentes <message />
+   - Header consistentes com as outras telas
+
 ### Comportamento Atual do Fluxo
 
 - Novos visitantes chegam por padrão à página de **seleção de papel** (a rota ainda não está forçada). Selecionar um papel apenas atualiza o estado local.
