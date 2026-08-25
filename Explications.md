@@ -48,7 +48,7 @@ Os utilizadores podem escolher o seu papel, criar uma nova conta, iniciar sessã
 - A partir daí, os utilizadores podem navegar para a página de cadastro, onde visualizam a primeira etapa do registo.
 - A tela de login pode ser acessada de forma independente e ainda não realiza autenticação com o backend.
 - "Esqueci a palavra-passe" redireciona para o formulário de recuperação, mas não envia nenhum email.
-- Após login/registo, a aplicação deve redirecionar para `/dashboard`, porém o dashboard está vazio e não existem guards, então a navegação não produz efeito prático.
+- Após login/registo, a aplicação deve redirecionar para `/dashboard`.
 
 ### Próximos Passos 
 

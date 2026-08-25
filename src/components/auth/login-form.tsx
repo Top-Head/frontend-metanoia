@@ -21,7 +21,7 @@ export default function LoginPage(): JSX.Element {
 
       {/* Right Section */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 lg:p-14 bg-white dark:bg-background-dark">
-        <div className="w-full max-w-[420px]">
+        <div className="w-full max-w-105">
           {/* Mobile Brand */}
           <div className="flex lg:hidden items-center gap-3 mb-12">
             <BrandLogo size="small" />
@@ -78,14 +78,16 @@ export default function LoginPage(): JSX.Element {
                 </button>
               </div>
             </div>
-
-            <button
-              type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
-            >
-              <span>Login to Dashboard</span>
-              <ArrowRight size={18} />
-            </button>
+           
+           <Link href="/dashboard" >
+              <button
+                type="submit"
+                className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+              >
+                <span>Login to Dashboard</span>
+                <ArrowRight size={18} />
+              </button>
+           </Link>
           </form>
 
           {/* Divider */}

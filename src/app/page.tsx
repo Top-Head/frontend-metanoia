@@ -313,7 +313,7 @@ export default function Page() {
         </div>
       </main>
 
- <Footer/>
+     <Footer/>
     </div>
   );
 }
