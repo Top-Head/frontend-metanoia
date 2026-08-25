@@ -2,7 +2,7 @@ import { Bell } from "lucide-react";
 
 export default function Header() {
   return (
-    <header className="mt-8 ml-8 flex h-[52px] w-[640px] items-center justify-between gap-4">
+    <header className="mt-8 ml-8 flex h-[52px] w-[830px] items-center justify-between gap-4">
       <div className="min-w-0">
         <h1 className="truncate text-base font-bold tracking-tight text-[#101822] text-[24px]">
           Welcome back, Mentor Alex
