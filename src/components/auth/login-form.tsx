@@ -109,7 +109,7 @@ export default function LoginPage(): JSX.Element {
           {/* Footer */}
           <div className="mt-6 text-center">
             <p className="text-slate-500 dark:text-slate-400">
-              Don't have an account?
+              Don&apos;t have an account?
               <Link
                 href="/auth/cadastro"
                 className="text-primary font-bold hover:underline ml-1"
