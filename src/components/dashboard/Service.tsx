@@ -117,7 +117,7 @@ export default function Service() {
                   </div>
                 </div>
                 <div className="flex gap-4 mt-4">
-                  <button className="border bg-[#10B981] text-[#FFFFFF] font-bold w-[263.33] h-[42px] rounded-[4px] shadow text-center">
+                  <button className="border bg-[#10B981] text-[#FFFFFF] font-bold w-[263.33] h-10.5 rounded-sm shadow text-center">
                     Classroom
                   </button>
                 </div>
