@@ -103,20 +103,6 @@ export default function Sidebar() {
           </div>
         </div>
 
-        <div className="flex gap-4 mt-2 w-[346px] h-[88px] border-t border-[#E7ECF3] items-center ">
-          <img className="w-14 h-14" src="/Container.png" alt="" />
-          <div className="">
-            <h1 className="text-black font-semibold text-[18px]">
-              Alex Rivera
-            </h1>
-            <span className="text-[#136DEC] text-[12px] font-medium">
-              UI Design Path
-            </span>
-            <p className="text-[#4C6C9A] text-[14px] ">
-              Can we reschedule the session?
-            </p>
-          </div>
-        </div>
       </div>
     </aside>
   );
