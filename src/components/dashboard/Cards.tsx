@@ -39,10 +39,10 @@ export default function Cards() {
           </div>
 
           <div>
-            <p className="text-[30px] font-bold tracking-tight text-[#0F172A]">
+            <p className="text-[30px] font-bold text-[#0F172A]">
               {value}
             </p>
-            <p className="mt-1 text-xs text-green-400">{trend}</p>
+            <p className="mt-1 text-[14px] font-medium text-[#07883B]">{trend}</p>
           </div>
         </div>
       ))}

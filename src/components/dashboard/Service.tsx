@@ -19,25 +19,94 @@ export default function Service() {
             </a>
           </div>
 
-          <div className="flex gap-4 grid-rows-2">
+          <div className="flex grid grid-cols-3">
             <div>
               <h1 className="">Pending</h1>
-              <div className=" w-[197.33px] h-[159px] rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
+              <div className="  h-[203.5px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
                 <div className="flex">
                   <img className="w-14 h-16" src="/Margin.png" alt="" />
                   <h1 className="w-10 h-4">Jonh Doe</h1>
                   <p>Designer UI</p>
                 </div>
-                <p className="text-[12px]">
+                <p className="text-[12px] text-gray-400">
                   Lorem ipsum dolor sit amet consectetur
                 </p>
-                <div className="flex gap-3">
-                  <button className="bg-blue">gj</button>
-                  <button className="bg-gray-300">gh</button>
+                <div className="flex gap-4 mt-4">
+                  <button className="bg-[#136DEC] text-white w-[77.67px] h-[30px]  shadow text-center">
+                    Accept
+                  </button>
+                  <button className="bg-gray-300 w-[77.67px] h-[30px]">
+                    View
+                  </button>
                 </div>
               </div>
             </div>
 
+            <div>
+              <h1 className="">Pending</h1>
+              <div className="  h-[203.5px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
+                <div className="flex">
+                  <img className="w-14 h-16" src="/Margin.png" alt="" />
+                  <h1 className="w-10 h-4">Jonh Doe</h1>
+                  <p>Designer UI</p>
+                </div>
+                <p className="text-[12px] text-gray-400">
+                  Lorem ipsum dolor sit amet consectetur
+                </p>
+                <div className="flex gap-4 mt-4">
+                  <button className="bg-[#136DEC] text-white w-[77.67px] h-[30px]  shadow text-center">
+                    aceitar
+                  </button>
+                  <button className="bg-gray-300 w-[77.67px] h-[30px]">
+                    View
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h1 className="">Pending</h1>
+              <div className="  h-[203.5px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
+                <div className="flex">
+                  <img className="w-14 h-16" src="/Margin.png" alt="" />
+                  <h1 className="w-10 h-4">Jonh Doe</h1>
+                  <p>Designer UI</p>
+                </div>
+                <p className="text-[12px] text-gray-400">
+                  Lorem ipsum dolor sit amet consectetur
+                </p>
+                <div className="flex gap-4 mt-4">
+                  <button className="bg-[#136DEC] text-white w-[77.67px] h-[30px]  shadow text-center">
+                    Accept
+                  </button>
+                  <button className="bg-gray-300 w-[77.67px] h-[30px]">
+                    View
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h1 className="">Pending</h1>
+              <div className="  h-[203.5px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
+                <div className="flex">
+                  <img className="w-14 h-16" src="/Margin.png" alt="" />
+                  <h1 className="w-10 h-4">Jonh Doe</h1>
+                  <p>Designer UI</p>
+                </div>
+                <p className="text-[12px] text-gray-400">
+                  Lorem ipsum dolor sit amet consectetur
+                </p>
+                <div className="flex gap-4 mt-4">
+                  <button className="bg-[#136DEC] text-white w-[77.67px] h-[30px] shadow text-center">
+                    Accept
+                  </button>
+                  <button className="bg-gray-300 w-[77.67px] h-[30px]">
+                    View
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
