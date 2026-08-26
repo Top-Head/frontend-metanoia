@@ -38,13 +38,17 @@ Os utilizadores podem escolher o seu papel, criar uma nova conta, iniciar sessã
 5. **Componentes de UI Partilhados**
    - Diversos componentes menores (headers, cards, inputs de formulário, etc.) estão em `src/components/auth/_components` e `src/components/ui`. Esses elementos são reutilizados em todo o fluxo de autenticação.
 
+6. **Rota de mensagem**
+   - Componentes <message />
+   - Header consistentes com as outras telas
+
 ### Comportamento Atual do Fluxo
 
 - Novos visitantes chegam por padrão à página de **seleção de papel** (a rota ainda não está forçada). Selecionar um papel apenas atualiza o estado local.
 - A partir daí, os utilizadores podem navegar para a página de cadastro, onde visualizam a primeira etapa do registo.
 - A tela de login pode ser acessada de forma independente e ainda não realiza autenticação com o backend.
 - "Esqueci a palavra-passe" redireciona para o formulário de recuperação, mas não envia nenhum email.
-- Após login/registo, a aplicação deve redirecionar para `/dashboard`, porém o dashboard está vazio e não existem guards, então a navegação não produz efeito prático.
+- Após login/registo, a aplicação deve redirecionar para `/dashboard`.
 
 ### Próximos Passos 
 

@@ -5,13 +5,12 @@ import MessageType from "@/components/message/message"
 
 export default function Messages (){
     return (
-        <section className=" bg-white">
+        <section className="h-dvh flex flex-col bg-white overflow-hidden">
             <Header/>
-            <main className="flex">
-
-            <Sidebar/>
-            <MessageType />
-            <Profile/>
+            <main className="flex flex-1 min-h-0">
+                <Sidebar/>
+                <MessageType />
+                <Profile/>
             </main>
         </section>
     )

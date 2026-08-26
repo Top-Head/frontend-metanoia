@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { MENTORES_DATA } from "@/data/mentors";
 import Link from "next/link";
+import Footer from "@/components/Footer";
 
 export default function Page() {
   const [termoBusca, setTermoBusca] = useState("");
@@ -31,7 +32,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans">
       <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md">
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-20 h-[72px] flex items-center justify-between">
+        <div className="max-w-360 mx-auto px-6 lg:px-20 h-18 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="text-blue-600">
               <svg
@@ -94,7 +95,7 @@ export default function Page() {
         overflow-visible
       "
       >
-        <div className="max-w-[1000px] mx-auto text-center space-y-8">
+        <div className="max-w-250 mx-auto text-center space-y-8">
           <div className="space-y-4">
             <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight md:leading-snug">
               Aprenda com os Melhores. <br />
@@ -136,9 +137,9 @@ export default function Page() {
         </div>
       </section>
 
-      <main className="max-w-[1440px] mx-auto px-6 lg:px-20 py-16">
+      <main className="max-w-360 mx-auto px-6 lg:px-20 py-16">
         <div className="flex flex-col lg:flex-row gap-12">
-          <aside className="w-full lg:w-64 flex-shrink-0">
+          <aside className="w-full lg:w-64 shrink-0">
             <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-8">
               <div className="flex items-center gap-2 pb-2">
                 <Filter size={18} className="text-blue-600" />
@@ -312,50 +313,7 @@ export default function Page() {
         </div>
       </main>
 
-      <footer className="bg-white border-t border-slate-100 pt-20 pb-10">
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-20 grid grid-cols-1 md:grid-cols-4 gap-12">
-          <div className="col-span-1 md:col-span-2 space-y-6">
-            <div className="flex items-center gap-2">
-              <div className="text-blue-600">
-                <svg
-                  className="w-8 h-8"
-                  fill="none"
-                  viewBox="0 0 48 48"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold">Academia Metanoia</h3>
-            </div>
-            <p className="text-slate-400 text-sm leading-relaxed max-w-sm font-medium">
-              Capacitando a próxima geração de pensadores, criadores e líderes
-              por meio de mentoria direta com veteranos da indústria.
-            </p>
-          </div>
-
-          <GrupoRodape
-            titulo="Plataforma"
-            links={["Buscar Mentores", "Comunidade", "Recursos"]}
-          />
-          <GrupoRodape
-            titulo="Suporte"
-            links={[
-              "Central de Ajuda",
-              "Termos de Serviço",
-              "Política de Privacidade",
-            ]}
-          />
-        </div>
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-20 mt-20 pt-8 border-t border-slate-50 text-center">
-          <p className="text-slate-300 text-xs font-bold tracking-widest">
-            © 2024 ACADEMIA METANOIA AI - TODOS OS DIREITOS RESERVADOS.
-          </p>
-        </div>
-      </footer>
+     <Footer/>
     </div>
   );
 }
@@ -383,7 +341,7 @@ const OpcaoAvaliacao = ({ label, active = false }: { label: string, active?: boo
       {active && <div className="size-1.5 bg-white rounded-full" />}
     </div>
     <span className={`text-xs font-bold transition-colors ${active ? 'text-slate-800' : 'text-slate-400 group-hover:text-slate-600'}`}>{label}</span>
-    {label.includes('Estrelas') && <Star size={10} className="fill-yellow-400 text-yellow-400 ml-[-4px]" />}
+    {label.includes('Estrelas') && <Star size={10} className="fill-yellow-400 text-yellow-400 -ml-1" />}
   </label>
 );
 

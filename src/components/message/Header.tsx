@@ -42,7 +42,7 @@ export default function Header() {
           <a className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
             Mentoring
           </a>
-          <a className="text-sm font-semibold text-blue-600 border-b-[2px] border-[#136DEC]">
+          <a className="text-sm font-semibold text-blue-600 border-b-4 border-[#136DEC] pb-[12px]">
             Messages
           </a>
         </div>
