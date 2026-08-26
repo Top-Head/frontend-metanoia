@@ -8,19 +8,32 @@ on:
   pull_request_review:
     types: [submitted]
 
+
 concurrency:
-  group: deploy
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+
+permissions:
+  contents: read
+
 jobs:
+
   quality:
     name: Lint, Test & Build
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
+      - name: Harden Runner (bloqueia egress não autorizado)
+        uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit 
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,14 +41,117 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
+      - name: Instalar dependências (respeita o lockfile)
         run: npm ci
 
       - name: Lint
         run: npm run lint
 
-      - name: Test
-        run: npm test
+      - name: Testes
+        run: npm test -- --ci
 
       - name: Build
         run: npm run build
+
+      - name: Guardar artefacto do build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+          retention-days: 7
+
+
+  audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: step-security/harden-runner@v2
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: npm ci
+        run: npm ci
+
+      - name: npm audit (falha em vulnerabilidades altas/críticas)
+        run: npm audit --audit-level=high
+
+
+  dependency-review:
+    name: Dependency Review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+
+  deploy:
+    name: Deploy
+    needs: [quality, audit, dependency-review, codeql]
+    if: |
+      always() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.quality.result == 'success' &&
+      needs.audit.result == 'success' &&
+      needs.codeql.result == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: production 
+    permissions:
+      contents: read
+      id-token: write 
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Descarregar artefacto do build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+
+      - name: Deploy
+        run: |
+          echo "Substituir por passo real de deploy (ex: OIDC + provider CLI)"
