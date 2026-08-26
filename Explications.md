@@ -2,11 +2,9 @@
 
 ### Visão Geral
 
-O fluxo de autenticação do frontend da Metanoia atualmente é composto por várias páginas em React/Next.js e componentes de suporte. Essas telas estão implementadas como client components em `src/app/auth` e `src/components/auth`.
+O fluxo de autenticação do frontend da Metanoia atualmente é composto por várias páginas em React/Next.js e componentes de suporte. Essas telas estão implementadas como client components em `src/app/auth` e `src/components/auth`. O fluxo da dashboard `src/app/dashboard`
 
 Os utilizadores podem escolher o seu papel, criar uma nova conta, iniciar sessão ou recuperar uma palavra-passe esquecida. A integração com a API ainda não está conectada, portanto os formulários atualmente não enviam dados para nenhum endpoint e o projeto utiliza handlers temporários (console logs) quando o utilizador interage com a interface.
-
-> **Nota:** A rota `dashboard` já existe, mas o layout e as páginas ainda estão vazios. O controlo de acesso e as rotas protegidas também ainda não foram implementados.
 
 ---
 
