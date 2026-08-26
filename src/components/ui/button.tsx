@@ -4,8 +4,15 @@ import { forwardRef } from "react"
 import type { ButtonHTMLAttributes } from "react"
 import clsx from "clsx"
 
-type ButtonVariant = "primary" | "secondary" | "ghost"
-type ButtonSize = "sm" | "md" | "lg"
+type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "ghost"
+  | "green"
+  | "blue"
+  | "blue-secondary"
+  | "gray";
+type ButtonSize = "sm" | "md" | "lg" | "xl"
 
 interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -38,14 +45,20 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
           // Variants
           {
-            "bg-primary text-white hover:bg-primary/90":
-              variant === "primary",
+            "bg-primary text-white hover:bg-primary/90": variant === "primary",
 
             "bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700":
               variant === "secondary",
 
             "bg-transparent text-primary hover:bg-primary/10":
               variant === "ghost",
+
+            "bg-[#10B981] text-white": variant === "green",
+
+            "bg-white text-blue-500 border border-blue-500": variant === "blue",
+            "bg-blue-500 text-white rounded-[4px]": variant === "blue-secondary",
+
+            "bg-gray-300  font-bold rounded-[4px]": variant === "gray",
           },
 
           // Sizes
@@ -53,9 +66,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             "h-10 px-4 text-sm": size === "sm",
             "h-12 px-6 text-base": size === "md",
             "h-14 px-8 text-lg": size === "lg",
+            "w-[263.33px] h-10.5": size === "xl",
           },
 
-          className
+          className,
         )}
         {...props}
       >
@@ -65,7 +79,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
         {children}
       </button>
-    )
+    );
   }
 )
 
