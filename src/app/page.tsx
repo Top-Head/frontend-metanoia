@@ -17,6 +17,8 @@ import {
 import { MENTORES_DATA } from "@/data/mentors";
 import Link from "next/link";
 import Footer from "@/components/Footer";
+import Image from "next/image";
+import logoMetanoia from "@/assets/logo.jpeg"
 
 export default function Page() {
   const [termoBusca, setTermoBusca] = useState("");
@@ -34,21 +36,12 @@ export default function Page() {
       <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md">
         <div className="max-w-360 mx-auto px-6 lg:px-20 h-18 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="text-blue-600">
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                viewBox="0 0 48 48"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M24 0.757355L47.2426 24L24 47.2426L0.757355 24L24 0.757355ZM21 35.7574V12.2426L9.24264 24L21 35.7574Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </div>
+          <Image
+              src={logoMetanoia}
+              alt="logo metanoia"
+              height={35}
+              width={35}
+            />
             <Link href="/" className="text-xl font-bold tracking-tight text-slate-800">
               Academia Metanoia
             </Link>
