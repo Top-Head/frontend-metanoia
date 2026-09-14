@@ -13,8 +13,8 @@ export default function Header () {
             <Image
               src={logoMetanoia}
               alt="logo metanoia"
-              height={20}
-              width={20}
+              height={50}
+              width={50}
             />
             <h2 className="text-lg font-bold tracking-tight text-[#0d131b]">Academia Metanoia</h2>
         </Link>

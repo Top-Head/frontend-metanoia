@@ -39,8 +39,8 @@ export default function Page() {
           <Image
               src={logoMetanoia}
               alt="logo metanoia"
-              height={35}
-              width={35}
+              height={50}
+              width={50}
             />
             <Link href="/" className="text-xl font-bold tracking-tight text-slate-800">
               Academia Metanoia

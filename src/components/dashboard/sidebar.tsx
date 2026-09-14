@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import logoMetanoia from "@/assets/logo.jpeg"
+import Image from "next/image";
 import {
   LayoutDashboard,
   Users,
@@ -24,7 +26,12 @@ export default function SidebarDashboard() {
   return (
     <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-x border-[#E7ECF3] bg-white px-4 py-6">
       <div className="flex items-center gap-3 px-2">
-        <img src="/Background.png" alt="" className="h-9 w-9 rounded-lg" />
+                    <Image
+              src={logoMetanoia}
+              alt="logo metanoia"
+              height={50}
+              width={50}
+            />
         <h1 className="text-lg font-bold text-[#101822]">Metanoia</h1>
       </div>
 
