@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+import Image from "next/image";
 export default function Sidebar() {
   return (
     <aside className="w-[380px] shrink-0 flex flex-col border-r bg-white border-[#E7ECF3] px-4 py-4">
@@ -27,7 +28,7 @@ export default function Sidebar() {
 
       <div className="flex-1 min-h-0 overflow-y-auto mt-4 space-y-0.5 pr-1">
         <div className="flex gap-4 bg-[#136DEC0D] border-l-4 border-[#136DEC] items-center rounded-r-xl p-2">
-          <img className="w-14 h-14 shrink-0" src="/Container.png" alt="" />
+          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
           <div className="min-w-0">
             <h1 className="text-black font-semibold text-[18px] truncate">
               Alex Rivera
@@ -42,7 +43,7 @@ export default function Sidebar() {
         </div>
 
         <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <img className="w-14 h-14 shrink-0" src="/Container.png" alt="" />
+          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
           <div className="min-w-0">
             <h1 className="text-black font-semibold text-[18px] truncate">
               Alex Rivera
@@ -57,7 +58,7 @@ export default function Sidebar() {
         </div>
 
         <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <img className="w-14 h-14 shrink-0" src="/Container.png" alt="" />
+          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
           <div className="min-w-0">
             <h1 className="text-black font-semibold text-[18px] truncate">
               Alex Rivera
@@ -72,7 +73,7 @@ export default function Sidebar() {
         </div>
 
         <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <img className="w-14 h-14 shrink-0" src="/Container.png" alt="" />
+          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
           <div className="min-w-0">
             <h1 className="text-black font-semibold text-[18px] truncate">
               Alex Rivera
@@ -87,7 +88,7 @@ export default function Sidebar() {
         </div>
 
         <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <img className="w-14 h-14 shrink-0" src="/Container.png" alt="" />
+          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
           <div className="min-w-0">
             <h1 className="text-black font-semibold text-[18px] truncate">
               Alex Rivera
@@ -101,7 +102,7 @@ export default function Sidebar() {
           </div>
         </div>
         <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <img className="w-14 h-14 shrink-0" src="/Container.png" alt="" />
+          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
           <div className="min-w-0">
             <h1 className="text-black font-semibold text-[18px] truncate">
               Alex Rivera
@@ -115,7 +116,7 @@ export default function Sidebar() {
           </div>
         </div>
         <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <img className="w-14 h-14 shrink-0" src="/Container.png" alt="" />
+          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
           <div className="min-w-0">
             <h1 className="text-black font-semibold text-[18px] truncate">
               Alex Rivera

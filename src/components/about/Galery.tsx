@@ -1,4 +1,4 @@
-
+import Image from "next/image";
 
 const IMAGENS = [
   "/Rectangle 7.png",
@@ -20,10 +20,12 @@ function Fila({ animacao }: { animacao: string }){
     return (
       <div className={`flex h-48 w-max ${animacao} md:h-[338px]`}>
         {[...IMAGENS, ...IMAGENS].map((src, i) => (
-          <img
+          <Image
             key={i}
             src={src}
             alt=""
+            width={338}
+            height={338}
             className="mr-3 h-full w-auto object-cover md:mr-4"
           />
         ))}

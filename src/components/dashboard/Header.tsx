@@ -1,8 +1,9 @@
 import { Bell } from "lucide-react";
+import Image from "next/image";
 
 export default function Header() {
   return (
-    <header className="mt-8 ml-8 flex h-[52px] w-[830px] items-center justify-between gap-4">
+    <header className="mt-8 ml-8 flex h-13 w-207.5 items-center justify-between gap-4">
       <div className="min-w-0">
         <h1 className="truncate text-base font-bold tracking-tight text-[#101822] text-[24px]">
           Welcome back, Mentor Alex
@@ -27,10 +28,11 @@ export default function Header() {
           aria-label="Perfil"
           className="rounded-full transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary/40"
         >
-          <img
+          <Image
             src="/Image+Border.svg"
             alt="Avatar do usuário"
-            className="h-10 w-10"
+            width={40}
+            height={40}
           />
         </button>
       </div>

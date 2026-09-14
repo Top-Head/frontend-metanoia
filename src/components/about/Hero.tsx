@@ -1,12 +1,13 @@
-
+import Image from "next/image";
 
 export default function Hero(){
     return (
       <section className="relative">
-        <img
+        <Image
           src="/Rectangle 1.png"
           alt=""
-          className="w-full h-[663px] object-cover"
+          fill
+          className="object-cover"
         />
         <div className="absolute inset-0 flex flex-col px-10 justify-center  px-6">
           <h1 className="font-bold text-[40px] text-white">Resiliencia</h1>

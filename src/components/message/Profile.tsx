@@ -1,11 +1,12 @@
 import { Ban, Eye, Calendar } from "lucide-react";
+import Image from "next/image";
 
 export default function Profile (){
     return (
       <section className="w-[487px] shrink-0 flex flex-col border-l border-[#E7ECF3] bg-white overflow-y-auto">
         <div className="p-6 space-y-6">
           <div className="flex flex-col items-center">
-            <img src="/Margin.png" alt="" className="w-20 h-20 rounded-full" />
+            <Image src="/Margin.png" alt="" width={80} height={80} className="rounded-full" />
             <h1 className="font-semibold text-lg mt-2">Alex Rivera</h1>
             <p className="text-[#4C6C9A] text-[14px]">Student since Sep 2023</p>
           </div>
