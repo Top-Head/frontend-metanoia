@@ -1,3 +1,4 @@
+import Image from "next/image";
 
 
 export default function SMS (){
@@ -5,7 +6,7 @@ export default function SMS (){
       <section className="py-10 px-5 space-y-4">
         <div className="flex gap-3">
           <div className="pt-1 shrink-0">
-            <img className="w-10 h-12" src="/Margin.png" alt="" />
+            <Image className="w-10 h-12" src="/Margin.png" alt="" width={40} height={48} />
           </div>
           <div className="bg-[#F0F3F8] max-w-[407px] rounded-b-[12px] rounded-r-[12px] rounded-b-l-[12px] p-4 text-[14px]">
             <p>
@@ -28,7 +29,7 @@ export default function SMS (){
 
         <div className="flex gap-3">
           <div className="pt-1 shrink-0">
-            <img className="w-10 h-12" src="/Margin.png" alt="" />
+            <Image className="w-10 h-12" src="/Margin.png" alt="" width={40} height={48} />
           </div>
           <div className="bg-[#F0F3F8] max-w-[407px] rounded-b-[12px] rounded-r-[12px] rounded-b-l-[12px] p-4 text-[14px]">
             <p>

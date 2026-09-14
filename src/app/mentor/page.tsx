@@ -1,5 +1,6 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import Image from "next/image";
 import {
   ChevronLeft,
   ChevronRight,
@@ -25,10 +26,11 @@ const MentorProfile = () => {
           <aside className="lg:col-span-3">
             <div className="bg-white rounded-2xl p-6 border border-[#e7ecf3] shadow-sm sticky top-24">
               <div className="aspect-square rounded-xl bg-slate-200 mb-6 overflow-hidden">
-                <img
+                <Image
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuADvhiG2GPyFDW5FYOjMcUNjzmrdU5nqtCCKrFRKMYDUagtaQ1kRbCPu87eZYB5Du1SNMkF5SrO9UmV84kRz1-uwOXR3YmI6K3ypWk7u6dBxiRX1N2OnIgbJaTRCY2V1T8s8xNZjyoHOKCnm_BPP8WmqEd0bbfQ2AfT7BvYV3aX7NLl7bFPqOzClcJZrNQ05r6SpfLpEMDHcYoC_WaVLV8fcD2gVBiUtmROclfclDW07Ku2ZPEUJgXNE-KOJKYS-t90IHQUUEhB6xY"
                   alt="Dr. Helena"
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
               <div className="flex items-center gap-2 mb-1">

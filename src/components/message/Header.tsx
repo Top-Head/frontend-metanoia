@@ -48,9 +48,9 @@ export default function Header() {
           </a>
         </div>
         <div className="flex gap-2">
-          <img src="/Button.svg" alt="" />
-          <img src="/Button(1).svg" alt="" />
-          <img src="/Image+Border.svg" alt="" />
+          <Image src="/Button.svg" alt="" width={32} height={32} />
+          <Image src="/Button(1).svg" alt="" width={32} height={32} />
+          <Image src="/Image+Border.svg" alt="" width={32} height={32} />
         </div>
       </nav>
     </header>

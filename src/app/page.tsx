@@ -214,10 +214,11 @@ export default function Page() {
                     className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group"
                   >
                     <div className="relative h-52 overflow-hidden bg-slate-200">
-                      <img
+                      <Image
                         src={mentor.image}
                         alt={mentor.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute top-3 right-3 bg-white/95 px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
                         <Star

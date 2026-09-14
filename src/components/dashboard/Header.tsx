@@ -1,4 +1,5 @@
 import { Bell } from "lucide-react";
+import Image from "next/image";
 
 export default function Header() {
   return (
@@ -27,10 +28,11 @@ export default function Header() {
           aria-label="Perfil"
           className="rounded-full transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary/40"
         >
-          <img
+          <Image
             src="/Image+Border.svg"
             alt="Avatar do usuário"
-            className="h-10 w-10"
+            width={40}
+            height={40}
           />
         </button>
       </div>

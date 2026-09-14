@@ -1,5 +1,6 @@
 import { Clock } from "lucide-react";
 import { Button } from "../ui/button";
+import Image from "next/image";
 
 export default function Service() {
     return (
@@ -33,10 +34,12 @@ export default function Service() {
               </div>
               <div className="h-[169px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
                 <div className="flex items-center gap-3">
-                  <img
-                    className="w-10 h-10 rounded-full"
+                  <Image
+                    className="rounded-full"
                     src="/Image.png"
                     alt=""
+                    width={40}
+                    height={40}
                   />
                   <div className="flex flex-col">
                     <h1 className="text-[14px] font-medium text-[#0F172A]">
@@ -62,10 +65,12 @@ export default function Service() {
 
               <div className="h-[169px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
                 <div className="flex items-center gap-3">
-                  <img
-                    className="w-10 h-10 rounded-full"
+                  <Image
+                    className="rounded-full"
                     src="/Image.png"
                     alt=""
+                    width={40}
+                    height={40}
                   />
                   <div className="flex flex-col">
                     <h1 className="text-[14px] font-medium text-[#0F172A]">
@@ -100,10 +105,12 @@ export default function Service() {
               </div>
               <div className="h-[169px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
                 <div className="flex items-center gap-3">
-                  <img
-                    className="w-10 h-10 rounded-full"
+                  <Image
+                    className="rounded-full"
                     src="/Image.png"
                     alt=""
+                    width={40}
+                    height={40}
                   />
                   <div className="flex flex-col">
                     <h1 className="text-[14px] font-medium text-[#0F172A]">
@@ -134,7 +141,7 @@ export default function Service() {
               </div>
               <div className="h-[169px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
                 <div className="flex gap-3 ">
-                  <img className="w-10 h-10" src="/Image.png" alt="" />
+                  <Image src="/Image.png" alt="" width={40} height={40} />
                   <div className="flex flex-col">
                     <h1 className="text-[14px] font-medium text-[#0F172A]">
                       Jonh Doe
