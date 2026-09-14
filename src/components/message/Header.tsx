@@ -1,5 +1,4 @@
 import { Search } from "lucide-react";
-import Link from "next/link";
 import logoMetanoia from "@/assets/logo.jpeg"
 import Image from "next/image";
 

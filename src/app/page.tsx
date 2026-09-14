@@ -339,15 +339,3 @@ const OpcaoAvaliacao = ({ label, active = false }: { label: string, active?: boo
   </label>
 );
 
-const GrupoRodape = ({ titulo, links }: { titulo: string, links: string[] }) => (
-  <div className="space-y-6">
-    <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">{titulo}</h4>
-    <ul className="space-y-4">
-      {links.map(link => (
-        <li key={link}>
-          <a href="#" className="text-sm font-bold text-slate-400 hover:text-blue-600 transition-colors">{link}</a>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
