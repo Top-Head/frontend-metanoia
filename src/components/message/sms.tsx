@@ -1,5 +1,8 @@
 import Image from "next/image";
+import { Check, CheckCheck } from "lucide-react";
 import clsx from "clsx";
+
+export type MessageStatus = "sent" | "delivered" | "read";
 
 export interface ChatMessage {
   id: number;
@@ -7,6 +10,7 @@ export interface ChatMessage {
   text: string;
   time: string;
   hasAttachment?: boolean;
+  status?: MessageStatus;
 }
 
 interface ChatThreadProps {
@@ -53,11 +57,32 @@ export function ChatThread({ messages, studentName }: ChatThreadProps) {
               )}
               <p
                 className={clsx(
-                  "mt-2 text-[10px] font-medium",
+                  "mt-2 flex items-center justify-end gap-1 text-[10px] font-medium",
                   incoming ? "text-ink-faint" : "text-white/70"
                 )}
               >
-                {message.time}
+                {incoming ? (
+                  message.time
+                ) : (
+                  <>
+                    {message.time}
+                    <span className="inline-flex items-center">
+                      {message.status === "sent" ? (
+                        <Check size={14} strokeWidth={2.5} />
+                      ) : (
+                        <CheckCheck
+                          size={14}
+                          strokeWidth={2.5}
+                          className={
+                            message.status === "read"
+                              ? "text-sky-400"
+                              : "text-white/70"
+                          }
+                        />
+                      )}
+                    </span>
+                  </>
+                )}
               </p>
             </div>
           </div>

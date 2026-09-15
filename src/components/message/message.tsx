@@ -20,6 +20,7 @@ const INITIAL_MESSAGES: ChatMessage[] = [
     sender: "mentor",
     text: "Excelente evolução, Alex! Fico feliz que os ajustes surtiram efeito. Vamos revisar o próximo passo na nossa sessão de quarta.",
     time: "09:47",
+    status: "read",
   },
   {
     id: 3,
@@ -45,6 +46,7 @@ export default function Message() {
         hour: "2-digit",
         minute: "2-digit",
       }),
+      status: "sent",
     };
 
     setMessages((current) => [...current, nextMessage]);
