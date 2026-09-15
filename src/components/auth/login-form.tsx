@@ -1,125 +1,146 @@
 "use client";
 
+import { JSX, useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
-import { useState, JSX } from "react";
-import SocialButton from "./_components/login-components/social-botton";
+import toast from "react-hot-toast";
+import { Button } from "../ui/button";
+import SocialButton from "./_components/login-components/social-button";
 import BrandLogo from "./_components/login-components/brand-logo";
 import LeftSection from "./_components/login-components/left-section";
 
 export default function LoginPage(): JSX.Element {
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleTogglePasswordVisibility(): void {
-    setIsPasswordVisible((previousState) => !previousState);
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!email || !password) {
+      toast.error("Informe seu e-mail e senha.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // TODO: substituir pela integração real com a API de autenticação.
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    toast.success("Login realizado com sucesso!");
+    router.push("/dashboard");
   }
 
   return (
-    <main className="flex h-screen w-full overflow-hidden bg-background-light dark:bg-background-dark">
-      {/* Left Section */}
+    <main className="flex h-screen w-full overflow-hidden bg-canvas">
       <LeftSection />
 
-      {/* Right Section */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 lg:p-14 bg-white dark:bg-background-dark">
-        <div className="w-full max-w-105">
-          {/* Mobile Brand */}
-          <div className="flex lg:hidden items-center gap-3 mb-12">
+      <div className="flex w-full flex-col items-center justify-center bg-panel p-6 md:p-10 lg:w-1/2 lg:p-14">
+        <div className="w-full max-w-md">
+          <div className="mb-10 flex items-center gap-3 lg:hidden">
             <BrandLogo size="small" />
           </div>
 
-          {/* Heading */}
-          <div className="mb-10">
-            <h2 className="text-2xl xl:text-3xl font-bold mb-1 text-slate-900 dark:text-white">
-              Welcome back
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400">
-              Log in to access your mentorship dashboard and courses.
+          <div className="mb-8">
+            <h1 className="mb-1 text-2xl font-bold text-ink xl:text-3xl">
+              Bem-vindo de volta
+            </h1>
+            <p className="text-ink-soft">
+              Acesse seu painel de mentoria e seus cursos.
             </p>
           </div>
 
-          {/* Form */}
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-2">
-              <label className="text-slate-900 dark:text-slate-200 font-medium">
-                Email Address
+              <label
+                htmlFor="email"
+                className="font-medium text-ink"
+              >
+                E-mail
               </label>
               <input
+                id="email"
                 type="email"
-                placeholder="e.g. name@email.com"
-                className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 h-11 px-4 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                autoComplete="email"
+                placeholder="ex. nome@email.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="h-11 w-full rounded-lg border border-line-strong bg-slate-50 px-4 text-ink outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
             <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-center">
-                <label className="text-slate-900 dark:text-slate-200 font-medium">
-                  Password
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="font-medium text-ink">
+                  Senha
                 </label>
                 <Link
                   href="/auth/recuperar-senha"
-                  className="text-primary text-sm font-semibold hover:underline"
+                  className="text-sm font-semibold text-primary hover:underline"
                 >
-                  Forgot Password?
+                  Esqueceu a senha?
                 </Link>
               </div>
 
               <div className="relative">
                 <input
+                  id="password"
                   type={isPasswordVisible ? "text" : "password"}
+                  autoComplete="current-password"
                   placeholder="••••••••"
-                  className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 h-11 px-4 pr-12 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="h-11 w-full rounded-lg border border-line-strong bg-slate-50 px-4 pr-12 text-ink outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
                 />
                 <button
                   type="button"
-                  onClick={handleTogglePasswordVisibility}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary"
+                  onClick={() => setIsPasswordVisible((visible) => !visible)}
+                  aria-label={isPasswordVisible ? "Ocultar senha" : "Mostrar senha"}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint transition-colors hover:text-primary"
                 >
                   {isPasswordVisible ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
-           
-           <Link href="/dashboard" >
-              <button
-                type="submit"
-                className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
-              >
-                <span>Login to Dashboard</span>
-                <ArrowRight size={18} />
-              </button>
-           </Link>
+
+            <Button
+              type="submit"
+              size="lg"
+              isLoading={isSubmitting}
+              className="w-full"
+            >
+              Entrar no Painel
+              <ArrowRight size={18} />
+            </Button>
           </form>
 
-          {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-300 dark:border-slate-700" />
+              <div className="w-full border-t border-line" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-white dark:bg-background-dark px-4 text-slate-500 uppercase tracking-wider">
-                Or continue with
+            <div className="relative flex justify-center">
+              <span className="bg-panel px-4 text-sm uppercase tracking-wider text-ink-soft">
+                Ou continue com
               </span>
             </div>
           </div>
 
-          {/* Social Buttons */}
           <div className="grid grid-cols-2 gap-4">
             <SocialButton provider="Google" />
             <SocialButton provider="LinkedIn" />
           </div>
 
-          {/* Footer */}
-          <div className="mt-6 text-center">
-            <p className="text-slate-500 dark:text-slate-400">
-              Don&apos;t have an account?
-              <Link
-                href="/auth/cadastro"
-                className="text-primary font-bold hover:underline ml-1"
-              >
-                Create an account
-              </Link>
-            </p>
-          </div>
+          <p className="mt-6 text-center text-ink-soft">
+            Não tem uma conta?{" "}
+            <Link
+              href="/auth/cadastro"
+              className="ml-1 font-bold text-primary hover:underline"
+            >
+              Criar conta
+            </Link>
+          </p>
         </div>
       </div>
     </main>

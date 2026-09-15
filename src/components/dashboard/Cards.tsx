@@ -1,24 +1,31 @@
 import { GraduationCap, Inbox, MessageSquare } from "lucide-react";
+import clsx from "clsx";
 
-const CARDS = [
+interface DashboardCard {
+  label: string;
+  value: string;
+  trend: string;
+  icon: typeof GraduationCap;
+  pending?: boolean;
+}
+
+const CARDS: DashboardCard[] = [
   {
-    label: "Earnings",
-    value: "$4,250.00",
-    trend: "+12.% this month",
+    label: "Ganhos",
+    value: "$4.250,00",
+    trend: "+12% este mês",
     icon: GraduationCap,
-    pending: false,
   },
   {
-    label: "Active Students",
+    label: "Alunos Ativos",
     value: "24",
-    trend: "+3 new students",
+    trend: "+3 novos alunos",
     icon: Inbox,
-    pending: false,
   },
   {
     label: "Mensagens não lidas",
     value: "12",
-    trend: "Needs attention",
+    trend: "Requer atenção",
     icon: MessageSquare,
     pending: true,
   },
@@ -26,28 +33,31 @@ const CARDS = [
 
 export default function Cards() {
   return (
-    <div className="flex gap-6">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
       {CARDS.map(({ label, value, trend, icon: Icon, pending }) => (
         <div
           key={label}
-          className="flex h-[163.5px] w-65 min-w-50 flex-col justify-between rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+          className="flex min-h-40 flex-col justify-between rounded-xl border border-line-strong bg-panel p-5 shadow-card"
         >
           <div className="flex items-center justify-between">
-            <p className="text-[14px] font-medium text-[#64748B] uppercase">
+            <p className="text-sm font-medium uppercase text-ink-soft">
               {label}
             </p>
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon className="h-5 w-5 text-primary" />
+            <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+              <Icon size={18} className="text-primary" />
             </span>
           </div>
 
           <div className="flex flex-col">
-            <p className="text-[30px] font-bold text-[#0F172A]">{value}</p>
+            <p className="text-[30px] font-bold text-ink">{value}</p>
             <div className="mt-1 flex items-center gap-2">
-              {pending && (
-                <span className="h-2 w-2 rounded-full bg-orange-500"></span>
-              )}
-              <p className="text-[14px] font-medium text-[#07883B]">{trend}</p>
+              <span
+                className={clsx(
+                  "size-2 rounded-full",
+                  pending ? "bg-warning" : "bg-success"
+                )}
+              />
+              <p className="text-sm font-medium text-success">{trend}</p>
             </div>
           </div>
         </div>

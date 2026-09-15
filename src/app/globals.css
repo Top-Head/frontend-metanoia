@@ -1,38 +1,80 @@
 @import "tailwindcss";
 
- /* Design Tokens */
+/*
+ * Design Tokens
+ * Cores semânticas e escala utilizadas em toda a aplicação.
+ */
 :root {
-  /* Cores */
+  /* Cores da marca */
   --color-primary: #136dec;
-  --color-background-light: #f6f7f8;
-  --color-background-dark: #101822;
+  --color-primary-strong: #0b56c4;
 
-  /* Font */
+  /* Superfícies */
+  --color-canvas: #f6f7f8;
+  --color-panel: #ffffff;
+
+  /* Texto */
+  --color-ink: #0d131b;
+  --color-ink-soft: #64748b;
+  --color-ink-faint: #94a3b8;
+
+  /* Bordas e preenchimentos */
+  --color-line: #e7ecf3;
+  --color-line-strong: #e2e8f0;
+
+  /* Estados */
+  --color-success: #10b981;
+  --color-success-soft: #d1fae5;
+  --color-warning: #f59e0b;
+  --color-warning-soft: #fffbeb;
+  --color-danger: #ef4444;
+
+  /* Fontes */
   --font-display: "Lexend", sans-serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
 
-  /* Radius */
-  --radius-default: 0.25rem;
+  /* Raio */
+  --radius-default: 0.375rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
   --radius-full: 9999px;
 }
 
-/* Mapeamento de temas */
+/* Mapeamento para utilitários Tailwind */
 @theme inline {
-  /* Colors */
+  /* Cores */
   --color-primary: var(--color-primary);
-  --color-background-light: var(--color-background-light);
+  --color-primary-strong: var(--color-primary-strong);
+  --color-canvas: var(--color-canvas);
+  --color-panel: var(--color-panel);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-ink-faint: var(--color-ink-faint);
+  --color-line: var(--color-line);
+  --color-line-strong: var(--color-line-strong);
+  --color-success: var(--color-success);
+  --color-success-soft: var(--color-success-soft);
+  --color-warning: var(--color-warning);
+  --color-warning-soft: var(--color-warning-soft);
+  --color-danger: var(--color-danger);
 
-  /* Font */
-  --font-sans: var(--font-display);
+  /* Fontes */
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
 
-  /* Radius */
+  /* Raio */
   --radius: var(--radius-default);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
   --radius-full: var(--radius-full);
 
-  /* Animations */
+  /* Sombras */
+  --shadow-card: 0 1px 2px 0 rgb(13 19 27 / 0.05);
+  --shadow-float: 0 12px 32px -12px rgb(13 19 27 / 0.18);
+
+  /* Animações */
   --animate-marquee: marquee 40s linear infinite;
   --animate-marquee-reverse: marquee-reverse 40s linear infinite;
 }
@@ -57,7 +99,14 @@
 
 /* Estilo base */
 body {
-  background-color: var(--color-background-light);
-  color: var(--color-background-dark);
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4 {
   font-family: var(--font-display);
 }

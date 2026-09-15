@@ -1,34 +1,102 @@
+"use client";
+
+import { useState } from "react";
 import { EllipsisVertical } from "lucide-react";
 import Image from "next/image";
-import SMS from "./sms";
-import Send from "./Send-sms";
+import { ChatThread, type ChatMessage } from "./sms";
+import { MessageComposer } from "./Send-sms";
+
+const STUDENT_NAME = "Alex Rivera";
+
+const INITIAL_MESSAGES: ChatMessage[] = [
+  {
+    id: 1,
+    sender: "student",
+    text: "Oi, mentor! Trabalhei no módulo de acessibilidade que você sugeriu na semana passada. O contraste de cores ficou muito melhor agora.",
+    time: "09:41",
+  },
+  {
+    id: 2,
+    sender: "mentor",
+    text: "Excelente evolução, Alex! Fico feliz que os ajustes surtiram efeito. Vamos revisar o próximo passo na nossa sessão de quarta.",
+    time: "09:47",
+  },
+  {
+    id: 3,
+    sender: "student",
+    text: "Perfeito. Subi o protótipo atualizado e adicionei as anotações sobre os testes de foco no arquivo compartilhado.",
+    time: "09:52",
+    hasAttachment: true,
+  },
+];
 
 export default function Message() {
-  return (
-    <section className="flex-1 min-w-0 flex flex-col border-x border-[#E7ECF3] bg-white">
-      <div className="flex bg-[#f1f1f104] h-[81px] shrink-0 pt-[16px] pr-5 pb-[16px] pl-5 border-b border-[#E7ECF3]">
-        <div className="flex gap-4 items-center">
-          <Image src="/Container.png" alt="" width={40} height={40} />
-          <h1 className="font-bold">Alex Rivera</h1>
-          <span className="bg-[#136DEC1A] rounded-xl h-[19px] w-[68.84px] text-center items-center justify-center text-[#136DEC] font-bold text-[10px]">
-            student
-          </span>
-          <div className="flex gap-3 ml-auto">
-            <button className="bg-[#E7ECF3] rounded-xl h-10 w-38 px-4">
-              Service Details
-            </button>
+  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
+  const [draft, setDraft] = useState("");
 
-            <button className="bg-[#E7ECF3] rounded-xl h-10 w-10 text-center flex items-center justify-center">
-              <EllipsisVertical className="h-4 w-4" />
-            </button>
+  function sendMessage() {
+    if (!draft.trim()) return;
+
+    const nextMessage: ChatMessage = {
+      id: Date.now(),
+      sender: "mentor",
+      text: draft.trim(),
+      time: new Date().toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    setMessages((current) => [...current, nextMessage]);
+    setDraft("");
+  }
+
+  return (
+    <section className="flex min-w-0 flex-1 flex-col border-x border-line bg-panel">
+      <div className="flex shrink-0 items-center border-b border-line bg-panel px-6 py-4">
+        <div className="flex items-center gap-4">
+          <Image
+            src="/Container.png"
+            alt={`Avatar de ${STUDENT_NAME}`}
+            width={40}
+            height={40}
+            className="size-10 rounded-full"
+          />
+          <div>
+            <h2 className="font-bold text-ink">{STUDENT_NAME}</h2>
+            <span className="mt-0.5 inline-block rounded-lg bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase text-primary">
+              aluno
+            </span>
           </div>
+        </div>
+
+        <div className="ml-auto flex items-center gap-3">
+          <button
+            type="button"
+            className="rounded-xl bg-line px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-slate-200"
+          >
+            Detalhes do Serviço
+          </button>
+          <button
+            type="button"
+            aria-label="Mais opções"
+            className="flex size-10 items-center justify-center rounded-xl bg-line text-ink transition-colors hover:bg-slate-200"
+          >
+            <EllipsisVertical size={16} />
+          </button>
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        <SMS/>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <ChatThread messages={messages} studentName={STUDENT_NAME} />
       </div>
-      <Send/>
+
+      <MessageComposer
+        value={draft}
+        onChange={setDraft}
+        onSend={sendMessage}
+        recipientName={STUDENT_NAME}
+      />
     </section>
   );
 }

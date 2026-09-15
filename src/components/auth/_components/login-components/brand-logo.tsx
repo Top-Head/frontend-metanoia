@@ -23,7 +23,7 @@ function BrandLogo({
       </div>
       {size === "large" && (
         <span className="text-2xl font-bold tracking-tight">
-          Metanoia Academy
+          Academia Metanoia
         </span>
       )}
     </div>

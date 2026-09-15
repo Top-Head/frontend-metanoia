@@ -1,115 +1,217 @@
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import {
-  ChevronLeft,
-  ChevronRight,
+  ArrowLeft,
   Clock,
   Globe,
   Link as LinkIcon,
   Mail,
   Share2,
-  ShieldCheck,
   Star,
   Users,
   Verified,
 } from "lucide-react";
-import Link from "next/link";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { BookingPanel } from "@/components/mentors/booking-panel";
+import { MENTORS, type Mentor } from "@/data/mentors";
 
-const MentorProfile = () => {
+export const metadata: Metadata = {
+  title: "Perfil do Mentor",
+};
+
+interface MentorPageProps {
+  searchParams: Promise<{ id?: string }>;
+}
+
+interface MentorReview {
+  author: string;
+  date: string;
+  course: string;
+  text: string;
+}
+
+interface MentorProfile {
+  bio: string[];
+  experience: string[];
+  stats: { students: string; hours: string; rating: string };
+  reviews: MentorReview[];
+}
+
+const REVIEW_AUTHORS = [
+  "Marcus Thompson",
+  "Larissa Mendes",
+  "João Pedro Silva",
+  "Beatriz Costa",
+  "Rafael Nogueira",
+  "Camila Duarte",
+  "Thiago Martins",
+  "Mariana Souza",
+];
+
+function buildProfile(mentor: Mentor): MentorProfile {
+  const rating = mentor.rating ?? 4.9;
+  const students = `${mentor.reviews * 4}+ Estudantes`;
+  const hours = `${mentor.reviews * 9}+ Horas Mentoras`;
+
+  const reviewCount = Math.min(2, mentor.reviews);
+  const reviews: MentorReview[] = Array.from(
+    { length: reviewCount },
+    (_, index) => {
+      const author =
+        REVIEW_AUTHORS[(mentor.id + index) % REVIEW_AUTHORS.length];
+      const seed = mentor.id * 31 + index * 7;
+      const text =
+        seed % 3 === 0
+          ? `A mentoria com ${mentor.name.split(" ")[0]} foi transformadora. Consegui aplicar cada direcionamento na prática e tive avanços que eu adiava há meses.`
+          : seed % 3 === 1
+            ? `Feedback direto, objetivo e muito bem fundamentado. Recomendo para quem busca crescimento real e consistente na área de ${mentor.category.toLowerCase()}.`
+            : `Uma experiência que superou minhas expectativas. O mentor tem uma didática clara e sabe exatamente onde apontar melhorias.`;
+
+      return {
+        author,
+        date: index === 0 ? "há 2 semanas" : "há 1 mês",
+        course: "Mentoria 1:1",
+        text,
+      };
+    }
+  );
+
+  return {
+    bio: [
+      `${mentor.name.split(" ")[0]} é ${mentor.role.toLowerCase()} com histórico sólido em ${mentor.category.toLowerCase()}. Com mais de 10 anos de experiência, o foco é unir o rigor da teoria ao que realmente funciona na prática.`,
+      `Além de atuar com casos reais e projetos de alto impacto, metodologia de mentoria é conhecida por ser direta e orientada a resultados: cada sessão termina com um plano de ação claro para a carreira.`,
+    ],
+    experience: mentor.skills,
+    stats: {
+      students,
+      hours,
+      rating: `${rating.toFixed(1)}/5.0 Classificação média`,
+    },
+    reviews,
+  };
+}
+
+
+export default async function MentorProfilePage({
+  searchParams,
+}: MentorPageProps) {
+  const { id } = await searchParams;
+  const mentorId = Number(id);
+  const mentor = MENTORS.find((item) => item.id === mentorId);
+
+  if (!mentor) {
+    return (
+      <div className="flex min-h-screen flex-col bg-canvas font-sans text-ink">
+        <Header />
+        <main className="flex flex-1 flex-col items-center justify-center px-6 py-32 text-center">
+          <p className="text-sm font-bold text-primary">
+            Mentor não encontrado
+          </p>
+          <h1 className="mt-3 max-w-md text-3xl font-bold text-ink">
+            Não localizamos este perfil.
+          </h1>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-ink-soft">
+            O perfil pode ter sido removido ou o link está incorreto. Explore
+            outros mentores disponíveis no marketplace.
+          </p>
+          <Link
+            href="/"
+            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-card transition-colors hover:bg-primary-strong"
+          >
+            <ArrowLeft size={16} />
+            Voltar para a busca
+          </Link>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const profile = buildProfile(mentor);
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#f6f7f8] font-sans text-[#0d131b]">
-      <Header />
+    <div className="flex min-h-screen flex-col bg-canvas font-sans text-ink">
+      <Header forceSolid />
 
-      <main className="flex-1 max-w-7xl mx-auto px-6 md:px-10 py-8 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-6 pt-28 pb-10 md:px-10">
+        <Link
+          href="/"
+          className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-ink-soft transition-colors hover:text-primary"
+        >
+          <ArrowLeft size={16} />
+          Voltar aos mentores
+        </Link>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <aside className="lg:col-span-3">
-            <div className="bg-white rounded-2xl p-6 border border-[#e7ecf3] shadow-sm sticky top-24">
-              <div className="aspect-square rounded-xl bg-slate-200 mb-6 overflow-hidden">
+            <div className="sticky top-24 rounded-2xl border border-line bg-panel p-6 shadow-card">
+              <div className="relative mb-6 aspect-square overflow-hidden rounded-xl bg-slate-200">
                 <Image
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuADvhiG2GPyFDW5FYOjMcUNjzmrdU5nqtCCKrFRKMYDUagtaQ1kRbCPu87eZYB5Du1SNMkF5SrO9UmV84kRz1-uwOXR3YmI6K3ypWk7u6dBxiRX1N2OnIgbJaTRCY2V1T8s8xNZjyoHOKCnm_BPP8WmqEd0bbfQ2AfT7BvYV3aX7NLl7bFPqOzClcJZrNQ05r6SpfLpEMDHcYoC_WaVLV8fcD2gVBiUtmROclfclDW07Ku2ZPEUJgXNE-KOJKYS-t90IHQUUEhB6xY"
-                  alt="Dr. Helena"
+                  src={mentor.image}
+                  alt={`Foto de ${mentor.name}`}
                   fill
+                  sizes="(min-width: 1024px) 25vw, 100vw"
                   className="object-cover"
                 />
               </div>
-              <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-xl font-bold">Dr. Helena Schmidt</h1>
-                <Verified
-                  className="text-[#136dec] fill-[#136dec]/10"
-                  size={20}
-                />
+
+              <div className="mb-1 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-ink">{mentor.name}</h2>
+                <Verified size={20} className="fill-primary/10 text-primary" />
               </div>
-              <p className="text-[#4c6c9a] text-sm leading-snug mb-6">
-                Senior UI/UX Design Specialist & Academic Mentor
+              <p className="mb-6 text-sm leading-snug text-ink-soft">
+                {mentor.role}
               </p>
 
-              <div className="space-y-4 py-6 border-t border-[#e7ecf3]">
-                <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                  <Users size={18} className="text-[#4c6c9a]" /> 500+ Estudantes
+              <div className="space-y-4 border-t border-line py-6">
+                <div className="flex items-center gap-3 text-sm font-medium text-ink-soft">
+                  <Users size={18} />
+                  {profile.stats.students}
                 </div>
-                <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                  <Clock size={18} className="text-[#4c6c9a]" /> 1,200+ Horas
-                  Mentoradas
+                <div className="flex items-center gap-3 text-sm font-medium text-ink-soft">
+                  <Clock size={18} />
+                  {profile.stats.hours}
                 </div>
-                <div className="flex items-center gap-3 text-sm font-medium text-slate-700">
-                  <Star size={18} className="text-[#4c6c9a]" /> 4.9/5.0
-                  Classificação média
+                <div className="flex items-center gap-3 text-sm font-medium text-ink-soft">
+                  <Star size={18} />
+                  {profile.stats.rating}
                 </div>
               </div>
-              <Link href="/messages">
-                <button className="w-full mt-2 bg-[#136dec] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#136dec]/20 transition-all">
-                  <Mail size={18} /> Enviar Mensagem
-                </button>
+
+              <Link
+                href="/messages"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 font-bold text-white shadow-card transition-colors hover:bg-primary-strong"
+              >
+                <Mail size={18} />
+                Enviar Mensagem
               </Link>
 
-              <div className="flex justify-center gap-6 mt-6 pt-6 border-t border-[#e7ecf3] text-[#4c6c9a]">
-                <Globe
-                  size={20}
-                  className="cursor-pointer hover:text-[#136dec]"
-                />
-                <LinkIcon
-                  size={20}
-                  className="cursor-pointer hover:text-[#136dec]"
-                />
-                <Share2
-                  size={20}
-                  className="cursor-pointer hover:text-[#136dec]"
-                />
+              <div className="mt-6 flex justify-center gap-6 border-t border-line pt-6 text-ink-faint">
+                <Globe size={20} className="cursor-pointer transition-colors hover:text-primary" />
+                <LinkIcon size={20} className="cursor-pointer transition-colors hover:text-primary" />
+                <Share2 size={20} className="cursor-pointer transition-colors hover:text-primary" />
               </div>
             </div>
           </aside>
 
-          <div className="lg:col-span-6 space-y-8">
-            <section className="bg-white rounded-2xl p-6 md:p-8 border border-[#e7ecf3] shadow-sm">
-              <h2 className="text-2xl font-bold mb-4">Sobre Mim</h2>
-              <div className="text-[#0d131b] space-y-4 leading-relaxed opacity-90">
-                <p>
-                  Educador apaixonado com mais de 10 anos de experiência em
-                  Design de UI/UX e Matemática Avançada. Eu me concentro em
-                  preencher a lacuna entre a teoria e a prática padrão da
-                  indústria.
-                </p>
-                <p>
-                  Tendo sido mentor em empresas de design de primeira linha e
-                  ensinado em universidades globais, trago uma perspectiva única
-                  que combina rigor analítico com resolução criativa de
-                  problemas.
-                </p>
+          <div className="space-y-8 lg:col-span-6">
+            <section className="rounded-2xl border border-line bg-panel p-6 shadow-card md:p-8">
+              <h2 className="mb-4 text-2xl font-bold text-ink">Sobre Mim</h2>
+              <div className="space-y-4 leading-relaxed text-ink/90">
+                {profile.bio.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
               </div>
 
-              <h3 className="font-bold mt-8 mb-4">Experiência principal</h3>
+              <h3 className="mb-4 mt-8 font-bold text-ink">
+                Especialidades
+              </h3>
               <div className="flex flex-wrap gap-2">
-                {[
-                  "UI/UX Design",
-                  "Product Strategy",
-                  "Design Systems",
-                  "Advanced Mathematics",
-                  "Prototyping",
-                ].map((skill) => (
+                {profile.experience.map((skill) => (
                   <span
                     key={skill}
-                    className="px-3 py-1.5 bg-[#136dec]/10 text-[#136dec] rounded-full text-xs font-semibold"
+                    className="rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary"
                   >
                     {skill}
                   </span>
@@ -117,38 +219,45 @@ const MentorProfile = () => {
               </div>
             </section>
 
-            <section className="bg-white rounded-2xl p-6 md:p-8 border border-[#e7ecf3] shadow-sm">
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-bold">Avaliações de estudantes</h2>
+            <section className="rounded-2xl border border-line bg-panel p-6 shadow-card md:p-8">
+              <div className="mb-8 flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-ink">
+                  Avaliações de estudantes
+                </h2>
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold">4.9</span>
+                  <span className="text-2xl font-bold text-ink">
+                    {mentor.rating.toFixed(1)}
+                  </span>
                   <div className="flex text-yellow-400">
-                    <Star size={16} fill="currentColor" />
-                    <Star size={16} fill="currentColor" />
-                    <Star size={16} fill="currentColor" />
-                    <Star size={16} fill="currentColor" />
-                    <Star
-                      size={16}
-                      fill="currentColor"
-                      className="opacity-50"
-                    />
+                    {Array.from({ length: 5 }, (_, index) => (
+                      <Star
+                        key={index}
+                        size={16}
+                        fill="currentColor"
+                        className={index >= Math.round(mentor.rating) ? "opacity-40" : undefined}
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
 
               <div className="space-y-6">
-                {[1, 2].map((review) => (
-                  <div
-                    key={review}
-                    className="pb-6 border-b border-[#e7ecf3] last:border-0 last:pb-0"
+                {profile.reviews.map((review) => (
+                  <article
+                    key={`${review.author}-${review.date}`}
+                    className="border-b border-line pb-6 last:border-0 last:pb-0"
                   >
-                    <div className="flex justify-between mb-3">
+                    <div className="mb-3 flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="size-10 rounded-full bg-slate-200" />
+                        <span className="flex size-10 items-center justify-center rounded-full bg-primary/10 font-bold text-primary">
+                          {review.author.charAt(0)}
+                        </span>
                         <div>
-                          <p className="font-bold text-sm">Marcus Thompson</p>
-                          <p className="text-xs text-[#4c6c9a]">
-                            2 weeks ago • UI/UX Coaching
+                          <p className="text-sm font-bold text-ink">
+                            {review.author}
+                          </p>
+                          <p className="text-xs text-ink-soft">
+                            {review.date} • {review.course}
                           </p>
                         </div>
                       </div>
@@ -156,94 +265,28 @@ const MentorProfile = () => {
                         <Star size={14} fill="currentColor" />
                       </div>
                     </div>
-                    <p className="text-sm text-slate-600 italic">
-                      &quot;Helena é uma mentora incrível. Ela me ajudou a
-                      reestruturar meu portfólio e conseguir meu primeiro cargo
-                      de designer sênior.&quot;
+                    <p className="text-sm italic text-ink-soft">
+                      &quot;{review.text}&quot;
                     </p>
-                  </div>
+                  </article>
                 ))}
               </div>
-              <button className="text-[#136dec] font-bold text-sm hover:underline mt-6">
+              <button
+                type="button"
+                className="mt-6 text-sm font-bold text-primary hover:underline"
+              >
                 Ver todas as avaliações
               </button>
             </section>
           </div>
 
           <aside className="lg:col-span-3">
-            <div className="sticky top-24 space-y-4">
-              <div className="bg-white rounded-2xl p-6 border border-[#e7ecf3] shadow-md">
-                <h2 className="text-xl font-bold mb-6">Agende uma Sessão</h2>
-
-                <div className="space-y-3 mb-8">
-                  <div className="flex items-center justify-between p-3 border-2 border-[#136dec] bg-[#136dec]/5 rounded-xl cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <div className="size-4 border-2 border-[#136dec] rounded-full flex items-center justify-center">
-                        <div className="size-2 bg-[#136dec] rounded-full" />
-                      </div>
-                      <span className="text-sm font-semibold">
-                        1:1 Mentoria
-                      </span>
-                    </div>
-                    <span className="text-sm font-bold">
-                      $50
-                      <span className="font-normal text-xs text-slate-500">
-                        /hr
-                      </span>
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 border border-[#e7ecf3] rounded-xl hover:border-[#136dec] transition-colors cursor-pointer">
-                    <span className="text-sm font-medium text-slate-600">
-                      Revisão do Projecto
-                    </span>
-                    <span className="text-sm font-bold">$35</span>
-                  </div>
-                </div>
-
-                <div className="mb-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-sm font-bold">Novembero 2024</span>
-                    <div className="flex gap-1">
-                      <ChevronLeft
-                        size={18}
-                        className="cursor-pointer text-slate-400 hover:text-[#136dec]"
-                      />
-                      <ChevronRight
-                        size={18}
-                        className="cursor-pointer text-slate-400 hover:text-[#136dec]"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <button className="w-full bg-[#136dec] text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-[#136dec]/20 hover:-translate-y-0.5 transition-all">
-                  Reserve Agora
-                </button>
-                <p className="text-[10px] text-center text-[#4c6c9a] mt-4 italic">
-                  Nenhum pagamento será feito até que a sessão seja confirmada
-                </p>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl flex gap-3">
-                <ShieldCheck className="text-[#136dec] shrink-0" size={20} />
-                <div>
-                  <p className="text-xs font-bold text-blue-900">
-                    Garantia de devolução do dinheiro
-                  </p>
-                  <p className="text-[10px] text-blue-700/80 leading-tight mt-0.5">
-                    Se você não estiver satisfeito com sua primeira sessão,
-                    reembolsaremos você 100%.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <BookingPanel basePrice={mentor.price} />
           </aside>
         </div>
       </main>
+
       <Footer />
     </div>
   );
-};
-
-export default MentorProfile;
+}

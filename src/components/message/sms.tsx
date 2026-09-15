@@ -1,46 +1,68 @@
 import Image from "next/image";
+import clsx from "clsx";
 
+export interface ChatMessage {
+  id: number;
+  sender: "student" | "mentor";
+  text: string;
+  time: string;
+  hasAttachment?: boolean;
+}
 
-export default function SMS (){
-    return (
-      <section className="py-10 px-5 space-y-4">
-        <div className="flex gap-3">
-          <div className="pt-1 shrink-0">
-            <Image className="w-10 h-12" src="/Margin.png" alt="" width={40} height={48} />
-          </div>
-          <div className="bg-[#F0F3F8] max-w-[407px] rounded-b-[12px] rounded-r-[12px] rounded-b-l-[12px] p-4 text-[14px]">
-            <p>
-              Hi Mentor! Ive been working on the accessibility module you
-              suggested last week. The color contrast ratios are much better
-              now.
-            </p>
-          </div>
-        </div>
+interface ChatThreadProps {
+  messages: ChatMessage[];
+  studentName: string;
+}
 
-        <div className="flex justify-end">
-          <div className="bg-[#3277ee] max-w-[407px] rounded-b-[12px] rounded-l-[12px] p-4 text-[14px]">
-            <p className="text-white">
-              Hi Mentor! Ive been working on the accessibility module you
-              suggested last week. The color contrast ratios are much better
-              now.
-            </p>
-          </div>
-        </div>
+export function ChatThread({ messages, studentName }: ChatThreadProps) {
+  return (
+    <section className="space-y-4 px-5 py-6" aria-label="Histórico de mensagens">
+      {messages.map((message) => {
+        const incoming = message.sender === "student";
+        const avatarSrc = incoming ? "/Margin.png" : "/Image+Border.svg";
 
-        <div className="flex gap-3">
-          <div className="pt-1 shrink-0">
-            <Image className="w-10 h-12" src="/Margin.png" alt="" width={40} height={48} />
+        return (
+          <div
+            key={message.id}
+            className={clsx(
+              "flex gap-3",
+              !incoming && "justify-end"
+            )}
+          >
+            {incoming && (
+              <Image
+                src={avatarSrc}
+                alt={`${studentName}`}
+                width={40}
+                height={48}
+                className="h-12 w-10 shrink-0 pt-1"
+              />
+            )}
+
+            <div
+              className={clsx(
+                "max-w-[70%] rounded-2xl p-4 text-sm md:max-w-[407px]",
+                incoming
+                  ? "rounded-bl-sm bg-slate-100 text-ink"
+                  : "rounded-br-sm bg-primary text-white"
+              )}
+            >
+              <p>{message.text}</p>
+              {message.hasAttachment && (
+                <div className="mt-3 h-[52px] w-full rounded-lg border border-line-strong bg-panel" />
+              )}
+              <p
+                className={clsx(
+                  "mt-2 text-[10px] font-medium",
+                  incoming ? "text-ink-faint" : "text-white/70"
+                )}
+              >
+                {message.time}
+              </p>
+            </div>
           </div>
-          <div className="bg-[#F0F3F8] max-w-[407px] rounded-b-[12px] rounded-r-[12px] rounded-b-l-[12px] p-4 text-[14px]">
-            <p>
-              Hi Mentor! Ive been working on the accessibility module you
-              suggested last week. The color contrast ratios are much better
-              now.
-            </p>
-            <div className="bg-white w-full h-[52px] rounded-[8px] p-[12px] border border-[#E2E8F0] mt-3"></div>
-          </div>
-        </div>
-        
-      </section>
-    );
+        );
+      })}
+    </section>
+  );
 }

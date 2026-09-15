@@ -2,93 +2,98 @@
 
 import { JSX, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, GraduationCap, Brain } from "lucide-react";
+import toast from "react-hot-toast";
 import { Header } from "./_components/role-components/header";
 import { RoleCard } from "./_components/role-components/role-card";
+import { Button } from "@/components/ui/button";
 
 type UserRole = "learner" | "mentor" | null;
 
+const ROLE_OPTIONS = [
+  {
+    value: "learner" as const,
+    title: "Quero Aprender",
+    description: "Encontre mentores especialistas e acelere seu crescimento.",
+    icon: <GraduationCap size={32} />,
+  },
+  {
+    value: "mentor" as const,
+    title: "Quero Ensinar",
+    description: "Compartilhe sua experiência e construa sua marca.",
+    icon: <Brain size={32} />,
+  },
+];
+
 export default function SelectUserRole(): JSX.Element {
+  const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<UserRole>(null);
 
-  function handleRoleSelection(role: UserRole): void {
-    setSelectedRole(role);
+  function handleContinue() {
+    if (!selectedRole) {
+      toast("Escolha um perfil para continuar.", { icon: "👈" });
+      return;
+    }
+
+    router.push("/auth/cadastro");
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
+    <div className="flex min-h-screen flex-col bg-canvas">
       <Header />
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-10">
-        <div className="w-full max-w-[900px] flex flex-col items-center">
-
-          {/* Headline */}
-          <div className="text-center mb-10">
-            <span className="inline-block px-3 py-1 mb-3 text-xs font-semibold tracking-wide text-primary uppercase bg-primary/10 rounded-full">
-              Step 1 of 2
+      <main className="flex flex-1 flex-col items-center justify-center px-4 py-10">
+        <div className="flex w-full max-w-3xl flex-col items-center">
+          <div className="mb-10 text-center">
+            <span className="mb-3 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
+              Etapa 1 de 2
             </span>
 
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">
-              Join Metanoia Academy
+            <h1 className="mb-3 text-3xl font-bold text-ink md:text-4xl">
+              Junte-se à Academia Metanoia
             </h1>
 
-            <p className="text-slate-600 dark:text-slate-400 text-base max-w-md mx-auto">
-              Tell us how you&apos;d like to use the platform to get started.
+            <p className="mx-auto max-w-md text-base text-ink-soft">
+              Como você gostaria de usar a plataforma?
             </p>
           </div>
 
-          {/* Role Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-10">
-
-            <RoleCard
-              title="I want to Learn"
-              description="Find expert mentors and accelerate your growth."
-              icon={<GraduationCap size={32} />}
-              isSelected={selectedRole === "learner"}
-              onSelect={() => handleRoleSelection("learner")}
-            />
-
-            <RoleCard
-              title="I want to Teach"
-              description="Share your expertise and build your brand."
-              icon={<Brain size={32} />}
-              isSelected={selectedRole === "mentor"}
-              onSelect={() => handleRoleSelection("mentor")}
-            />
-
+          <div className="mb-10 grid w-full grid-cols-1 gap-6 md:grid-cols-2">
+            {ROLE_OPTIONS.map(({ value, title, description, icon }) => (
+              <RoleCard
+                key={value}
+                title={title}
+                description={description}
+                icon={icon}
+                isSelected={selectedRole === value}
+                onSelect={() => setSelectedRole(value)}
+              />
+            ))}
           </div>
 
-          {/* Continue Button */}
-          <div className="flex flex-col items-center gap-4 w-full">
-            <Link
-              href="/auth/cadastro"
-              aria-disabled={!selectedRole}
-              onClick={(e) => {
-                if (!selectedRole) e.preventDefault();
-              }}
-              className={`flex items-center justify-center gap-2 min-w-[260px] h-12 px-6 rounded-lg bg-primary text-white text-sm font-semibold shadow-md hover:bg-primary/90 transition-all ${
-                !selectedRole ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              Continue
+          <div className="flex w-full flex-col items-center gap-4">
+            <Button size="lg" className="min-w-72" onClick={handleContinue}>
+              Continuar
               <ArrowRight size={18} />
-            </Link>
+            </Button>
 
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Already have an account?{" "}
+            <p className="text-sm text-ink-soft">
+              Já tem uma conta?{" "}
               <Link
                 href="/auth/login"
-                className="text-primary font-semibold hover:underline"
+                className="font-semibold text-primary hover:underline"
               >
-                Log in here
+                Entre aqui
               </Link>
             </p>
           </div>
         </div>
       </main>
 
-      <footer className="py-6 text-center text-xs text-slate-400">
-        © 2024 Metanoia Academy. All rights reserved.
+      <footer className="py-6 text-center text-xs text-ink-faint">
+        © {new Date().getFullYear()} Academia Metanoia. Todos os direitos
+        reservados.
       </footer>
     </div>
   );

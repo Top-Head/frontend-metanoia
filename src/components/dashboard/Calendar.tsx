@@ -1,111 +1,164 @@
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
+const WEEK_DAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
-const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const calendarDays = [
-  null,
-  null,
-  null,
-  null,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8,
-  9,
-  10,
-  11,
-  12,
-  13,
-  13,
-  14,
-  15,
-  null,
-  null,
+const MONTH_NAMES_PT = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
 ];
 
+interface UpcomingSession {
+  title: string;
+  time: string;
+  date: string;
+  label: string;
+  tint: "primary" | "success";
+}
+
+const UPCOMING_SESSIONS: UpcomingSession[] = [
+  {
+    title: "Revisão de Design",
+    time: "10:00",
+    date: "Design review",
+    label: "Manhã",
+    tint: "primary",
+  },
+  {
+    title: "Workshop",
+    time: "14:30",
+    date: "Lab UI/UX",
+    label: "Tarde",
+    tint: "success",
+  },
+];
+
+type CalendarCell = null | { day: number; outOfMonth: boolean };
+
+function buildCalendar(): CalendarCell[] {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  const trailingCells = (7 - ((firstWeekday + lastDay) % 7)) % 7;
+
+  return [
+    ...Array.from({ length: firstWeekday }, () => null),
+    ...Array.from({ length: lastDay }, (_, index) => ({
+      day: index + 1,
+      outOfMonth: false,
+    })),
+    ...Array.from({ length: trailingCells }, (_, index) => ({
+      day: index + 1,
+      outOfMonth: true,
+    })),
+  ];
+}
+
 export default function Calendar() {
+  const today = new Date();
+  const monthLabel = `${MONTH_NAMES_PT[today.getMonth()]} ${today.getFullYear()}`;
+  const cells = buildCalendar();
+
   return (
-    <aside className="h-[1024px] w-[320px] border-l border-[#E2E8F0] bg-white p-6">
-      <div className="rounded-[20px] bg-[#F8FAFC] p-5 shadow-sm">
+    <aside className="bg-panel p-6">
+      <div className="rounded-2xl bg-slate-50 p-5 shadow-card">
         <div className="mb-5 flex items-center justify-between">
-          <h1 className="text-[20px] font-bold text-[#0F172A]">October 2023</h1>
-          <div className="flex items-center gap-3 text-[#64748B]">
-            <button className="text-lg">‹</button>
-            <button className="text-lg">›</button>
+          <h2 className="text-xl font-bold text-ink">{monthLabel}</h2>
+          <div className="flex items-center gap-3 text-ink-soft">
+            <button type="button" aria-label="Mês anterior" className="cursor-pointer">
+              <ChevronLeft size={16} />
+            </button>
+            <button type="button" aria-label="Próximo mês" className="cursor-pointer">
+              <ChevronRight size={16} />
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-2 text-center text-[12px] font-medium text-[#64748B]">
-          {weekDays.map((day) => (
-            <div key={day}>{day}</div>
+        <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-ink-soft">
+          {WEEK_DAY_LABELS.map((label) => (
+            <span key={label} className="py-1">
+              {label}
+            </span>
           ))}
         </div>
 
-        <div className="mt-3 grid grid-cols-7 gap-2 text-center text-[13px] text-[#334155]">
-          {calendarDays.map((day, index) => (
-            <div
-              key={`${day ?? "empty"}-${index}`}
-              className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                day === 15
-                  ? "bg-[#5d9aee] font-semibold text-white"
-                  : day === 18 || day === 22
-                    ? "bg-[#DBEAFE] font-medium text-[#136DEC]"
-                    : day
-                      ? "hover:bg-slate-100"
-                      : ""
-              }`}
-            >
-              {day ?? ""}
-            </div>
-          ))}
+        <div className="mt-1 grid grid-cols-7 gap-1 text-center text-[13px] text-ink-soft">
+          {cells.map((cell, index) =>
+            cell === null ? (
+              <div key={`empty-${index}`} />
+            ) : (
+              <div
+                key={cell.outOfMonth ? `next-${cell.day}` : cell.day}
+                className={`flex size-9 items-center justify-center rounded-full ${
+                  cell.outOfMonth
+                    ? "text-ink-faint/50"
+                    : cell.day === today.getDate()
+                      ? "bg-primary font-bold text-white"
+                      : cell.day % 4 === 0
+                        ? "bg-primary/10 font-medium text-primary"
+                        : "hover:bg-slate-100"
+                }`}
+              >
+                {cell.day}
+              </div>
+            )
+          )}
         </div>
       </div>
 
       <div className="mt-8">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-[16px] font-bold text-[#0F172A]">
-            Upcoming Sessions
-          </h2>
-        </div>
+        <h3 className="text-base font-bold text-ink">Próximas Sessões</h3>
 
-        <div className="space-y-3">
-          <div className="rounded-[12px] border border-[#E2E8F0] bg-[#F8FAFC] p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[12px] font-semibold text-[#136DEC]">
-                Design Review
-              </span>
-              <span className="rounded-full bg-[#DBEAFE] px-2 py-1 text-[10px] text-[#136DEC]">
-                10:00 AM
-              </span>
+        <div className="mt-4 space-y-3">
+          {UPCOMING_SESSIONS.map(({ title, time, date, label, tint }) => (
+            <div
+              key={title}
+              className="rounded-xl border border-line-strong bg-slate-50 p-3"
+            >
+              <div className="flex items-center justify-between">
+                <span
+                  className={`text-xs font-semibold ${
+                    tint === "primary" ? "text-primary" : "text-success"
+                  }`}
+                >
+                  {title}
+                </span>
+                <span
+                  className={`rounded-full px-2 py-1 text-[10px] ${
+                    tint === "primary"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-success-soft text-success"
+                  }`}
+                >
+                  {time}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-ink-soft">
+                {date} • {label}
+              </p>
             </div>
-            <p className="mt-2 text-[12px] text-[#64748B]">
-              Oct 15 • Mentor session
-            </p>
-          </div>
-
-          <div className="rounded-[12px] border border-[#E2E8F0] bg-[#F8FAFC] p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[12px] font-semibold text-[#10B981]">
-                Workshop
-              </span>
-              <span className="rounded-full bg-[#D1FAE5] px-2 py-1 text-[10px] text-[#047857]">
-                02:30 PM
-              </span>
-            </div>
-            <p className="mt-2 text-[12px] text-[#64748B]">
-              Oct 22 • UI/UX Lab
-            </p>
-          </div>
+          ))}
         </div>
       </div>
-      <button className="flex items-center justify-center gap-2 text-[#64748B] font-bold text-[11px] w-[271px] h-[52px] rounded-[8px] border border-dashed border-[#E2E8F0] shadow mt-8">
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
-        <span className="text-[14px]">Add Custom Slot</span>
+
+      <button
+        type="button"
+        className="mt-8 flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-line-strong text-sm font-bold text-ink-soft transition-colors hover:border-primary hover:text-primary"
+      >
+        <Plus size={16} />
+        Adicionar Faixa Horária
       </button>
     </aside>
   );

@@ -1,174 +1,188 @@
 import { Clock } from "lucide-react";
 import { Button } from "../ui/button";
-import Image from "next/image";
 
-export default function Service() {
-    return (
-      <section className="py-20">
-        <div>
-          <h1 className="font-bold text-[#0F172A] text-[20px]">
-            Service Board
-          </h1>
-          <div className="flex gap-[32px] py-[24px]">
-            <a
-              className="text-[#136DEC] text-[14px] border-b-4 border-[#136DEC] pb-[12px] "
-              href="#"
-            >
-              Active Workflow
-            </a>
-            <a className="text-[14px] text-[#64748B] " href="#">
-              Completed Services
-            </a>
-            <a className="text-[14px] text-[#64748B] " href="#">
-              Canceled
-            </a>
+type RequestStatus = "pending" | "accepted" | "in_progress";
+
+interface ServiceRequest {
+  id: number;
+  student: string;
+  service: string;
+  status: RequestStatus;
+  description?: string;
+  expiresIn?: string;
+  progress?: number;
+}
+
+const BOARD_TABS = [
+  { label: "Fluxo Ativo", active: true },
+  { label: "Serviços Concluídos", active: false },
+  { label: "Cancelados", active: false },
+];
+
+const REQUESTS: ServiceRequest[] = [
+  {
+    id: 1,
+    student: "John Doe",
+    service: "Mentoria UI/UX",
+    status: "pending",
+    description: "Sessão focada em design de portfólio.",
+  },
+  {
+    id: 2,
+    student: "John Doe",
+    service: "Revisão de Portfólio",
+    status: "pending",
+    expiresIn: "Expira em 2h",
+  },
+  {
+    id: 3,
+    student: "John Doe",
+    service: "Coaching de Carreira",
+    status: "accepted",
+    description: "Planejamento de transição profissional.",
+  },
+  {
+    id: 4,
+    student: "John Doe",
+    service: "React Avançado",
+    status: "in_progress",
+    progress: 75,
+  },
+];
+
+const COLUMN_META: Record<
+  RequestStatus,
+  { label: string; dotClass: string }
+> = {
+  pending: {
+    label: "Pendentes",
+    dotClass: "bg-warning",
+  },
+  accepted: {
+    label: "Aceitos",
+    dotClass: "bg-blue-500",
+  },
+  in_progress: {
+    label: "Em Andamento",
+    dotClass: "bg-success",
+  },
+};
+
+function RequestCard({ request }: { request: ServiceRequest }) {
+  return (
+    <div className="w-full max-w-64 rounded-xl border border-line-strong bg-panel p-4 shadow-card">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+          {request.student.charAt(0)}
+        </span>
+        <div className="min-w-0">
+          <h3 className="truncate text-sm font-medium text-ink">
+            {request.student}
+          </h3>
+          <p className="truncate text-xs text-ink-soft">{request.service}</p>
+        </div>
+      </div>
+
+      {request.description && (
+        <p className="mt-2 h-6 truncate text-xs text-ink-faint">
+          {request.description}
+        </p>
+      )}
+
+      {request.expiresIn && (
+        <div className="mt-2 flex w-fit items-center gap-1 rounded-md bg-warning-soft px-2 py-1 text-xs font-medium text-warning">
+          <Clock size={16} />
+          <span>{request.expiresIn}</span>
+        </div>
+      )}
+
+      {request.progress !== undefined && (
+        <div className="mt-4">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-success-soft">
+            <span
+              className="block h-full rounded-full bg-success"
+              style={{ width: `${request.progress}%` }}
+            />
           </div>
-
-          <div className="grid grid-cols-3 gap-1 mt-8">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-orange-500"></span>
-                <h1 className="text-[16px] font-bold text-[#0F172A]">
-                  Pending
-                </h1>
-              </div>
-              <div className="h-[169px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
-                <div className="flex items-center gap-3">
-                  <Image
-                    className="rounded-full"
-                    src="/Image.png"
-                    alt=""
-                    width={40}
-                    height={40}
-                  />
-                  <div className="flex flex-col">
-                    <h1 className="text-[14px] font-medium text-[#0F172A]">
-                      Jonh Doe
-                    </h1>
-                    <p className="text-[12px] text-[#64748B]">
-                      UI/UX Mentorship
-                    </p>
-                  </div>
-                </div>
-                <p className="text-[12px] text-gray-400 mt-2 h-6 ">
-                  Lorem ipsum dolor sit amet consectetur
-                </p>
-                <div className="flex gap-4 mt-4">
-                  <Button variant="blue-secondary" size="sm">
-                    Accept
-                  </Button>
-                  <Button variant="gray" size="sm">
-                    View
-                  </Button>
-                </div>
-              </div>
-
-              <div className="h-[169px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
-                <div className="flex items-center gap-3">
-                  <Image
-                    className="rounded-full"
-                    src="/Image.png"
-                    alt=""
-                    width={40}
-                    height={40}
-                  />
-                  <div className="flex flex-col">
-                    <h1 className="text-[14px] font-medium text-[#0F172A]">
-                      Jonh Doe
-                    </h1>
-                    <p className="text-[12px] text-[#64748B]">
-                      Portfolio Review
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-2 flex h-[30px] w-[150px] items-center gap-1 rounded-[6px] bg-[#FFFBEB] px-2 text-[14px] font-medium text-[#D97706]">
-                  <Clock size={20} className="text-[#D97706]" />
-                  <span>Expires in 2h</span>
-                </div>
-                <div className="flex gap-4 mt-4">
-                  <Button variant="blue-secondary" size="sm">
-                    Accept
-                  </Button>
-                  <Button variant="gray" size="sm">
-                    View
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-blue-500"></span>
-                <h1 className="text-[16px] font-bold text-[#0F172A]">
-                  Accepted
-                </h1>
-              </div>
-              <div className="h-[169px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
-                <div className="flex items-center gap-3">
-                  <Image
-                    className="rounded-full"
-                    src="/Image.png"
-                    alt=""
-                    width={40}
-                    height={40}
-                  />
-                  <div className="flex flex-col">
-                    <h1 className="text-[14px] font-medium text-[#0F172A]">
-                      Jonh Doe
-                    </h1>
-                    <p className="text-[12px] text-[#64748B]">
-                      Career Coaching
-                    </p>
-                  </div>
-                </div>
-                <p className="text-[12px] text-gray-400 mt-2 h-6 ">
-                  Lorem ipsum dolor sit amet consectetur
-                </p>
-                <div className="flex gap-4 mt-4">
-                  <Button variant="blue" size="xl">
-                    Messages Students
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-green-400"></span>
-                <h1 className="text-[16px] font-bold text-[#0F172A]">
-                  In Progress
-                </h1>
-              </div>
-              <div className="h-[169px] w-64 min-w-50 rounded-[12px] bg-white border border-[#E2E8F0] shadow mt-4 p-4">
-                <div className="flex gap-3 ">
-                  <Image src="/Image.png" alt="" width={40} height={40} />
-                  <div className="flex flex-col">
-                    <h1 className="text-[14px] font-medium text-[#0F172A]">
-                      Jonh Doe
-                    </h1>
-                    <p className="text-[12px] text-[#64748B]">
-                      React Advanced Mastery
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <div className="h-[6px] w-full overflow-hidden rounded-full bg-[#D1FAE5]">
-                    <span className="block h-full w-[75%] rounded-full bg-[#10B981]"></span>
-                  </div>
-                  <div className="mb-2 flex items-center justify-between text-[11px] text-[#64748B]">
-                    <span>Progress</span>
-                    <span>75%</span>
-                  </div>
-                </div>
-                <div className="flex gap-4 mt-4">
-                  <Button variant="green" size="xl">
-                    Classroom
-                  </Button>
-                </div>
-              </div>
-            </div>
+          <div className="mb-2 mt-1 flex items-center justify-between text-[11px] text-ink-soft">
+            <span>Progresso</span>
+            <span>{request.progress}%</span>
           </div>
         </div>
-      </section>
-    );
+      )}
+
+      <div className="mt-4 flex gap-3">
+        {request.status === "pending" && (
+          <>
+            <Button variant="primary" size="sm">
+              Aceitar
+            </Button>
+            <Button variant="secondary" size="sm">
+              Ver
+            </Button>
+          </>
+        )}
+        {request.status === "accepted" && (
+          <Button variant="blue" size="sm">
+            Mensagens do Aluno
+          </Button>
+        )}
+        {request.status === "in_progress" && (
+          <Button variant="green" size="sm">
+            Sala de Aula
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function Service() {
+  return (
+    <section className="py-10">
+      <h2 className="text-xl font-bold text-ink">Quadro de Serviços</h2>
+
+      <div className="mt-4 flex gap-8">
+        {BOARD_TABS.map(({ label, active }) => (
+          <button
+            key={label}
+            type="button"
+            className={
+              active
+                ? "border-b-4 border-primary pb-2 text-sm font-bold text-primary"
+                : "pb-2 text-sm text-ink-soft"
+            }
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3">
+        {(Object.keys(COLUMN_META) as RequestStatus[]).map((status) => {
+          const columnRequests = REQUESTS.filter(
+            (request) => request.status === status
+          );
+          const meta = COLUMN_META[status];
+
+          return (
+            <div key={status}>
+              <div className="flex items-center gap-2">
+                <span className={`size-2 rounded-full ${meta.dotClass}`} />
+                <h3 className="text-base font-bold text-ink">{meta.label}</h3>
+                <span className="text-xs text-ink-faint">
+                  ({columnRequests.length})
+                </span>
+              </div>
+              <div className="mt-4 space-y-4">
+                {columnRequests.map((request) => (
+                  <RequestCard key={request.id} request={request} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
 }
