@@ -1,341 +1,204 @@
 "use client";
 
-import  { useState, useMemo } from "react";
-import { 
-  Search, 
-  Filter, 
-  Grid3X3, 
-  Code, 
-  Brain, 
-  Palette, 
-  Briefcase, 
-  Beaker, 
-  Star, 
-  ChevronLeft, 
-  ChevronRight 
-} from "lucide-react";
-import { MENTORES_DATA } from "@/data/mentors";
-import Link from "next/link";
+import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
+import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import Image from "next/image";
-import logoMetanoia from "@/assets/logo.jpeg"
+import { HeroVideo } from "@/components/hero-video";
+import { MentorCard } from "@/components/mentors/mentor-card";
+import {
+  MentorFilters,
+  type CategoryFilter,
+  type RatingFilter,
+} from "@/components/mentors/mentor-filters";
+import { MentorPagination } from "@/components/mentors/mentor-pagination";
+import { MENTORS } from "@/data/mentors";
+
+const PAGE_SIZE = 6;
+
+type SortOrder = "recomendados" | "preco";
 
 export default function Page() {
-  const [termoBusca, setTermoBusca] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [category, setCategory] = useState<CategoryFilter>("Todas Categorias");
+  const [rating, setRating] = useState<RatingFilter>(0);
+  const [maxPrice, setMaxPrice] = useState(250);
+  const [sortOrder, setSortOrder] = useState<SortOrder>("recomendados");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const mentoresFiltrados = useMemo(() => {
-    return MENTORES_DATA.filter(m => 
-      m.name.toLowerCase().includes(termoBusca.toLowerCase()) || 
-      m.role.toLowerCase().includes(termoBusca.toLowerCase())
-    );
-  }, [termoBusca]);
- 
+  const mentors = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+
+    const filtered = MENTORS.filter((mentor) => {
+      const matchesQuery =
+        !query ||
+        mentor.name.toLowerCase().includes(query) ||
+        mentor.role.toLowerCase().includes(query) ||
+        mentor.skills.some((skill) => skill.toLowerCase().includes(query));
+
+      const matchesCategory =
+        category === "Todas Categorias" || mentor.category === category;
+
+      const matchesRating = mentor.rating >= rating;
+      const matchesPrice = mentor.price <= maxPrice;
+
+      return (
+        matchesQuery &&
+        matchesCategory &&
+        matchesRating &&
+        matchesPrice
+      );
+    });
+
+    if (sortOrder === "preco") {
+      filtered.sort((a, b) => a.price - b.price);
+    }
+
+    return filtered;
+  }, [searchTerm, category, rating, maxPrice, sortOrder]);
+
+  const totalPages = Math.max(1, Math.ceil(mentors.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+
+  const visibleMentors = useMemo(() => {
+    const start = (safePage - 1) * PAGE_SIZE;
+    return mentors.slice(start, start + PAGE_SIZE);
+  }, [mentors, safePage]);
+
+  function resetFilters() {
+    setSearchTerm("");
+    setCategory("Todas Categorias");
+    setRating(0);
+    setMaxPrice(250);
+    setSortOrder("recomendados");
+    setCurrentPage(1);
+  }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans">
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md">
-        <div className="max-w-360 mx-auto px-6 lg:px-20 h-18 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-          <Image
-              src={logoMetanoia}
-              alt="logo metanoia"
-              height={50}
-              width={50}
-            />
-            <Link href="/" className="text-xl font-bold tracking-tight text-slate-800">
-              Academia Metanoia
-            </Link>
-          </div>
+    <div className="min-h-screen bg-canvas font-sans text-ink">
+      <Header />
 
-          <nav className="hidden md:flex items-center gap-8">
-            <a className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
-              Encontrar Mentores
-            </a>
-            <a className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
-              Tornar-se Mentor
-            </a>
-            <Link
-              href="/about"
-              className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors"
-            >
-              Sobre Nós
-            </Link>
-          </nav>
+      <section className="relative min-h-screen overflow-hidden">
+        <HeroVideo
+          src="/videos/hero-pesquisa.mp4"
+          className="absolute inset-0"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/50 to-ink/80"
+        />
 
-          <div className="flex items-center gap-4">
-            <Link
-              href="/auth/login"
-              className="text-sm font-bold text-slate-700 hover:text-slate-900"
-            >
-              Entrar
-            </Link>
-            <Link
-              href="/auth/selecionar-papel"
-              className="bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow-md shadow-blue-200"
-            >
-              Cadastre-se Grátis
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <section
-        className="
-        border-b border-slate-100
-        py-16 lg:py-24 px-6
-        relative
-        bg-white
-        overflow-visible
-      "
-      >
-        <div className="max-w-250 mx-auto text-center space-y-8">
+        <div className="relative mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center space-y-8 px-6 pt-24 text-center">
           <div className="space-y-4">
-            <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight md:leading-snug">
-              Aprenda com os Melhores. <br />
-              <span className="text-blue-600">
-                Conecte-se com Mentores Especialistas.
+            <h1 className="text-4xl font-bold leading-tight text-white md:text-6xl">
+              Aprenda com os melhores.{" "}
+              <span className="text-sky-300">
+                Conecte-se com mentores especialistas.
               </span>
             </h1>
-
-            <p className="text-slate-500 text-lg md:text-xl max-w-2xl mx-auto font-normal">
+            <p className="mx-auto max-w-2xl text-lg text-slate-200 md:text-xl">
               Encontre o par perfeito em nosso mercado global de mentores
               profissionais nas áreas de tecnologia, artes e negócios.
             </p>
           </div>
 
-          <div className="max-w-2xl mx-auto mt-10">
-            <div className="flex items-center bg-white border border-slate-200 p-2 rounded-2xl shadow-lg shadow-slate-200/50">
-              <div className="pl-4 pr-2 text-slate-400">
+          <div className="mx-auto w-full max-w-2xl">
+            <label className="flex items-center rounded-2xl border border-white/20 bg-panel/95 p-2 shadow-float backdrop-blur-sm">
+              <span className="pl-4 pr-2 text-ink-faint">
                 <Search size={20} strokeWidth={2.5} />
-              </div>
-
+              </span>
               <input
-                type="text"
+                type="search"
                 aria-label="Buscar mentores por especialidade"
-                className="flex-1 bg-transparent border-none focus:ring-0 text-slate-900 text-base py-3 px-4 outline-none"
-                placeholder="Busque por especialidade (ex. Tecnologia, Psicologia, Artes)"
-                value={termoBusca}
-                onChange={(e) => setTermoBusca(e.target.value)}
+                placeholder="Busque por nome, especialidade ou habilidade"
+                value={searchTerm}
+                onChange={(event) => {
+                  setSearchTerm(event.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full bg-transparent px-4 py-3 text-base text-ink outline-none placeholder:text-ink-faint"
               />
-
-              <button
-                className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors transform active:scale-95"
-                type="button"
-              >
-                Buscar Mentores
-              </button>
-            </div>
+            </label>
           </div>
-          
         </div>
       </section>
 
-      <main className="max-w-360 mx-auto px-6 lg:px-20 py-16">
-        <div className="flex flex-col lg:flex-row gap-12">
-          <aside className="w-full lg:w-64 shrink-0">
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-8">
-              <div className="flex items-center gap-2 pb-2">
-                <Filter size={18} className="text-blue-600" />
-                <h3 className="font-bold text-slate-800">Filtros</h3>
-              </div>
-
-              <div className="space-y-4">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  Categorias
-                </p>
-                <div className="space-y-1">
-                  <BotaoFiltro icon={Grid3X3} label="Todas Categorias" active />
-                  <BotaoFiltro icon={Code} label="Tecnologia" />
-                  <BotaoFiltro icon={Brain} label="Psicologia" />
-                  <BotaoFiltro icon={Palette} label="Artes" />
-                  <BotaoFiltro icon={Briefcase} label="Negócios" />
-                  <BotaoFiltro icon={Beaker} label="Ciências" />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  Preço por Hora ($)
-                </p>
-                <div className="px-1">
-                  <div className="h-1 w-full bg-slate-100 rounded-full relative">
-                    <div className="absolute left-[20%] right-[30%] h-full bg-blue-600 rounded-full" />
-                    <div className="absolute left-[20%] -top-1.5 size-4 bg-blue-600 border-2 border-white rounded-full shadow-md cursor-pointer" />
-                    <div className="absolute right-[30%] -top-1.5 size-4 bg-blue-600 border-2 border-white rounded-full shadow-md cursor-pointer" />
-                  </div>
-                  <div className="flex justify-between mt-4 text-xs font-bold text-slate-600">
-                    <span>$20</span>
-                    <span>$250</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  Avaliação Mínima
-                </p>
-                <div className="space-y-3">
-                  <OpcaoAvaliacao label="4 Estrelas ou mais" active />
-                  <OpcaoAvaliacao label="3 Estrelas ou mais" />
-                  <OpcaoAvaliacao label="Todas Avaliações" />
-                </div>
-              </div>
-
-              <button className="w-full py-3 border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors mt-4">
-                Limpar Todos Filtros
-              </button>
-            </div>
-          </aside>
+      <main className="mx-auto max-w-7xl px-6 py-16 lg:px-10">
+        <div className="flex flex-col gap-12 lg:flex-row">
+          <MentorFilters
+            selectedCategory={category}
+            selectedRating={rating}
+            maxPrice={maxPrice}
+            onCategoryChange={(next) => {
+              setCategory(next);
+              setCurrentPage(1);
+            }}
+            onRatingChange={(next) => {
+              setRating(next);
+              setCurrentPage(1);
+            }}
+            onPriceChange={(next) => setMaxPrice(next)}
+            onReset={resetFilters}
+          />
 
           <div className="flex-1">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
-              <h2 className="text-2xl font-bold text-slate-800">
-                Mentores em Destaque{" "}
-                <span className="text-slate-300 font-medium ml-2">
-                  ({mentoresFiltrados.length})
+            <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <h2 className="text-2xl font-bold text-ink">
+                Mentores em destaque{" "}
+                <span className="ml-2 font-medium text-ink-faint">
+                  ({mentors.length})
                 </span>
               </h2>
+
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">
+                <span className="text-xs font-bold text-ink-faint">
                   Ordenar por:
                 </span>
-                <select className="bg-transparent border-none text-xs font-bold text-slate-800 focus:ring-0 cursor-pointer">
-                  <option>Recomendados</option>
-                  <option>Preço: Menor para Maior</option>
+                <select
+                  value={sortOrder}
+                  onChange={(event) =>
+                    setSortOrder(event.target.value as SortOrder)
+                  }
+                  className="cursor-pointer bg-transparent text-xs font-bold text-ink focus:outline-none"
+                >
+                  <option value="recomendados">Recomendados</option>
+                  <option value="preco">Preço: menor para maior</option>
                 </select>
               </div>
             </div>
 
-            {mentoresFiltrados.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {mentoresFiltrados.map((mentor) => (
-                  <div
-                    key={mentor.id}
-                    className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group"
-                  >
-                    <div className="relative h-52 overflow-hidden bg-slate-200">
-                      <Image
-                        src={mentor.image}
-                        alt={mentor.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute top-3 right-3 bg-white/95 px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
-                        <Star
-                          size={12}
-                          className="fill-yellow-400 text-yellow-400"
-                        />
-                        <span className="text-[11px] font-black">
-                          {mentor.rating}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-bold">
-                          ({mentor.reviews})
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="p-6 space-y-4">
-                      <div>
-                        <h4 className="font-bold text-lg text-slate-900">
-                          {mentor.name}
-                        </h4>
-                        <p className="text-blue-600 text-xs font-bold uppercase tracking-wide mt-1">
-                          {mentor.role}
-                        </p>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1.5">
-                        {mentor.skills.map((skill) => (
-                          <span
-                            key={skill}
-                            className="px-2 py-1 bg-slate-50 text-[9px] font-black text-slate-400 rounded-md border border-slate-100 uppercase tracking-tighter"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
-                        <div>
-                          <p className="text-[10px] font-bold text-slate-400">
-                            A partir de
-                          </p>
-                          <p className="text-lg font-black text-slate-900">
-                            ${mentor.price}
-                            <span className="text-xs font-normal text-slate-400">
-                              /h
-                            </span>
-                          </p>
-                        </div>
-                        <Link
-                          href="/mentor"
-                          className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-black hover:bg-blue-700 transition shadow-lg shadow-blue-100"
-                        >
-                          Ver Perfil
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            {visibleMentors.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                  {visibleMentors.map((mentor) => (
+                    <MentorCard key={mentor.id} mentor={mentor} />
+                  ))}
+                </div>
+                <MentorPagination
+                  totalPages={totalPages}
+                  currentPage={safePage}
+                  onPageChange={setCurrentPage}
+                />
+              </>
             ) : (
-              <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-slate-100">
-                <p className="text-slate-400 font-medium">
-                  Nenhum mentor encontrado para &quot;{termoBusca}&quot;
+              <div className="rounded-2xl border-2 border-dashed border-line bg-panel py-20 text-center">
+                <p className="text-ink-soft">
+                  Nenhum mentor encontrado para os filtros selecionados.
                 </p>
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="mt-4 text-sm font-bold text-primary hover:underline"
+                >
+                  Limpar filtros
+                </button>
               </div>
             )}
-
-            <div className="mt-16 flex items-center justify-center gap-2">
-              <button className="p-2.5 rounded-xl border border-slate-200 hover:bg-white transition shadow-sm text-slate-400">
-                <ChevronLeft size={18} />
-              </button>
-              <button className="size-10 rounded-xl bg-blue-600 text-white font-black text-sm shadow-lg shadow-blue-200">
-                1
-              </button>
-              <button className="size-10 rounded-xl hover:bg-white font-bold text-slate-400 text-sm transition border border-transparent hover:border-slate-100">
-                2
-              </button>
-              <button className="size-10 rounded-xl hover:bg-white font-bold text-slate-400 text-sm transition border border-transparent hover:border-slate-100">
-                3
-              </button>
-              <button className="p-2.5 rounded-xl border border-slate-200 hover:bg-white transition shadow-sm text-slate-400">
-                <ChevronRight size={18} />
-              </button>
-            </div>
           </div>
         </div>
       </main>
 
-     <Footer/>
+      <Footer />
     </div>
   );
 }
-
-const BotaoFiltro = ({
-  icon: Icon,
-  label,
-  active = false,
-}: {
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
-  label: string;
-  active?: boolean;
-}) => (
-  <button className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
-    active ? 'bg-blue-50 text-blue-600 font-bold' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-  }`}>
-    <Icon size={16} strokeWidth={active ? 2.5 : 2} />
-    <span className="text-xs">{label}</span>
-  </button>
-);
-
-const OpcaoAvaliacao = ({ label, active = false }: { label: string, active?: boolean }) => (
-  <label className="flex items-center gap-3 cursor-pointer group">
-    <div className={`size-4 rounded border flex items-center justify-center transition-all ${active ? 'bg-blue-600 border-blue-600' : 'border-slate-200'}`}>
-      {active && <div className="size-1.5 bg-white rounded-full" />}
-    </div>
-    <span className={`text-xs font-bold transition-colors ${active ? 'text-slate-800' : 'text-slate-400 group-hover:text-slate-600'}`}>{label}</span>
-    {label.includes('Estrelas') && <Star size={10} className="fill-yellow-400 text-yellow-400 -ml-1" />}
-  </label>
-);
-

@@ -1,33 +1,40 @@
-import { JSX } from 'react'
- 
-function FormInput({
-  label,
-  placeholder,
-  type = "text",
-  icon,
-}: {
+import { JSX, useId, type InputHTMLAttributes, type ReactNode } from "react";
+
+interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  placeholder: string;
-  type?: string;
-  icon: JSX.Element;
-}): JSX.Element {
+  icon?: ReactNode;
+}
+
+export default function FormInput({
+  label,
+  icon,
+  id,
+  className,
+  ...rest
+}: FormInputProps): JSX.Element {
+  const autoId = useId();
+  const inputId = id ?? autoId;
+
   return (
     <div>
-      <label className="text-sm font-bold text-slate-900 dark:text-white mb-2 block">
+      <label
+        htmlFor={inputId}
+        className="mb-2 block text-sm font-bold text-ink"
+      >
         {label}
       </label>
       <div className="relative">
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-          {icon}
-        </div>
+        {icon && (
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint">
+            {icon}
+          </span>
+        )}
         <input
-          type={type}
-          placeholder={placeholder}
-          className="w-full h-10 pl-10 pr-3 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary"
+          id={inputId}
+          className={`h-11 w-full rounded-lg border border-line-strong bg-panel pl-10 pr-3 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-primary focus:ring-1 focus:ring-primary ${className ?? ""}`}
+          {...rest}
         />
       </div>
     </div>
   );
 }
-
-export default FormInput

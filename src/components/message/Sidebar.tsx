@@ -1,134 +1,154 @@
+"use client";
+
 import { Search } from "lucide-react";
 import Image from "next/image";
+import clsx from "clsx";
+import { useState } from "react";
+
+interface Conversation {
+  id: number;
+  name: string;
+  course: string;
+  lastMessage: string;
+  active?: boolean;
+  unread?: number;
+}
+
+const CONVERSATIONS: Conversation[] = [
+  {
+    id: 1,
+    name: "Alex Rivera",
+    course: "Trilha de UI Design",
+    lastMessage: "Podemos remarcar a sessão?",
+    active: true,
+    unread: 2,
+  },
+  {
+    id: 2,
+    name: "Maria Oliveira",
+    course: "React Avançado",
+    lastMessage: "Enviei o link do repositório.",
+  },
+  {
+    id: 3,
+    name: "João Santos",
+    course: "Coaching de Carreira",
+    lastMessage: "Obrigado pelo feedback de hoje!",
+  },
+  {
+    id: 4,
+    name: "Beatriz Lima",
+    course: "Design Systems",
+    lastMessage: "A próxima aula será quarta?",
+  },
+  {
+    id: 5,
+    name: "Gustavo Alves",
+    course: "Data Science",
+    lastMessage: "Consegui rodar o notebook.",
+  },
+];
+
+const FILTER_TABS = ["Todos", "Mentores", "Alunos"];
+
 export default function Sidebar() {
+  const [activeFilter, setActiveFilter] = useState("Todos");
+  const [query, setQuery] = useState("");
+
+  const conversations = CONVERSATIONS.filter(({ name, lastMessage }) => {
+    const search = query.trim().toLowerCase();
+    return (
+      !search ||
+      name.toLowerCase().includes(search) ||
+      lastMessage.toLowerCase().includes(search)
+    );
+  });
+
   return (
-    <aside className="w-[380px] shrink-0 flex flex-col border-r bg-white border-[#E7ECF3] px-4 py-4">
+    <aside className="flex w-full shrink-0 flex-col border-r border-line bg-panel px-4 py-4 md:w-80 lg:w-96">
       <div className="shrink-0">
-        <h1 className="text-[20px] font-bold text-[#0D131B]">Messages</h1>
-        <p className="text-[14px] text-[#4C6C9A]">Communication Hub</p>
-        <div className="hidden md:flex relative h-11 mt-4">
+        <h1 className="text-xl font-bold text-ink">Mensagens</h1>
+        <p className="text-sm text-ink-soft">Central de comunicação</p>
+
+        <div className="relative mt-4 h-11">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4c6c9a]"
             size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft"
           />
           <input
-            type="text"
-            placeholder="Search mentors..."
-            className="w-full bg-[#e7ecf3] border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-[#136dec]/20 outline-none"
+            type="search"
+            placeholder="Buscar conversas..."
+            aria-label="Buscar conversas"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            className="h-full w-full rounded-lg bg-line pl-10 pr-4 text-sm outline-none transition-shadow focus:ring-2 focus:ring-primary/20"
           />
         </div>
-        <div className="bg-[#F0F3F8] rounded-xl h-[44px] mt-4 flex gap-4 px-2 text-[#4C6C9A]">
-          <button className="bg-white rounded-[6px] w-[113px] h-[28px] mt-1.5 mb-1.5 shadow">
-            All
-          </button>
-          <button className="mt-1.5 mb-1.5">Mentors</button>
-          <button className="mt-1.5 mb-1.5">Students</button>
+
+        <div className="mt-4 flex h-11 gap-2 rounded-xl bg-slate-100 px-2">
+          {FILTER_TABS.map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveFilter(tab)}
+              className={clsx(
+                "my-1.5 rounded-lg px-4 text-sm font-medium transition-colors",
+                activeFilter === tab
+                  ? "bg-panel text-ink shadow-card"
+                  : "text-ink-soft hover:text-ink"
+              )}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto mt-4 space-y-0.5 pr-1">
-        <div className="flex gap-4 bg-[#136DEC0D] border-l-4 border-[#136DEC] items-center rounded-r-xl p-2">
-          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
-          <div className="min-w-0">
-            <h1 className="text-black font-semibold text-[18px] truncate">
-              Alex Rivera
-            </h1>
-            <span className="text-[#136DEC] text-[12px] font-medium">
-              UI Design Path
-            </span>
-            <p className="text-[#4C6C9A] text-[14px] truncate">
-              Can we reschedule the session?
-            </p>
-          </div>
-        </div>
+      <div className="mt-4 min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
+        {conversations.map((conversation) => (
+          <button
+            key={conversation.id}
+            type="button"
+            className={clsx(
+              "flex w-full items-center gap-4 rounded-r-xl p-2 text-left transition-colors",
+              conversation.active
+                ? "border-l-4 border-primary bg-primary/5"
+                : "border-l-4 border-transparent hover:bg-slate-50"
+            )}
+          >
+            <Image
+              src="/Container.png"
+              alt={`Avatar de ${conversation.name}`}
+              width={48}
+              height={48}
+              className="h-12 w-12 shrink-0"
+            />
+            <div className="min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="truncate text-lg font-semibold text-ink">
+                  {conversation.name}
+                </h2>
+                {conversation.unread && (
+                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                    {conversation.unread}
+                  </span>
+                )}
+              </div>
+              <span className="text-xs font-medium text-primary">
+                {conversation.course}
+              </span>
+              <p className="truncate text-sm text-ink-soft">
+                {conversation.lastMessage}
+              </p>
+            </div>
+          </button>
+        ))}
 
-        <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
-          <div className="min-w-0">
-            <h1 className="text-black font-semibold text-[18px] truncate">
-              Alex Rivera
-            </h1>
-            <span className="text-[#136DEC] text-[12px] font-medium">
-              UI Design Path
-            </span>
-            <p className="text-[#4C6C9A] text-[14px] truncate">
-              Can we reschedule the session?
-            </p>
-          </div>
-        </div>
-
-        <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
-          <div className="min-w-0">
-            <h1 className="text-black font-semibold text-[18px] truncate">
-              Alex Rivera
-            </h1>
-            <span className="text-[#136DEC] text-[12px] font-medium">
-              UI Design Path
-            </span>
-            <p className="text-[#4C6C9A] text-[14px] truncate">
-              Can we reschedule the session?
-            </p>
-          </div>
-        </div>
-
-        <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
-          <div className="min-w-0">
-            <h1 className="text-black font-semibold text-[18px] truncate">
-              Alex Rivera
-            </h1>
-            <span className="text-[#136DEC] text-[12px] font-medium">
-              UI Design Path
-            </span>
-            <p className="text-[#4C6C9A] text-[14px] truncate">
-              Can we reschedule the session?
-            </p>
-          </div>
-        </div>
-
-        <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
-          <div className="min-w-0">
-            <h1 className="text-black font-semibold text-[18px] truncate">
-              Alex Rivera
-            </h1>
-            <span className="text-[#136DEC] text-[12px] font-medium">
-              UI Design Path
-            </span>
-            <p className="text-[#4C6C9A] text-[14px] truncate">
-              Can we reschedule the session?
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
-          <div className="min-w-0">
-            <h1 className="text-black font-semibold text-[18px] truncate">
-              Alex Rivera
-            </h1>
-            <span className="text-[#136DEC] text-[12px] font-medium">
-              UI Design Path
-            </span>
-            <p className="text-[#4C6C9A] text-[14px] truncate">
-              Can we reschedule the session?
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-4 items-center border-t border-[#E7ECF3] p-2">
-          <Image className="shrink-0" src="/Container.png" alt="" width={56} height={56} />
-          <div className="min-w-0">
-            <h1 className="text-black font-semibold text-[18px] truncate">
-              Alex Rivera
-            </h1>
-            <span className="text-[#136DEC] text-[12px] font-medium">
-              UI Design Path
-            </span>
-            <p className="text-[#4C6C9A] text-[14px] truncate">
-              Can we reschedule the session?
-            </p>
-          </div>
-        </div>
+        {conversations.length === 0 && (
+          <p className="py-8 text-center text-sm text-ink-faint">
+            Nenhuma conversa encontrada.
+          </p>
+        )}
       </div>
     </aside>
   );

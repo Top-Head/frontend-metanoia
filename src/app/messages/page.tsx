@@ -1,17 +1,17 @@
-import Header from "@/components/message/Header"
-import Profile from "@/components/message/Profile"
-import Sidebar from "@/components/message/Sidebar"
-import MessageType from "@/components/message/message"
+import Header from "@/components/Header";
+import Profile from "@/components/message/Profile";
+import Sidebar from "@/components/message/Sidebar";
+import MessageThread from "@/components/message/message";
 
-export default function Messages (){
-    return (
-        <section className="h-dvh flex flex-col bg-white overflow-hidden">
-            <Header/>
-            <main className="flex flex-1 min-h-0">
-                <Sidebar/>
-                <MessageType />
-                <Profile/>
-            </main>
-        </section>
-    )
+export default function Messages() {
+  return (
+    <section className="flex h-dvh flex-col overflow-hidden bg-panel">
+      <Header forceSolid search />
+      <main className="flex min-h-0 flex-1 pt-19">
+        <Sidebar />
+        <MessageThread />
+        <Profile />
+      </main>
+    </section>
+  );
 }
