@@ -8,7 +8,6 @@ import { Button } from "../ui/button";
 import FormInput from "../ui/form-input";
 import PasswordInput from "../ui/password-input";
 import { Footer, SelectInput, TermsCheckbox, TrustCard } from "../ui/select-input";
-import { Header } from "./_components/register-components/header";
 import { ProgressBar } from "./_components/register-components/progress-bar";
 
 export default function RegistrationPage(): JSX.Element {
@@ -35,11 +34,9 @@ export default function RegistrationPage(): JSX.Element {
 
   return (
     <div className="flex min-h-screen flex-col bg-canvas">
-      <Header />
-
       <main className="flex flex-1 justify-center px-4 py-8">
         <div className="flex w-full max-w-lg flex-col">
-          <ProgressBar progressPercentage={50} />
+          {/* <ProgressBar progressPercentage={50} /> */}
 
           <div className="mb-6 text-center">
             <h1 className="mb-2 text-2xl font-bold text-ink md:text-3xl">
@@ -96,23 +93,23 @@ export default function RegistrationPage(): JSX.Element {
             </form>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+          {/* <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
             <TrustCard
               icon={<Verified size={28} />}
               title="Especialistas verificados"
-              description="Entre em uma comunidade selecionada de profissionais."
+              // description="Entre em uma comunidade selecionada de profissionais."
             />
             <TrustCard
               icon={<CreditCard size={28} />}
               title="Ganhos flexíveis"
-              description="Defina seus honorários e sua agenda."
+              // description="Defina seus honorários e sua agenda."
             />
             <TrustCard
               icon={<Users size={28} />}
               title="Impacto global"
-              description="Ajude estudantes de mais de 50 países."
+              // description="Ajude estudantes de mais de 50 países."
             />
-          </div>
+          </div> */}
         </div>
       </main>
 

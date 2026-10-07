@@ -86,7 +86,7 @@ export function TermsCheckbox(): JSX.Element {
 interface TrustCardProps {
   icon: JSX.Element;
   title: string;
-  description: string;
+  description?: string;
 }
 
 export function TrustCard({
