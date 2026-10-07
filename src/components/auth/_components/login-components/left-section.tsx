@@ -1,5 +1,5 @@
 import Image from "next/image";
-import BrandLogo from "./brand-logo";
+import logoMetanoia from "@/assets/logo.png";
 
 export default function LeftSection() {
   return (
@@ -15,7 +15,12 @@ export default function LeftSection() {
       <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/20 to-transparent" />
 
       <div className="relative z-10 flex flex-col justify-end p-10 text-white xl:p-14">
-        <BrandLogo size="large" />
+        <Image
+          src={logoMetanoia}
+          alt="logo"
+          width={100}
+          height={100}
+        />
         <h1 className="mb-3 mt-6 max-w-md text-3xl font-bold leading-tight tracking-tight xl:text-4xl">
           Desperte seu potencial com mentoria de especialistas.
         </h1>
