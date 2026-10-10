@@ -15,16 +15,16 @@ export default function LeftSection() {
       <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/20 to-transparent" />
 
       <div className="relative z-10 flex flex-col justify-end p-10 text-white xl:p-14">
-        <Image
+        {/* <Image
           src={logoMetanoia}
           alt="logo"
           width={100}
           height={100}
-        />
-        <h1 className="mb-3 mt-6 max-w-md text-3xl font-bold leading-tight tracking-tight xl:text-4xl">
+        /> */}
+        <h1 className="mb-3 mt-6 text-3xl font-bold leading-tight tracking-tight xl:text-4xl">
           Desperte seu potencial com mentoria de especialistas.
         </h1>
-        <p className="max-w-md text-base font-light text-slate-100 xl:text-lg">
+        <p className="text-base font-light text-slate-100 xl:text-lg">
           Entre em uma comunidade de aprendizes e líderes da indústria
           dedicados ao crescimento e à excelência profissional.
         </p>

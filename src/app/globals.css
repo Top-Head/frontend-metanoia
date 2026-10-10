@@ -75,22 +75,23 @@
   --shadow-float: 0 12px 32px -12px rgb(13 19 27 / 0.18);
 
   /* Animações */
-  --animate-marquee: marquee 40s linear infinite;
-  --animate-marquee-reverse: marquee-reverse 40s linear infinite;
+  --animate-marquee: marquee 70s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 85s linear infinite;
 }
 
+/* Desloca exatamente uma das 3 cópias renderizadas (COPIES em Gallery.tsx). */
 @keyframes marquee {
   from {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(calc(-100% / 3));
   }
 }
 
 @keyframes marquee-reverse {
   from {
-    transform: translateX(-50%);
+    transform: translateX(calc(-100% / 3));
   }
   to {
     transform: translateX(0);

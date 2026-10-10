@@ -1,5 +1,6 @@
 import { GraduationCap, Inbox, MessageSquare } from "lucide-react";
 import clsx from "clsx";
+import { formatKz } from "@/lib/currency";
 
 interface DashboardCard {
   label: string;
@@ -12,7 +13,7 @@ interface DashboardCard {
 const CARDS: DashboardCard[] = [
   {
     label: "Ganhos",
-    value: "$4.250,00",
+    value: formatKz(4_250_000),
     trend: "+12% este mês",
     icon: GraduationCap,
   },

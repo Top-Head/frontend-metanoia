@@ -6,7 +6,7 @@ const FOOTER_LINKS = [
   { label: "Termos de Serviço", href: "/termos" },
   { label: "Política de Privacidade", href: "/privacidade" },
   { label: "Central de Ajuda", href: "/ajuda" },
-  { label: "Fale Conosco", href: "/messages" },
+  { label: "Fale Conosco", href: "/contact" },
 ];
 
 export default function Footer() {

@@ -7,7 +7,6 @@ import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { Button } from "../ui/button";
 import SocialButton from "./_components/login-components/social-button";
-import BrandLogo from "./_components/login-components/brand-logo";
 import LeftSection from "./_components/login-components/left-section";
 
 export default function LoginPage(): JSX.Element {
@@ -39,9 +38,6 @@ export default function LoginPage(): JSX.Element {
 
       <div className="flex w-full flex-col items-center justify-center bg-panel p-6 md:p-10 lg:w-1/2 lg:p-14">
         <div className="w-full max-w-md">
-          <div className="mb-10 flex items-center gap-3 lg:hidden">
-            <BrandLogo size="small" />
-          </div>
 
           <div className="mb-8">
             <h1 className="mb-1 text-2xl font-bold text-ink xl:text-3xl">
@@ -115,22 +111,6 @@ export default function LoginPage(): JSX.Element {
               <ArrowRight size={18} />
             </Button>
           </form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-line" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-panel px-4 text-sm uppercase tracking-wider text-ink-soft">
-                Ou continue com
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <SocialButton provider="Google" />
-            <SocialButton provider="LinkedIn" />
-          </div>
 
           <p className="mt-6 text-center text-ink-soft">
             Não tem uma conta?{" "}
