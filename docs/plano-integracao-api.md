@@ -73,8 +73,8 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 
 | Endpoint | Uso | Tela |
 |---|---|---|
-| `GET/PATCH /api/me/mentor/` 🔒 · `POST` cria perfil | Perfil de mentor (nome, bio, especialidades, experiência) | **nova** `/dashboard/perfil` |
-| `GET/PATCH /api/me/student/` 🔒 · `POST` cria perfil | Perfil de estudante (nome, telefone, bio) | **nova** `/aluno/perfil` |
+| `GET/PATCH /api/me/mentor/` 🔒 · `POST` cria perfil | Perfil de mentor (nome, bio, especialidades, experiência) | `/dashboard/perfil` ✅ |
+| `GET/PATCH /api/me/student/` 🔒 · `POST` cria perfil | Perfil de estudante (nome, telefone, bio) | `/aluno/perfil` ✅ |
 
 ### P3 — Onboarding com IA e recomendações
 
@@ -96,7 +96,7 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 | 2 | Descoberta pública: catálogo de aulas, detalhe da aula (`/aulas/[id]`), diretório e perfil de mentores | ✅ feito |
 | 3 | Área do aluno: pedir inscrição, `/aluno/inscricoes` (lista e detalhe), comprovativo, cancelamento | ✅ feito (validar no backend real) |
 | 4 | Área do mentor: `/dashboard` com inscrições reais, `/dashboard/aulas` (lista, nova, editor com turmas e encontros) | ✅ feito (validar no backend real) |
-| 5 | Perfis de mentor e estudante | — |
+| 5 | Perfis: `/dashboard/perfil` (mentor) e `/aluno/perfil` (aluno), criar o segundo perfil na mesma conta | ✅ feito (validar no backend real) |
 | 6 | Onboarding com IA, perfil de aprendizagem, recomendações | — |
 
 ## Sem endpoint na API (continuam mock ou ficam desativados)
@@ -168,3 +168,10 @@ Isolado em `src/services/mentor-course.service.ts` e `src/services/mentor-enroll
 - **Publicar:** o frontend não bloqueia; se a API exigir turma ativa, mostra a mensagem dela.
 - O calendário do dashboard pede o detalhe de até 10 aulas para montar os encontros (não há endpoint
   de "encontros do mentor").
+
+### A confirmar no backend (fase 5)
+
+- `GET /api/me/mentor/` e `/api/me/student/` devolvem **404** quando o perfil não existe (documentado);
+  o frontend trata como "sem perfil".
+- Criar o segundo perfil (`POST`) transforma a conta em aluno **e** mentor. Confirmar que o backend permite
+  isto para contas registadas só com um papel.
