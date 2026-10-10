@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { label: "Inicio", href: "/" },
   { label: "Sobre", href: "/about" },
   { label: "FAQ", href: "/faq" },
+  { label: "Mentores", href: "/mentores" },
   { label: "Tornar-se Mentor", href: "/auth/selecionar-papel" },
   { label: "Contato", href: "/contact" },
 ];

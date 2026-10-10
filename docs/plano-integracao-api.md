@@ -34,9 +34,9 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 
 | Endpoint | Uso | Tela |
 |---|---|---|
-| `GET /api/discovery/search/` 🔓 | Busca de aulas publicadas (`q`, `category`, `type`, `modality`, `max_price`, `free`) com `score` e `reasons` | `/` — **refazer** como catálogo de aulas |
-| `GET /api/courses/{id}/` 🔓 | Detalhe da aula com mentor, turmas e encontros | **nova** `/aulas/[id]` |
-| `GET /api/mentors/` 🔓 | Diretório público de mentores (`search`, `specialties`) | `/mentor` — adaptar |
+| `GET /api/discovery/search/` 🔓 | Busca de aulas publicadas (`q`, `category`, `type`, `modality`, `max_price`, `free`) com `score` e `reasons` | `/` — catálogo de aulas ✅ |
+| `GET /api/courses/{id}/` 🔓 | Detalhe da aula com mentor, turmas e encontros | `/aulas/[id]` ✅ |
+| `GET /api/mentors/` 🔓 | Diretório público de mentores (`search`, `specialties`) | `/mentores` (diretório) e `/mentor?id=` (perfil) ✅ |
 | `GET /api/categories/{id}/` 🔓 | Detalhe de categoria | (opcional) |
 | `GET /api/courses/` 🔓 | Lista paginada de aulas | alternativa ao `search` |
 
@@ -93,7 +93,7 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 |---|---|---|
 | 0 | Cliente HTTP com axios (instância `api`, interceptores de JWT e refresh automático, erros do DRF), tipos da API | ✅ feito |
 | 1 | Autenticação: login, registo por papel, sessão (`/me`), logout, proteção do dashboard | ✅ feito |
-| 2 | Descoberta pública: catálogo de aulas, detalhe da aula, diretório de mentores | ⏳ aguarda decisão |
+| 2 | Descoberta pública: catálogo de aulas, detalhe da aula (`/aulas/[id]`), diretório e perfil de mentores | ✅ feito |
 | 3 | Área do estudante: inscrições, comprovativo, cancelamento | — |
 | 4 | Área do mentor: CRUD de aulas, turmas, encontros; gestão de inscrições no dashboard | — |
 | 5 | Perfis de mentor e estudante | — |
@@ -110,7 +110,7 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 
 ## Decisões pendentes
 
-1. **Página inicial:** passar a ser um catálogo de *aulas* (`/api/discovery/search/`) em vez de mentores?
+1. ~~**Página inicial:** catálogo de aulas~~ — decidido e feito na fase 2.
 2. **Rotas do aluno:** criar o grupo `(student)` com `/aluno/...` (o diretório já existe vazio)?
 3. **Aulas do próprio mentor:** a API não tem um filtro explícito "minhas aulas" em `GET /api/courses/`.
    Confirmar com o backend se a listagem autenticada já devolve só as do mentor, ou se há um parâmetro.
@@ -128,3 +128,16 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 - `download-proof` declara JSON, mas deve devolver o ficheiro (blob).
 - `price_amount` é **string decimal** (ex.: `"15000.00"`) e há `currency`; formatar com `formatKz` quando `currency` for `AOA`/`KZ`.
 - `topic_details` e `specialty_details` são objetos sem esquema; presume-se `{ id, name }`.
+
+### Confirmado na API real (fase 2)
+
+- `GET /api/discovery/search/` devolve **objeto paginado** (`count`, `next`, `previous`, `results`), não lista
+  como o YAML diz. O serviço aceita os dois formatos. Os filtros `category`, `type`, `modality`, `free`,
+  `max_price`, `q` e `page_size` são aceites (HTTP 200).
+- `GET /api/courses/{id}/` inexistente → `404 {"detail": "No Course matches the given query."}`.
+- `specialty_details` vem como `{ id, name, slug }`.
+- **Não existe `GET /api/mentors/{id}/`**: o perfil procura o mentor no diretório (`page_size=100`).
+- **Não há filtro de aulas por mentor**: o perfil filtra o catálogo publicado pelo `mentor.id`.
+  Pedir ao backend um endpoint de detalhe de mentor e um filtro `mentor` na busca.
+- O catálogo carrega até 100 aulas e ordena/pagina no cliente, porque a busca não tem ordenação por
+  preço. Migrar para paginação no servidor quando o volume crescer.

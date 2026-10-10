@@ -6,5 +6,5 @@ export async function listCategories(search?: string) {
     params: { search: search || undefined, ordering: "name" },
     skipAuth: true,
   });
-  return data;
+  return data.filter((category) => category.is_active !== false);
 }
