@@ -9,6 +9,8 @@ interface QueryState<T> {
   isLoading: boolean;
   /** Volta a executar o pedido (ex.: botão "Tentar de novo"). */
   reload: () => void;
+  /** Substitui os dados localmente (ex.: com a resposta de uma ação). */
+  mutate: (next: T) => void;
 }
 
 /**
@@ -54,5 +56,5 @@ export function useApiQuery<T>(key: string | null, fetcher: () => Promise<T>): Q
 
   const reload = useCallback(() => setAttempt((current) => current + 1), []);
 
-  return { data, error, isLoading, reload };
+  return { data, error, isLoading, reload, mutate: setData };
 }

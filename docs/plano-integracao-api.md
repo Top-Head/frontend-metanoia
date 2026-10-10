@@ -45,8 +45,8 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 | Endpoint | Uso | Tela |
 |---|---|---|
 | `POST /api/student/enrollments/` 🔒 | Pedir inscrição numa turma | botão no detalhe da aula |
-| `GET /api/student/enrollments/` 🔒 | Minhas inscrições (paginado) | **nova** `/aluno/inscricoes` |
-| `GET /api/student/enrollments/{id}/` 🔒 | Detalhe e estado da inscrição/pagamento | **nova** `/aluno/inscricoes/[id]` |
+| `GET /api/student/enrollments/` 🔒 | Minhas inscrições (paginado) | `/aluno/inscricoes` ✅ |
+| `GET /api/student/enrollments/{id}/` 🔒 | Detalhe e estado da inscrição/pagamento | `/aluno/inscricoes/[id]` ✅ |
 | `POST /api/student/enrollments/{id}/proof/` 🔒 | Enviar comprovativo (upload) | no detalhe da inscrição |
 | `GET /api/student/enrollments/{id}/download-proof/` 🔒 | Baixar o comprovativo enviado | no detalhe da inscrição |
 | `POST /api/student/enrollments/{id}/cancel/` 🔒 | Cancelar inscrição | no detalhe da inscrição |
@@ -94,7 +94,7 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 | 0 | Cliente HTTP com axios (instância `api`, interceptores de JWT e refresh automático, erros do DRF), tipos da API | ✅ feito |
 | 1 | Autenticação: login, registo por papel, sessão (`/me`), logout, proteção do dashboard | ✅ feito |
 | 2 | Descoberta pública: catálogo de aulas, detalhe da aula (`/aulas/[id]`), diretório e perfil de mentores | ✅ feito |
-| 3 | Área do estudante: inscrições, comprovativo, cancelamento | — |
+| 3 | Área do aluno: pedir inscrição, `/aluno/inscricoes` (lista e detalhe), comprovativo, cancelamento | ✅ feito (validar no backend real) |
 | 4 | Área do mentor: CRUD de aulas, turmas, encontros; gestão de inscrições no dashboard | — |
 | 5 | Perfis de mentor e estudante | — |
 | 6 | Onboarding com IA, perfil de aprendizagem, recomendações | — |
@@ -111,7 +111,7 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 ## Decisões pendentes
 
 1. ~~**Página inicial:** catálogo de aulas~~ — decidido e feito na fase 2.
-2. **Rotas do aluno:** criar o grupo `(student)` com `/aluno/...` (o diretório já existe vazio)?
+2. ~~**Rotas do aluno:** grupo `(student)` com `/aluno/...`~~ — feito na fase 3.
 3. **Aulas do próprio mentor:** a API não tem um filtro explícito "minhas aulas" em `GET /api/courses/`.
    Confirmar com o backend se a listagem autenticada já devolve só as do mentor, ou se há um parâmetro.
 4. **Base URL da API** em cada ambiente (`NEXT_PUBLIC_API_URL`).
@@ -141,3 +141,15 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
   Pedir ao backend um endpoint de detalhe de mentor e um filtro `mentor` na busca.
 - O catálogo carrega até 100 aulas e ordena/pagina no cliente, porque a busca não tem ordenação por
   preço. Migrar para paginação no servidor quando o volume crescer.
+
+### A confirmar no backend (fase 3)
+
+O schema publicado em `/api/schema/` é igual ao YAML, por isso estes pontos continuam por confirmar.
+Estão isolados em `src/services/enrollment.service.ts`:
+
+- **Criar inscrição:** o frontend envia `{ "session": <id da turma>, "course": <id da aula> }`.
+- **Comprovativo:** o ficheiro vai em `multipart/form-data` com os campos `payment_proof` **e** `proof`
+  (constante `PROOF_FIELD_NAMES`). Reduzir para o nome certo quando confirmado.
+- **Limites do comprovativo** (só validados no cliente): JPG, PNG, WEBP ou PDF, até 5 MB.
+- **Cancelamento:** o frontend permite cancelar enquanto a inscrição está ativa e o pagamento não foi
+  confirmado. Confirmar a regra do backend.

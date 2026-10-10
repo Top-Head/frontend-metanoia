@@ -80,16 +80,25 @@ function firstMessage(value: unknown): string | undefined {
   return undefined;
 }
 
-function toApiError(error: AxiosError): ApiError {
+async function toApiError(error: AxiosError): Promise<ApiError> {
   if (!error.response) {
     return new ApiError("Não foi possível conectar ao servidor. Verifique sua conexão.", 0);
   }
 
-  const { status, data } = error.response;
+  const { status } = error.response;
+  let data: unknown = error.response.data;
+  // Pedidos com responseType "blob" recebem também os erros como Blob.
+  if (typeof Blob !== "undefined" && data instanceof Blob) {
+    try {
+      data = JSON.parse(await data.text());
+    } catch {
+      data = null;
+    }
+  }
   const fieldErrors: Record<string, string> = {};
   let message: string | undefined;
 
-  if (data && typeof data === "object" && !Array.isArray(data) && !(data instanceof Blob)) {
+  if (data && typeof data === "object" && !Array.isArray(data)) {
     for (const [key, value] of Object.entries(data)) {
       const text = firstMessage(value);
       if (!text) continue;
@@ -133,6 +142,6 @@ api.interceptors.response.use(
       window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
     }
 
-    throw toApiError(error);
+    throw await toApiError(error);
   }
 );

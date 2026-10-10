@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
-import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
+import { ChevronDown, ClipboardList, LayoutDashboard, LogOut } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { displayName } from "@/services/auth.service";
@@ -21,7 +21,7 @@ interface UserMenuProps {
 
 export function UserMenu({ tone = "default" }: UserMenuProps) {
   const router = useRouter();
-  const { user, isMentor, signOut } = useAuth();
+  const { user, isMentor, isStudent, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -92,6 +92,17 @@ export function UserMenu({ tone = "default" }: UserMenuProps) {
               >
                 <LayoutDashboard size={16} className="text-ink-soft" />
                 Painel do mentor
+              </Link>
+            )}
+            {isStudent && (
+              <Link
+                href="/aluno/inscricoes"
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-canvas"
+              >
+                <ClipboardList size={16} className="text-ink-soft" />
+                Minhas inscrições
               </Link>
             )}
             <button

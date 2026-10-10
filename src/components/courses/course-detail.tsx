@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import clsx from "clsx";
 import {
   ArrowLeft,
@@ -15,6 +17,7 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { MentorAvatar } from "@/components/mentors/mentor-card";
+import { Button } from "@/components/ui/button";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { useAuth } from "@/hooks/useAuth";
@@ -27,6 +30,8 @@ import {
   formatMeetingTime,
 } from "@/lib/format";
 import { getCourse } from "@/services/course.service";
+import { requestEnrollment } from "@/services/enrollment.service";
+import { ApiError } from "@/lib/api/client";
 import { categoryVisual } from "./category-visual";
 
 function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
@@ -96,9 +101,25 @@ function SessionOption({
 }
 
 function EnrollPanel({ course }: { course: CourseDetail }) {
-  const { status, isStudent } = useAuth();
+  const router = useRouter();
+  const { status, isStudent, user } = useAuth();
   const sessions = course.sessions.filter((session) => session.is_active !== false);
   const [selectedId, setSelectedId] = useState<number | null>(sessions[0]?.id ?? null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isOwnCourse = user?.mentor_profile?.id === course.mentor.id;
+
+  async function enroll() {
+    if (!selectedId) return;
+    setIsSubmitting(true);
+    try {
+      const enrollment = await requestEnrollment(selectedId, course.id);
+      toast.success("Pedido enviado! O mentor vai analisar a sua inscrição.");
+      router.push(`/aluno/inscricoes/${enrollment.id}`);
+    } catch (reason) {
+      toast.error(reason instanceof ApiError ? reason.message : "Não foi possível pedir a inscrição.");
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <div className="sticky top-24 rounded-2xl border border-line bg-panel p-6 shadow-card">
@@ -136,17 +157,25 @@ function EnrollPanel({ course }: { course: CourseDetail }) {
         >
           Entrar para se inscrever
         </Link>
+      ) : isOwnCourse ? (
+        <p className="mt-6 rounded-xl bg-canvas p-4 text-center text-sm font-semibold text-ink-soft">
+          Esta aula é sua.
+        </p>
+      ) : status === "authenticated" && !isStudent ? (
+        <p className="mt-6 rounded-xl bg-canvas p-4 text-center text-sm text-ink-soft">
+          Inscrições disponíveis apenas para contas de aluno.
+        </p>
       ) : (
-        // TODO (fase 3): POST /api/student/enrollments/ com a turma escolhida.
-        <button
+        <Button
           type="button"
-          disabled
-          className="mt-6 w-full rounded-xl bg-primary py-3.5 font-bold text-white opacity-50"
+          size="xl"
+          onClick={enroll}
+          isLoading={isSubmitting || status === "loading"}
+          disabled={!selectedId}
+          className="mt-6 w-full"
         >
-          {status === "authenticated" && !isStudent
-            ? "Disponível para contas de aluno"
-            : "Inscrições em breve"}
-        </button>
+          Pedir inscrição
+        </Button>
       )}
       <p className="mt-3 text-center text-xs text-ink-soft">
         {course.is_free
