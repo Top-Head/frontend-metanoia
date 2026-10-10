@@ -10,10 +10,15 @@ import {
 } from "lucide-react";
 import clsx from "clsx";
 import type { MentorCategory } from "@/data/mentors";
+import { formatKz } from "@/lib/currency";
 
 export type CategoryFilter = MentorCategory | "Todas Categorias";
 
 export type RatingFilter = 4 | 3 | 0;
+
+export const PRICE_MIN = 20_000;
+export const PRICE_MAX = 250_000;
+const PRICE_STEP = 5_000;
 
 interface MentorFiltersProps {
   selectedCategory: CategoryFilter;
@@ -89,24 +94,28 @@ export function MentorFilters({
         </div>
 
         <div className="space-y-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-ink-faint">
-            Preço por hora (US$)
-          </p>
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-ink-faint">
+              Preço por hora
+            </p>
+            <span className="text-xs font-bold text-primary">
+              até {formatKz(maxPrice)}
+            </span>
+          </div>
           <div className="px-1">
             <input
               type="range"
-              min={20}
-              max={250}
-              step={5}
+              min={PRICE_MIN}
+              max={PRICE_MAX}
+              step={PRICE_STEP}
               value={maxPrice}
               onChange={(event) => onPriceChange(Number(event.target.value))}
               aria-label="Preço máximo por hora"
               className="w-full accent-primary"
             />
-            <div className="mt-2 flex justify-between text-xs font-bold text-ink-soft">
-              <span>$20</span>
-              <span>até ${maxPrice}</span>
-              <span>$250</span>
+            <div className="mt-2 flex justify-between text-[11px] font-semibold text-ink-faint">
+              <span>{formatKz(PRICE_MIN)}</span>
+              <span>{formatKz(PRICE_MAX)}</span>
             </div>
           </div>
         </div>

@@ -9,9 +9,11 @@ import { Bell, Search } from "lucide-react";
 import logoMetanoia from "@/assets/logo.png";
 
 const NAV_ITEMS = [
-  { label: "Encontrar Mentores", href: "/" },
+  { label: "Inicio", href: "/" },
+  { label: "Sobre", href: "/about" },
+  { label: "FAQ", href: "/faq" },
   { label: "Tornar-se Mentor", href: "/auth/selecionar-papel" },
-  { label: "Meu Aprendizado", href: "/dashboard" },
+  { label: "Contato", href: "/contact" },
 ];
 
 const SCROLL_THRESHOLD = 80;

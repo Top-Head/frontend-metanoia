@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Star } from "lucide-react";
 import type { Mentor } from "@/data/mentors";
+import { formatKz } from "@/lib/currency";
 
 interface MentorCardProps {
   mentor: Mentor;
@@ -52,7 +53,7 @@ export function MentorCard({ mentor }: MentorCardProps) {
               A partir de
             </p>
             <p className="text-lg font-bold text-ink">
-              ${mentor.price}
+              {formatKz(mentor.price)}
               <span className="text-xs font-normal text-ink-soft">/h</span>
             </p>
           </div>

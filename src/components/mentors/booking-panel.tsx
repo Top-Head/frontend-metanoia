@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
+import { formatKz } from "@/lib/currency";
 
 const WEEKDAY_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
 
@@ -76,27 +77,27 @@ export function BookingPanel({ basePrice }: BookingPanelProps) {
                     setSelectedSession(session.id);
                   }
                 }}
-                className={`flex cursor-pointer items-center justify-between rounded-xl p-3 transition-colors ${
+                className={`flex cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors ${
                   selected
                     ? "border-2 border-primary bg-primary/5"
                     : "border border-line hover:border-primary"
                 }`}
               >
-                <span className="flex items-center gap-3">
-                  <span
-                    className={`flex size-4 items-center justify-center rounded-full border-2 ${
-                      selected ? "border-primary" : "border-line-strong"
-                    }`}
-                  >
-                    {selected && <span className="size-2 rounded-full bg-primary" />}
-                  </span>
-                  <span className="text-sm font-semibold text-ink">
+                <span
+                  className={`flex size-4 shrink-0 items-center justify-center rounded-full border-2 ${
+                    selected ? "border-primary" : "border-line-strong"
+                  }`}
+                >
+                  {selected && <span className="size-2 rounded-full bg-primary" />}
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold text-ink">
                     {session.label}
                   </span>
-                </span>
-                <span className="min-w-fit text-sm font-bold text-ink">
-                  ${session.price}
-                  <span className="text-xs font-normal text-ink-soft">/h</span>
+                  <span className="mt-0.5 block whitespace-nowrap text-sm font-bold text-primary">
+                    {formatKz(session.price)}
+                    <span className="text-xs font-normal text-ink-soft">/h</span>
+                  </span>
                 </span>
               </div>
             );

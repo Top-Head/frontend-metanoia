@@ -8,6 +8,7 @@ import { HeroVideo } from "@/components/hero-video";
 import { MentorCard } from "@/components/mentors/mentor-card";
 import {
   MentorFilters,
+  PRICE_MAX,
   type CategoryFilter,
   type RatingFilter,
 } from "@/components/mentors/mentor-filters";
@@ -22,7 +23,7 @@ export default function Page() {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("Todas Categorias");
   const [rating, setRating] = useState<RatingFilter>(0);
-  const [maxPrice, setMaxPrice] = useState(250);
+  const [maxPrice, setMaxPrice] = useState(PRICE_MAX);
   const [sortOrder, setSortOrder] = useState<SortOrder>("recomendados");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -69,7 +70,7 @@ export default function Page() {
     setSearchTerm("");
     setCategory("Todas Categorias");
     setRating(0);
-    setMaxPrice(250);
+    setMaxPrice(PRICE_MAX);
     setSortOrder("recomendados");
     setCurrentPage(1);
   }
