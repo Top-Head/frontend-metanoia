@@ -95,7 +95,7 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 | 1 | Autenticação: login, registo por papel, sessão (`/me`), logout, proteção do dashboard | ✅ feito |
 | 2 | Descoberta pública: catálogo de aulas, detalhe da aula (`/aulas/[id]`), diretório e perfil de mentores | ✅ feito |
 | 3 | Área do aluno: pedir inscrição, `/aluno/inscricoes` (lista e detalhe), comprovativo, cancelamento | ✅ feito (validar no backend real) |
-| 4 | Área do mentor: CRUD de aulas, turmas, encontros; gestão de inscrições no dashboard | — |
+| 4 | Área do mentor: `/dashboard` com inscrições reais, `/dashboard/aulas` (lista, nova, editor com turmas e encontros) | ✅ feito (validar no backend real) |
 | 5 | Perfis de mentor e estudante | — |
 | 6 | Onboarding com IA, perfil de aprendizagem, recomendações | — |
 
@@ -153,3 +153,18 @@ Estão isolados em `src/services/enrollment.service.ts`:
 - **Limites do comprovativo** (só validados no cliente): JPG, PNG, WEBP ou PDF, até 5 MB.
 - **Cancelamento:** o frontend permite cancelar enquanto a inscrição está ativa e o pagamento não foi
   confirmado. Confirmar a regra do backend.
+
+### A confirmar no backend (fase 4)
+
+Isolado em `src/services/mentor-course.service.ts` e `src/services/mentor-enrollment.service.ts`:
+
+- **Minhas aulas:** o frontend pede `GET /api/courses/` autenticado e filtra pelo `mentor.id` do utilizador.
+  Confirmar se esta listagem inclui os **rascunhos** do próprio mentor; se não, é preciso um endpoint
+  (ou filtro) para as aulas do mentor, senão rascunhos recém-criados não aparecem na lista.
+- **Criar turma:** `POST /api/courses/{id}/sessions/` com `{ course, name, capacity, is_active }`.
+- **Criar encontro:** `POST /api/sessions/{id}/meetings/` com `{ session, starts_at, ends_at, location }`
+  (datas em ISO UTC, convertidas a partir da hora local).
+- **Recusar pedido / comprovativo:** o frontend envia `{ "decision_note": "..." }` quando há motivo.
+- **Publicar:** o frontend não bloqueia; se a API exigir turma ativa, mostra a mensagem dela.
+- O calendário do dashboard pede o detalhe de até 10 aulas para montar os encontros (não há endpoint
+  de "encontros do mentor").

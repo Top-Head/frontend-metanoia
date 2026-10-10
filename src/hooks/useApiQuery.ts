@@ -7,17 +7,10 @@ interface QueryState<T> {
   data: T | undefined;
   error: ApiError | null;
   isLoading: boolean;
-  /** Volta a executar o pedido (ex.: botão "Tentar de novo"). */
   reload: () => void;
-  /** Substitui os dados localmente (ex.: com a resposta de uma ação). */
   mutate: (next: T) => void;
 }
 
-/**
- * Executa `fetcher` sempre que `key` muda. Respostas de pedidos antigos
- * são ignoradas, para que filtros alterados rapidamente não mostrem
- * resultados desatualizados. Passe `key = null` para não executar.
- */
 export function useApiQuery<T>(key: string | null, fetcher: () => Promise<T>): QueryState<T> {
   const [data, setData] = useState<T>();
   const [error, setError] = useState<ApiError | null>(null);

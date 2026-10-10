@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { ApiError } from "@/lib/api/client";
+import { openBlob } from "@/lib/download";
 import type { Enrollment } from "@/lib/api/types";
 import {
   canCancel,
@@ -150,9 +151,7 @@ function PaymentSection({
     setIsDownloading(true);
     try {
       const blob = await downloadMyPaymentProof(enrollment.id);
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank", "noopener");
-      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      openBlob(blob);
     } catch (reason) {
       toast.error(reason instanceof ApiError ? reason.message : "Não foi possível abrir o comprovativo.");
     } finally {

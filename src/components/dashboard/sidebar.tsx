@@ -15,9 +15,9 @@ import logoMetanoia from "@/assets/logo.png";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Minhas aulas", href: "/dashboard/aulas", icon: BookOpen },
   { label: "Mensagens", href: "/messages", icon: MessagesSquare },
-  { label: "Encontrar Mentores", href: "/", icon: Presentation },
-  { label: "Meus Cursos", href: "/about", icon: BookOpen },
+  { label: "Ver catálogo", href: "/", icon: Presentation },
 ];
 
 export default function SidebarDashboard() {
@@ -38,7 +38,9 @@ export default function SidebarDashboard() {
 
       <nav className="mt-10 flex flex-col gap-1">
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-          const isActive = pathname === href;
+          // "/dashboard" e "/" só ficam ativos na própria página; os restantes também nas sub-rotas.
+          const isActive =
+            href === "/dashboard" || href === "/" ? pathname === href : pathname.startsWith(href);
 
           return (
             <Link
