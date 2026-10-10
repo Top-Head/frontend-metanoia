@@ -25,6 +25,8 @@ interface SelectProps {
   placeholder?: string;
   icon?: ReactNode;
   name?: string;
+  /** "field": campo de formulário com label acima. "inline": compacto, label ao lado. */
+  variant?: "field" | "inline";
 }
 
 /**
@@ -41,7 +43,9 @@ export function Select({
   placeholder = "Selecione uma opção",
   icon,
   name,
+  variant = "field",
 }: SelectProps) {
+  const isInline = variant === "inline";
   const id = useId();
   const labelId = `${id}-label`;
   const listboxId = `${id}-listbox`;
@@ -159,8 +163,16 @@ export function Select({
   }
 
   return (
-    <div ref={rootRef} className="relative">
-      <label id={labelId} htmlFor={`${id}-trigger`} className="mb-2 block text-sm font-bold text-ink">
+    <div ref={rootRef} className={clsx("relative", isInline && "flex items-center gap-2")}>
+      <label
+        id={labelId}
+        htmlFor={`${id}-trigger`}
+        className={clsx(
+          isInline
+            ? "whitespace-nowrap text-xs font-bold text-ink-faint"
+            : "mb-2 block text-sm font-bold text-ink"
+        )}
+      >
         {label}
       </label>
 
@@ -176,8 +188,9 @@ export function Select({
         onClick={() => (isOpen ? setIsOpen(false) : open())}
         onKeyDown={handleKeyDown}
         className={clsx(
-          "relative flex h-11 w-full items-center rounded-lg border bg-panel pr-10 text-left text-sm outline-none transition-colors",
-          icon ? "pl-10" : "pl-3",
+          "relative flex items-center rounded-lg border bg-panel text-left outline-none transition-colors",
+          isInline ? "h-9 pr-9 text-xs font-bold" : "h-11 w-full pr-10 text-sm",
+          icon ? (isInline ? "pl-9" : "pl-10") : "pl-3",
           isOpen
             ? "border-primary ring-1 ring-primary"
             : "border-line-strong hover:border-ink-faint focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary"
@@ -192,9 +205,11 @@ export function Select({
           {selected?.label ?? placeholder}
         </span>
         <ChevronDown
-          size={18}
+          size={isInline ? 16 : 18}
           className={clsx(
-            "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint transition-transform duration-200",
+            "pointer-events-none absolute top-1/2",
+            isInline ? "right-2.5" : "right-3",
+            "-translate-y-1/2 text-ink-faint transition-transform duration-200",
             isOpen && "rotate-180 text-primary"
           )}
         />
@@ -209,7 +224,10 @@ export function Select({
           role="listbox"
           aria-labelledby={labelId}
           tabIndex={-1}
-          className="absolute inset-x-0 top-full z-30 mt-2 max-h-80 overflow-y-auto rounded-xl border border-line bg-panel p-1.5 shadow-float transition duration-150 starting:-translate-y-1 starting:opacity-0"
+          className={clsx(
+            "absolute top-full z-30 mt-2 max-h-80 overflow-y-auto rounded-xl border border-line bg-panel p-1.5 shadow-float transition duration-150 starting:-translate-y-1 starting:opacity-0",
+            isInline ? "right-0 w-72" : "inset-x-0"
+          )}
         >
           {options.map((option, index) => {
             const isSelected = index === selectedIndex;

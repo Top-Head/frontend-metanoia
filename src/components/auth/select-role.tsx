@@ -36,7 +36,7 @@ export default function SelectUserRole(): JSX.Element {
       return;
     }
 
-    router.push("/auth/cadastro");
+    router.push(`/auth/cadastro?papel=${selectedRole === "mentor" ? "mentor" : "aluno"}`);
   }
 
   return (

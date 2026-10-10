@@ -9,19 +9,23 @@ import {
   MessagesSquare,
   Presentation,
   BookOpen,
-  Cog,
+  UserRound,
+  LogOut,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import logoMetanoia from "@/assets/logo.png";
+import { useAuth } from "@/hooks/useAuth";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Minhas aulas", href: "/dashboard/aulas", icon: BookOpen },
   { label: "Mensagens", href: "/messages", icon: MessagesSquare },
-  { label: "Encontrar Mentores", href: "/", icon: Presentation },
-  { label: "Meus Cursos", href: "/about", icon: BookOpen },
+  { label: "Ver catálogo", href: "/", icon: Presentation },
 ];
 
 export default function SidebarDashboard() {
   const pathname = usePathname();
+  const { signOut } = useAuth();
 
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-line bg-panel px-4 py-6 md:flex">
@@ -38,7 +42,9 @@ export default function SidebarDashboard() {
 
       <nav className="mt-10 flex flex-col gap-1">
         {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-          const isActive = pathname === href;
+          // "/dashboard" e "/" só ficam ativos na própria página; os restantes também nas sub-rotas.
+          const isActive =
+            href === "/dashboard" || href === "/" ? pathname === href : pathname.startsWith(href);
 
           return (
             <Link
@@ -60,13 +66,30 @@ export default function SidebarDashboard() {
       </nav>
 
       <div className="mt-auto flex flex-col gap-1 border-t border-line pt-4">
-        <span className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-ink-faint">
-          <Cog size={18} />
-          Configurações
-          <span className="ml-auto rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-ink-soft">
-            em breve
-          </span>
-        </span>
+        <Link
+          href="/dashboard/perfil"
+          aria-current={pathname === "/dashboard/perfil" ? "page" : undefined}
+          className={clsx(
+            "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            pathname === "/dashboard/perfil"
+              ? "bg-primary/10 text-primary"
+              : "text-ink-soft hover:bg-slate-50 hover:text-ink"
+          )}
+        >
+          <UserRound size={18} />
+          Meu perfil
+        </Link>
+        <button
+          type="button"
+          onClick={() => {
+            signOut();
+            toast.success("Sessão terminada.");
+          }}
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-danger transition-colors hover:bg-danger/5"
+        >
+          <LogOut size={18} />
+          Sair
+        </button>
       </div>
     </aside>
   );

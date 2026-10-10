@@ -1,22 +1,24 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 
-interface MentorPaginationProps {
+interface PaginationProps {
   totalPages: number;
   currentPage: number;
   onPageChange: (page: number) => void;
+  label?: string;
 }
 
-export function MentorPagination({
+export function Pagination({
   totalPages,
   currentPage,
   onPageChange,
-}: MentorPaginationProps) {
+  label = "Paginação",
+}: PaginationProps) {
   if (totalPages <= 1) return null;
 
   return (
     <nav
-      aria-label="Paginação de mentores"
+      aria-label={label}
       className="mt-16 flex items-center justify-center gap-2"
     >
       <button

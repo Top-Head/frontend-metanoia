@@ -1,16 +1,20 @@
 "use client";
 
 import { JSX, forwardRef, useId, useState, type InputHTMLAttributes } from "react";
+import clsx from "clsx";
 import { Lock, EyeOff, Eye } from "lucide-react";
 
 interface PasswordInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  /** Mensagem de erro exibida abaixo do campo. */
+  error?: string;
 }
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-  function PasswordInput({ label = "Senha", id, ...rest }, ref): JSX.Element {
+  function PasswordInput({ label = "Senha", error, id, ...rest }, ref): JSX.Element {
     const autoId = useId();
     const inputId = id ?? autoId;
+    const errorId = `${inputId}-error`;
     const [isVisible, setIsVisible] = useState(false);
 
     return (
@@ -30,7 +34,14 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             ref={ref}
             id={inputId}
             type={isVisible ? "text" : "password"}
-            className="h-11 w-full rounded-lg border border-line-strong bg-panel pl-10 pr-11 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-primary focus:ring-1 focus:ring-primary"
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
+            className={clsx(
+              "h-11 w-full rounded-lg border bg-panel pl-10 pr-11 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:ring-1",
+              error
+                ? "border-danger focus:border-danger focus:ring-danger"
+                : "border-line-strong focus:border-primary focus:ring-primary"
+            )}
             {...rest}
           />
           <button
@@ -42,6 +53,11 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             {isVisible ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
+        {error && (
+          <p id={errorId} className="mt-1.5 text-xs font-medium text-danger">
+            {error}
+          </p>
+        )}
       </div>
     );
   }

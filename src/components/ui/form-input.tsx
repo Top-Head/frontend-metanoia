@@ -1,19 +1,24 @@
 import { JSX, useId, type InputHTMLAttributes, type ReactNode } from "react";
+import clsx from "clsx";
 
 interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   icon?: ReactNode;
+  /** Mensagem de erro exibida abaixo do campo. */
+  error?: string;
 }
 
 export default function FormInput({
   label,
   icon,
+  error,
   id,
   className,
   ...rest
 }: FormInputProps): JSX.Element {
   const autoId = useId();
   const inputId = id ?? autoId;
+  const errorId = `${inputId}-error`;
 
   return (
     <div>
@@ -31,10 +36,24 @@ export default function FormInput({
         )}
         <input
           id={inputId}
-          className={`h-11 w-full rounded-lg border border-line-strong bg-panel pl-10 pr-3 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-primary focus:ring-1 focus:ring-primary ${className ?? ""}`}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
+          className={clsx(
+            "h-11 w-full rounded-lg border bg-panel pr-3 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:ring-1",
+            icon ? "pl-10" : "pl-3",
+            error
+              ? "border-danger focus:border-danger focus:ring-danger"
+              : "border-line-strong focus:border-primary focus:ring-primary",
+            className
+          )}
           {...rest}
         />
       </div>
+      {error && (
+        <p id={errorId} className="mt-1.5 text-xs font-medium text-danger">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

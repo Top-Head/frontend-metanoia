@@ -1,70 +1,51 @@
-import Image from "next/image";
 import Link from "next/link";
-import { Star } from "lucide-react";
-import type { Mentor } from "@/data/mentors";
-import { formatKz } from "@/lib/currency";
+import { ArrowRight, BadgeCheck } from "lucide-react";
+import type { Mentor, MentorSummary } from "@/lib/api/types";
+import { initials } from "@/lib/format";
 
-interface MentorCardProps {
-  mentor: Mentor;
+export function MentorAvatar({ name, size = "md" }: { name: string; size?: "md" | "lg" }) {
+  return (
+    <span
+      className={
+        size === "lg"
+          ? "flex size-20 shrink-0 items-center justify-center rounded-2xl bg-primary text-2xl font-bold text-white"
+          : "flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary text-base font-bold text-white"
+      }
+    >
+      {initials(name)}
+    </span>
+  );
 }
 
-export function MentorCard({ mentor }: MentorCardProps) {
-  return (
-    <article className="group overflow-hidden rounded-2xl border border-line bg-panel shadow-card transition-all duration-300 hover:shadow-float">
-      <div className="relative h-52 overflow-hidden bg-slate-200">
-        <Image
-          src={mentor.image}
-          alt={`Foto de ${mentor.name}`}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-lg bg-white/95 px-2 py-1 shadow-card">
-          <Star size={12} className="fill-yellow-400 text-yellow-400" />
-          <span className="text-[11px] font-bold">{mentor.rating}</span>
-          <span className="text-[10px] font-medium text-ink-faint">
-            ({mentor.reviews})
-          </span>
-        </div>
-      </div>
+export function MentorCard({ mentor }: { mentor: Mentor | MentorSummary }) {
+  const verified = "is_verified" in mentor && mentor.is_verified;
 
-      <div className="space-y-4 p-6">
-        <div>
-          <h3 className="text-lg font-bold text-ink">{mentor.name}</h3>
-          <p className="mt-1 text-xs font-bold uppercase tracking-wide text-primary">
-            {mentor.role}
+  return (
+    <Link
+      href={`/mentor?id=${mentor.id}`}
+      className="group flex flex-col rounded-2xl border border-line bg-panel p-5 shadow-card transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-float"
+    >
+      <div className="flex items-center gap-3">
+        <MentorAvatar name={mentor.name} />
+        <div className="min-w-0">
+          <p className="flex items-center gap-1.5 font-bold text-ink">
+            <span className="truncate">{mentor.name}</span>
+            {verified && (
+              <BadgeCheck size={16} className="shrink-0 text-primary" aria-label="Mentor verificado" />
+            )}
+          </p>
+          <p className="truncate text-xs text-ink-soft">
+            {mentor.specialty_details.map((detail) => detail.name).join(" · ") || "Mentor"}
           </p>
         </div>
-
-        <div className="flex flex-wrap gap-1.5">
-          {mentor.skills.map((skill) => (
-            <span
-              key={skill}
-              className="rounded-md border border-line bg-slate-50 px-2 py-1 text-[9px] font-bold uppercase tracking-tighter text-ink-faint"
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
-
-        <div className="flex items-center justify-between border-t border-line pt-4">
-          <div>
-            <p className="text-[10px] font-medium text-ink-faint">
-              A partir de
-            </p>
-            <p className="text-lg font-bold text-ink">
-              {formatKz(mentor.price)}
-              <span className="text-xs font-normal text-ink-soft">/h</span>
-            </p>
-          </div>
-          <Link
-            href={`/mentor?id=${mentor.id}`}
-            className="rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-primary-strong"
-          >
-            Ver Perfil
-          </Link>
-        </div>
       </div>
-    </article>
+
+      {mentor.bio && <p className="mt-4 line-clamp-2 text-sm text-ink-soft">{mentor.bio}</p>}
+
+      <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-bold text-primary">
+        Ver perfil
+        <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+      </span>
+    </Link>
   );
 }
