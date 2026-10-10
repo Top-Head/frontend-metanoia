@@ -106,7 +106,7 @@ export default function RegistrationPage(): JSX.Element {
     try {
       const user = await signUp(payload);
       toast.success("Conta criada com sucesso!");
-      router.replace(homePathFor(user));
+      router.replace(isMentor ? homePathFor(user) : "/aluno/onboarding");
     } catch (error) {
       if (error instanceof ApiError) {
         setErrors(error.fieldErrors);

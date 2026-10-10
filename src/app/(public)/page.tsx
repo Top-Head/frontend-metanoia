@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowDownUp, ArrowRight, GraduationCap, Search, SearchX } from "lucide-react";
+import { ArrowDownUp, ArrowRight, GraduationCap, Search, SearchX, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { HeroVideo } from "@/components/hero-video";
@@ -22,6 +22,8 @@ import type { DiscoveryResult } from "@/lib/api/types";
 import { listCategories } from "@/services/category.service";
 import { searchCourses } from "@/services/course.service";
 import { listMentors } from "@/services/mentor.service";
+import { getRecommendations } from "@/services/onboarding.service";
+import { useAuth } from "@/hooks/useAuth";
 
 const PAGE_SIZE = 9;
 /** Carregamos o catálogo de uma vez para ordenar por preço no cliente. */
@@ -54,6 +56,8 @@ export default function Page() {
 
   const categories = useApiQuery("categories", () => listCategories());
   const mentors = useApiQuery("mentors-featured", () => listMentors({ page_size: 4 }));
+  const { isStudent } = useAuth();
+  const recommended = useApiQuery(isStudent ? "home-recommendations" : null, () => getRecommendations());
 
   const params = {
     q: query,
@@ -137,6 +141,34 @@ export default function Page() {
       </section>
 
       <main id="catalogo" className="mx-auto max-w-7xl scroll-mt-20 px-6 py-16 lg:px-10">
+        {recommended.data && recommended.data.length > 0 && (
+          <section aria-labelledby="para-voce-title" className="mb-16 rounded-3xl bg-primary/5 p-6 md:p-8">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <div>
+                <p className="mb-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                  <Sparkles size={14} />
+                  Para você
+                </p>
+                <h2 id="para-voce-title" className="text-2xl font-bold text-ink">
+                  Recomendado a partir dos seus objetivos
+                </h2>
+              </div>
+              <Link
+                href="/aluno/para-voce"
+                className="inline-flex shrink-0 items-center gap-1 text-sm font-bold text-primary hover:underline"
+              >
+                Ver todas
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {recommended.data.slice(0, 3).map((result) => (
+                <CourseCard key={result.course.id} result={result} />
+              ))}
+            </div>
+          </section>
+        )}
+
         <div className="flex flex-col gap-12 lg:flex-row">
           <CourseFilters
             categories={categories.data ?? []}

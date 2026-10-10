@@ -80,12 +80,12 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 
 | Endpoint | Uso | Tela |
 |---|---|---|
-| `POST /api/onboarding/start/` 🔒 | Inicia conversa | **nova** `/aluno/onboarding` (chat) |
+| `POST /api/onboarding/start/` 🔒 | Inicia conversa | `/aluno/onboarding` (chat) ✅ |
 | `POST /api/onboarding/{id}/message/` 🔒 | Envia mensagem | chat |
 | `POST /api/onboarding/{id}/skip/` 🔒 | Pular conversa | chat |
 | `GET /api/onboarding/` · `/{id}/` 🔒 | Histórico / retomar | chat |
 | `GET/PATCH /api/learning-profile/{id}/` 🔒 | Rever e ajustar perfil extraído | `/aluno/perfil` |
-| `GET /api/discovery/recommendations/` 🔒 | Aulas recomendadas | **nova** secção "Para você" |
+| `GET /api/discovery/recommendations/` 🔒 | Aulas recomendadas | `/aluno/para-voce` e página inicial ✅ |
 
 ## Fases de execução
 
@@ -97,7 +97,7 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 | 3 | Área do aluno: pedir inscrição, `/aluno/inscricoes` (lista e detalhe), comprovativo, cancelamento | ✅ feito (validar no backend real) |
 | 4 | Área do mentor: `/dashboard` com inscrições reais, `/dashboard/aulas` (lista, nova, editor com turmas e encontros) | ✅ feito (validar no backend real) |
 | 5 | Perfis: `/dashboard/perfil` (mentor) e `/aluno/perfil` (aluno), criar o segundo perfil na mesma conta | ✅ feito (validar no backend real) |
-| 6 | Onboarding com IA, perfil de aprendizagem, recomendações | — |
+| 6 | Onboarding com IA (`/aluno/onboarding`), perfil de aprendizagem e recomendações (`/aluno/para-voce`, faixa na página inicial) | ✅ feito (validar no backend real) |
 
 ## Sem endpoint na API (continuam mock ou ficam desativados)
 
@@ -175,3 +175,17 @@ Isolado em `src/services/mentor-course.service.ts` e `src/services/mentor-enroll
   o frontend trata como "sem perfil".
 - Criar o segundo perfil (`POST`) transforma a conta em aluno **e** mentor. Confirmar que o backend permite
   isto para contas registadas só com um papel.
+
+### A confirmar no backend (fase 6)
+
+Isolado em `src/services/onboarding.service.ts`:
+
+- **Enviar mensagem:** `POST /api/onboarding/{id}/message/` com `{ "content": "...", "message": "..." }`
+  (o corpo não está documentado). Reduzir para o campo certo quando confirmado.
+- **Id do perfil de aprendizagem:** nenhum endpoint o devolve. O frontend usa o **id do perfil de aluno**
+  em `GET/PATCH /api/learning-profile/{id}/` e trata 404 como "perfil ainda não gerado". Se o id for outro,
+  é preciso expô-lo (ex.: em `/api/me/` ou na resposta da conversa concluída).
+- **Recomendações:** aceita lista (como no YAML) ou objeto paginado (como a busca real).
+- O frontend esconde mensagens com `role: SYSTEM` e considera a conversa terminada quando `status` passa a
+  `COMPLETED`.
+- Depois do cadastro, alunos novos vão para `/aluno/onboarding`.

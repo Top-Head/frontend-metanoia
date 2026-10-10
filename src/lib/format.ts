@@ -1,5 +1,5 @@
 import { formatKz } from "./currency";
-import type { CourseType, Modality } from "./api/types";
+import type { CourseType, Level, Modality, PreferredModality } from "./api/types";
 
 export const COURSE_TYPE_LABEL: Record<CourseType, string> = {
   INDIVIDUAL: "Individual",
@@ -9,6 +9,19 @@ export const COURSE_TYPE_LABEL: Record<CourseType, string> = {
 export const MODALITY_LABEL: Record<Modality, string> = {
   ONLINE: "Online",
   PRESENTIAL: "Presencial",
+};
+
+export const LEVEL_LABEL: Record<Level, string> = {
+  BEGINNER: "Iniciante",
+  INTERMEDIATE: "Intermédio",
+  ADVANCED: "Avançado",
+  UNKNOWN: "Não definido",
+};
+
+export const PREFERRED_MODALITY_LABEL: Record<PreferredModality, string> = {
+  ONLINE: "Online",
+  PRESENTIAL: "Presencial",
+  ANY: "Qualquer",
 };
 
 const KWANZA_CODES = new Set(["", "AOA", "KZ", "KWZ"]);
