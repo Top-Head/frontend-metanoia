@@ -1,33 +1,48 @@
+"use client";
+
 import { useCallback } from "react";
 import { useStore } from "@/store/useStore";
 import {
+  isMentor,
+  isStudent,
   login as loginRequest,
+  register as registerRequest,
   type LoginPayload,
+  type RegisterPayload,
 } from "@/services/auth.service";
 
-/**
- * Hook de autenticação.
- *
- * TODO: integrar com a API real (login, sessão/jwt, refresh token)
- * e manter a informação persistida entre recarregamentos.
- */
+/** Hook de autenticação: sessão atual e ações de login, registo e logout. */
 export function useAuth() {
-  const { user, login, logout } = useStore();
+  const { user, status, startSession, refreshUser, endSession, endReason } = useStore();
 
   const signIn = useCallback(
     async (payload: LoginPayload) => {
-      const authenticated = await loginRequest(payload);
-      login(authenticated);
+      const envelope = await loginRequest(payload);
+      startSession(envelope);
+      return envelope.user;
     },
-    [login]
+    [startSession]
   );
 
-  const signOut = useCallback(() => logout(), [logout]);
+  const signUp = useCallback(
+    async (payload: RegisterPayload) => {
+      const envelope = await registerRequest(payload);
+      startSession(envelope);
+      return envelope.user;
+    },
+    [startSession]
+  );
 
   return {
     user,
-    isAuthenticated: Boolean(user),
+    status,
+    isAuthenticated: status === "authenticated",
+    isMentor: isMentor(user),
+    isStudent: isStudent(user),
     signIn,
-    signOut,
+    signUp,
+    signOut: () => endSession("manual"),
+    endReason,
+    refreshUser,
   };
 }

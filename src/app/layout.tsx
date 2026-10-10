@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Lexend, Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { StoreProvider } from "@/store/useStore";
 import "./globals.css";
 
 const lexend = Lexend({
@@ -15,7 +16,7 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Academia Metanoia — Mentoria com Especialistas",
+    default: "Academia Metanoia - Mentoria com Especialistas",
     template: "%s | Academia Metanoia",
   },
   description:
@@ -48,7 +49,7 @@ export default function RootLayout({
       <body
         className={`${lexend.variable} ${jakarta.variable} font-sans antialiased`}
       >
-        {children}
+        <StoreProvider>{children}</StoreProvider>
         <Toaster
           position="top-center"
           toastOptions={{ duration: 4000 }}

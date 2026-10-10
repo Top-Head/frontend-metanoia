@@ -7,6 +7,8 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { Bell, Search } from "lucide-react";
 import logoMetanoia from "@/assets/logo.png";
+import { UserMenu } from "@/components/user-menu";
+import { useAuth } from "@/hooks/useAuth";
 
 const NAV_ITEMS = [
   { label: "Inicio", href: "/" },
@@ -30,6 +32,7 @@ export default function Header({
   activeLabel = null,
 }: HeaderProps) {
   const pathname = usePathname();
+  const { status } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -123,14 +126,12 @@ export default function Header({
                 <Bell size={18} />
                 <span className="absolute right-2.5 top-2.5 size-2 rounded-full bg-danger" />
               </button>
-              <Image
-                src="/Image+Border.svg"
-                alt="Avatar do usuário"
-                width={36}
-                height={36}
-                className="rounded-full"
-              />
+              <UserMenu />
             </>
+          ) : status === "authenticated" ? (
+            <UserMenu tone={solid ? "default" : "light"} />
+          ) : status === "loading" ? (
+            <span aria-hidden="true" className="h-10 w-44" />
           ) : (
             <>
               <Link

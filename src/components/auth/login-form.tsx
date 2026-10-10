@@ -2,15 +2,25 @@
 
 import { JSX, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { Button } from "../ui/button";
 import SocialButton from "./_components/login-components/social-button";
 import LeftSection from "./_components/login-components/left-section";
+import { useAuth } from "@/hooks/useAuth";
+import { ApiError } from "@/lib/api/client";
+import { displayName, homePathFor } from "@/services/auth.service";
+
+/** Aceita apenas caminhos internos, para evitar redirecionamento aberto. */
+function safeNextPath(next: string | null) {
+  return next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+}
 
 export default function LoginPage(): JSX.Element {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -26,10 +36,20 @@ export default function LoginPage(): JSX.Element {
 
     setIsSubmitting(true);
 
-    // TODO: substituir pela integração real com a API de autenticação.
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    toast.success("Login realizado com sucesso!");
-    router.push("/dashboard");
+    try {
+      const user = await signIn({ email: email.trim(), password });
+      toast.success(`Bem-vindo de volta, ${displayName(user)}!`);
+      router.replace(safeNextPath(searchParams.get("next")) ?? homePathFor(user));
+    } catch (error) {
+      const message =
+        error instanceof ApiError && error.status === 401
+          ? "E-mail ou senha incorretos."
+          : error instanceof Error
+            ? error.message
+            : "Não foi possível entrar. Tente novamente.";
+      toast.error(message);
+      setIsSubmitting(false);
+    }
   }
 
   return (

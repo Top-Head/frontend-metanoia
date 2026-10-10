@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { ArrowDownUp, Search } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { HeroVideo } from "@/components/hero-video";
@@ -13,11 +13,33 @@ import {
   type RatingFilter,
 } from "@/components/mentors/mentor-filters";
 import { MentorPagination } from "@/components/mentors/mentor-pagination";
-import { MENTORS } from "@/data/mentors";
+import { Select, type SelectOption } from "@/components/ui/select";
+import { MENTORS, type Mentor } from "@/data/mentors";
 
 const PAGE_SIZE = 6;
 
-type SortOrder = "recomendados" | "preco";
+type SortOrder =
+  | "recomendados"
+  | "avaliacao"
+  | "popularidade"
+  | "preco-asc"
+  | "preco-desc";
+
+const SORT_OPTIONS: Array<SelectOption & { value: SortOrder }> = [
+  { value: "recomendados", label: "Recomendados", description: "Seleção da equipe Metanoia" },
+  { value: "avaliacao", label: "Melhor avaliados", description: "Maior nota média primeiro" },
+  { value: "popularidade", label: "Mais avaliados", description: "Mais avaliações de estudantes" },
+  { value: "preco-asc", label: "Menor preço", description: "Do mais acessível ao mais alto" },
+  { value: "preco-desc", label: "Maior preço", description: "Do mais alto ao mais acessível" },
+];
+
+const SORTERS: Record<SortOrder, ((a: Mentor, b: Mentor) => number) | null> = {
+  recomendados: null,
+  avaliacao: (a, b) => b.rating - a.rating || b.reviews - a.reviews,
+  popularidade: (a, b) => b.reviews - a.reviews,
+  "preco-asc": (a, b) => a.price - b.price,
+  "preco-desc": (a, b) => b.price - a.price,
+};
 
 export default function Page() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,11 +73,8 @@ export default function Page() {
       );
     });
 
-    if (sortOrder === "preco") {
-      filtered.sort((a, b) => a.price - b.price);
-    }
-
-    return filtered;
+    const sorter = SORTERS[sortOrder];
+    return sorter ? filtered.sort(sorter) : filtered;
   }, [searchTerm, category, rating, maxPrice, sortOrder]);
 
   const totalPages = Math.max(1, Math.ceil(mentors.length / PAGE_SIZE));
@@ -151,21 +170,17 @@ export default function Page() {
                 </span>
               </h2>
 
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-ink-faint">
-                  Ordenar por:
-                </span>
-                <select
-                  value={sortOrder}
-                  onChange={(event) =>
-                    setSortOrder(event.target.value as SortOrder)
-                  }
-                  className="cursor-pointer bg-transparent text-xs font-bold text-ink focus:outline-none"
-                >
-                  <option value="recomendados">Recomendados</option>
-                  <option value="preco">Preço: menor para maior</option>
-                </select>
-              </div>
+              <Select
+                variant="inline"
+                label="Ordenar por:"
+                icon={<ArrowDownUp size={14} />}
+                options={SORT_OPTIONS}
+                value={sortOrder}
+                onChange={(next) => {
+                  setSortOrder(next as SortOrder);
+                  setCurrentPage(1);
+                }}
+              />
             </div>
 
             {visibleMentors.length > 0 ? (

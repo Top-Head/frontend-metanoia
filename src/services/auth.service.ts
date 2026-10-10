@@ -1,63 +1,47 @@
-export type UserRole = "student" | "mentor";
+import { api } from "@/lib/api/client";
+import type {
+  LoginPayload,
+  RegisterPayload,
+  TokenEnvelope,
+  User,
+} from "@/lib/api/types";
 
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
+export type { LoginPayload, RegisterPayload, User };
 
-export interface RegisterPayload {
-  fullName: string;
-  email: string;
-  password: string;
-  expertise: string;
-}
-
-export interface AuthenticatedUser {
-  id: string;
-  fullName: string;
-  email: string;
-  role: UserRole;
-}
-
-/**
- * Camada de acesso à API de autenticação.
- *
- * TODO: definir a base URL via NEXT_PUBLIC_API_URL e integrar
- * com o backend real (endpoints REST + fluxo de tokens).
- */
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, {
-    headers: { "Content-Type": "application/json" },
-    ...init,
+/** POST /api/auth/login/ */
+export async function login(payload: LoginPayload) {
+  const { data } = await api.post<TokenEnvelope>("/api/auth/login/", payload, {
+    skipAuth: true,
   });
-
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || `Requisição falhou (${response.status}).`);
-  }
-
-  return response.json() as Promise<T>;
+  return data;
 }
 
-export async function login(payload: LoginPayload): Promise<AuthenticatedUser> {
-  return request<AuthenticatedUser>("/api/auth/login", {
-    method: "POST",
-    body: JSON.stringify(payload),
+/** POST /api/auth/register/ — devolve tokens, o utilizador já fica autenticado. */
+export async function register(payload: RegisterPayload) {
+  const { data } = await api.post<TokenEnvelope>("/api/auth/register/", payload, {
+    skipAuth: true,
   });
+  return data;
 }
 
-export async function register(
-  payload: RegisterPayload
-): Promise<AuthenticatedUser> {
-  return request<AuthenticatedUser>("/api/auth/register", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+/** GET /api/me/ */
+export async function getMe() {
+  const { data } = await api.get<User>("/api/me/");
+  return data;
 }
 
-export async function requestPasswordReset(email: string): Promise<void> {
-  await request("/api/auth/password/reset", {
-    method: "POST",
-    body: JSON.stringify({ email }),
-  });
+export const isMentor = (user: User | null) => Boolean(user?.mentor_profile);
+export const isStudent = (user: User | null) => Boolean(user?.student_profile);
+
+export function displayName(user: User | null) {
+  return (
+    user?.mentor_profile?.name ??
+    user?.student_profile?.name ??
+    user?.email.split("@")[0] ??
+    ""
+  );
+}
+
+export function homePathFor(user: User | null) {
+  return isMentor(user) ? "/dashboard" : "/";
 }

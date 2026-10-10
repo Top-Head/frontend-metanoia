@@ -1,0 +1,2745 @@
+openapi: 3.0.3
+info:
+  title: Metanoia Mentorship API
+  version: 1.0.0
+  description: Fase 1 MVP — descoberta e publicação de aulas de mentoria.
+paths:
+  /api/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenEnvelope'
+          description: ''
+  /api/auth/refresh/:
+    post:
+      operationId: auth_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/auth/register/:
+    post:
+      operationId: auth_register_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenEnvelope'
+          description: ''
+  /api/categories/:
+    get:
+      operationId: categories_list
+      description: Categories are platform-managed; users only read them.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - categories
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+          description: ''
+  /api/categories/{id}/:
+    get:
+      operationId: categories_retrieve
+      description: Categories are platform-managed; users only read them.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - categories
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /api/courses/:
+    get:
+      operationId: courses_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - courses
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCourseListList'
+          description: ''
+    post:
+      operationId: courses_create
+      tags:
+      - courses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseWrite'
+          description: ''
+  /api/courses/{id}/:
+    get:
+      operationId: courses_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course.
+        required: true
+      tags:
+      - courses
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetail'
+          description: ''
+    put:
+      operationId: courses_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course.
+        required: true
+      tags:
+      - courses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseWrite'
+          description: ''
+    patch:
+      operationId: courses_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course.
+        required: true
+      tags:
+      - courses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseWrite'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseWrite'
+          description: ''
+    delete:
+      operationId: courses_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course.
+        required: true
+      tags:
+      - courses
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/courses/{id}/archive/:
+    post:
+      operationId: courses_archive_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course.
+        required: true
+      tags:
+      - courses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseList'
+          description: ''
+  /api/courses/{id}/cancel/:
+    post:
+      operationId: courses_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course.
+        required: true
+      tags:
+      - courses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseList'
+          description: ''
+  /api/courses/{id}/publish/:
+    post:
+      operationId: courses_publish_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course.
+        required: true
+      tags:
+      - courses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseList'
+          description: ''
+  /api/courses/{id}/sessions/:
+    get:
+      operationId: courses_sessions_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course.
+        required: true
+      tags:
+      - courses
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseList'
+          description: ''
+    post:
+      operationId: courses_sessions_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course.
+        required: true
+      tags:
+      - courses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseList'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseList'
+          description: ''
+  /api/discovery/recommendations/:
+    get:
+      operationId: discovery_recommendations_list
+      description: |-
+        Recommend courses from the student's LearningProfile.
+
+        Optional query params (topics/topic_text/modality) act as a fallback for
+        students who skipped the conversation.
+      parameters:
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Consulta de texto para recomendações sem perfil.
+      tags:
+      - discovery
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscoveryResult'
+          description: ''
+  /api/discovery/search/:
+    get:
+      operationId: discovery_search_list
+      description: Search published courses with filters and a transparent ranking.
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: ID da categoria.
+      - in: query
+        name: free
+        schema:
+          type: boolean
+      - in: query
+        name: max_price
+        schema:
+          type: number
+          format: double
+      - in: query
+        name: modality
+        schema:
+          type: string
+          enum:
+          - ONLINE
+          - PRESENTIAL
+      - in: query
+        name: q
+        schema:
+          type: string
+        description: Termos de pesquisa textual.
+      - in: query
+        name: type
+        schema:
+          type: string
+          enum:
+          - GROUP
+          - INDIVIDUAL
+      tags:
+      - discovery
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiscoveryResult'
+          description: ''
+  /api/learning-profile/{id}/:
+    get:
+      operationId: learning_profile_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this learning profile.
+        required: true
+      tags:
+      - learning-profile
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningProfile'
+          description: ''
+    put:
+      operationId: learning_profile_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this learning profile.
+        required: true
+      tags:
+      - learning-profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LearningProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LearningProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LearningProfile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningProfile'
+          description: ''
+    patch:
+      operationId: learning_profile_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this learning profile.
+        required: true
+      tags:
+      - learning-profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLearningProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLearningProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLearningProfile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningProfile'
+          description: ''
+  /api/me/:
+    get:
+      operationId: me_retrieve
+      tags:
+      - me
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/me/mentor/:
+    get:
+      operationId: me_mentor_retrieve
+      tags:
+      - me
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mentor'
+          description: ''
+        '404':
+          description: No response body
+    post:
+      operationId: me_mentor_create
+      tags:
+      - me
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Mentor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Mentor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Mentor'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mentor'
+          description: ''
+    patch:
+      operationId: me_mentor_partial_update
+      tags:
+      - me
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMentor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMentor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMentor'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mentor'
+          description: ''
+  /api/me/student/:
+    get:
+      operationId: me_student_retrieve
+      tags:
+      - me
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+          description: ''
+        '404':
+          description: No response body
+    post:
+      operationId: me_student_create
+      tags:
+      - me
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Student'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Student'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+          description: ''
+    patch:
+      operationId: me_student_partial_update
+      tags:
+      - me
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStudent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStudent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStudent'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+          description: ''
+  /api/meetings/{id}/:
+    get:
+      operationId: meetings_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this session meeting.
+        required: true
+      tags:
+      - meetings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMeeting'
+          description: ''
+    put:
+      operationId: meetings_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this session meeting.
+        required: true
+      tags:
+      - meetings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionMeeting'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SessionMeeting'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SessionMeeting'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMeeting'
+          description: ''
+    patch:
+      operationId: meetings_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this session meeting.
+        required: true
+      tags:
+      - meetings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSessionMeeting'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSessionMeeting'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSessionMeeting'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionMeeting'
+          description: ''
+    delete:
+      operationId: meetings_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this session meeting.
+        required: true
+      tags:
+      - meetings
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/mentor/enrollments/:
+    get:
+      operationId: mentor_enrollments_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - mentor
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnrollmentReadList'
+          description: ''
+  /api/mentor/enrollments/{id}/:
+    get:
+      operationId: mentor_enrollments_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this enrollment.
+        required: true
+      tags:
+      - mentor
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+  /api/mentor/enrollments/{id}/approve/:
+    post:
+      operationId: mentor_enrollments_approve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this enrollment.
+        required: true
+      tags:
+      - mentor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+  /api/mentor/enrollments/{id}/confirm-payment/:
+    post:
+      operationId: mentor_enrollments_confirm_payment_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this enrollment.
+        required: true
+      tags:
+      - mentor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+  /api/mentor/enrollments/{id}/download-proof/:
+    get:
+      operationId: mentor_enrollments_download_proof_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this enrollment.
+        required: true
+      tags:
+      - mentor
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+  /api/mentor/enrollments/{id}/reject/:
+    post:
+      operationId: mentor_enrollments_reject_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this enrollment.
+        required: true
+      tags:
+      - mentor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+  /api/mentor/enrollments/{id}/reject-payment/:
+    post:
+      operationId: mentor_enrollments_reject_payment_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this enrollment.
+        required: true
+      tags:
+      - mentor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+  /api/mentors/:
+    get:
+      operationId: mentors_list
+      description: Public directory of mentors (used for recommendations).
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: specialties
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: true
+        style: form
+      tags:
+      - mentors
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMentorList'
+          description: ''
+  /api/onboarding/:
+    get:
+      operationId: onboarding_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - onboarding
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAIConversationList'
+          description: ''
+  /api/onboarding/{id}/:
+    get:
+      operationId: onboarding_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ai conversation.
+        required: true
+      tags:
+      - onboarding
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIConversation'
+          description: ''
+  /api/onboarding/{id}/message/:
+    post:
+      operationId: onboarding_message_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ai conversation.
+        required: true
+      tags:
+      - onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIConversation'
+          description: ''
+  /api/onboarding/{id}/skip/:
+    post:
+      operationId: onboarding_skip_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ai conversation.
+        required: true
+      tags:
+      - onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIConversation'
+          description: ''
+  /api/onboarding/start/:
+    post:
+      operationId: onboarding_start_create
+      tags:
+      - onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIConversation'
+          description: ''
+  /api/sessions/{id}/:
+    get:
+      operationId: sessions_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course session.
+        required: true
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSession'
+          description: ''
+    put:
+      operationId: sessions_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course session.
+        required: true
+      tags:
+      - sessions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseSession'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSession'
+          description: ''
+    patch:
+      operationId: sessions_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course session.
+        required: true
+      tags:
+      - sessions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCourseSession'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSession'
+          description: ''
+    delete:
+      operationId: sessions_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course session.
+        required: true
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/sessions/{id}/meetings/:
+    get:
+      operationId: sessions_meetings_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course session.
+        required: true
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSession'
+          description: ''
+    post:
+      operationId: sessions_meetings_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this course session.
+        required: true
+      tags:
+      - sessions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CourseSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CourseSession'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseSession'
+          description: ''
+  /api/student/enrollments/:
+    get:
+      operationId: student_enrollments_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - student
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnrollmentReadList'
+          description: ''
+    post:
+      operationId: student_enrollments_create
+      tags:
+      - student
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+  /api/student/enrollments/{id}/:
+    get:
+      operationId: student_enrollments_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this enrollment.
+        required: true
+      tags:
+      - student
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+  /api/student/enrollments/{id}/cancel/:
+    post:
+      operationId: student_enrollments_cancel_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this enrollment.
+        required: true
+      tags:
+      - student
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+  /api/student/enrollments/{id}/download-proof/:
+    get:
+      operationId: student_enrollments_download_proof_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this enrollment.
+        required: true
+      tags:
+      - student
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+  /api/student/enrollments/{id}/proof/:
+    post:
+      operationId: student_enrollments_proof_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this enrollment.
+        required: true
+      tags:
+      - student
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRead'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentRead'
+          description: ''
+components:
+  schemas:
+    AIConversation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/AIConversationStatusEnum'
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AIMessage'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - messages
+      - updated_at
+    AIConversationStatusEnum:
+      enum:
+      - ACTIVE
+      - COMPLETED
+      - SKIPPED
+      type: string
+      description: |-
+        * `ACTIVE` - Ativa
+        * `COMPLETED` - Concluída
+        * `SKIPPED` - Ignorada
+    AIMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/AIMessageRoleEnum'
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - content
+      - created_at
+      - id
+      - role
+    AIMessageRoleEnum:
+      enum:
+      - USER
+      - ASSISTANT
+      - SYSTEM
+      type: string
+      description: |-
+        * `USER` - Utilizador
+        * `ASSISTANT` - Assistente
+        * `SYSTEM` - Sistema
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        slug:
+          type: string
+          maxLength: 140
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        is_active:
+          type: boolean
+      required:
+      - id
+      - name
+      - slug
+    CourseDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        category:
+          allOf:
+          - $ref: '#/components/schemas/Category'
+          readOnly: true
+        mentor:
+          allOf:
+          - $ref: '#/components/schemas/MentorSummary'
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        modality:
+          $ref: '#/components/schemas/ModalityEnum'
+        location:
+          type: string
+          maxLength: 255
+        price_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 8
+        is_free:
+          type: boolean
+          readOnly: true
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Obrigatório para aulas de grupo; deve ser positivo.
+        status:
+          $ref: '#/components/schemas/Status137Enum'
+        session_count:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseSession'
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - id
+      - is_free
+      - mentor
+      - session_count
+      - sessions
+      - title
+      - updated_at
+    CourseList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        category:
+          allOf:
+          - $ref: '#/components/schemas/Category'
+          readOnly: true
+        mentor:
+          allOf:
+          - $ref: '#/components/schemas/MentorSummary'
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        modality:
+          $ref: '#/components/schemas/ModalityEnum'
+        location:
+          type: string
+          maxLength: 255
+        price_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 8
+        is_free:
+          type: boolean
+          readOnly: true
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Obrigatório para aulas de grupo; deve ser positivo.
+        status:
+          $ref: '#/components/schemas/Status137Enum'
+        session_count:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - id
+      - is_free
+      - mentor
+      - session_count
+      - title
+      - updated_at
+    CourseSession:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course:
+          type: integer
+        name:
+          type: string
+          maxLength: 150
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Se vazio, usa a capacidade da aula.
+        effective_capacity:
+          type: integer
+          readOnly: true
+        is_active:
+          type: boolean
+        meetings:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedMeeting'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - course
+      - created_at
+      - effective_capacity
+      - id
+      - name
+      - updated_at
+    CourseWrite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        category:
+          type: integer
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        modality:
+          $ref: '#/components/schemas/ModalityEnum'
+        location:
+          type: string
+          maxLength: 255
+        price_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 8
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Obrigatório para aulas de grupo; deve ser positivo.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status137Enum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - created_at
+      - id
+      - status
+      - title
+      - updated_at
+    CustomTokenObtainPair:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    DiscoveryResult:
+      type: object
+      properties:
+        score:
+          type: integer
+        reasons:
+          type: array
+          items:
+            type: string
+        has_capacity:
+          type: boolean
+        course:
+          $ref: '#/components/schemas/CourseList'
+      required:
+      - course
+      - has_capacity
+      - reasons
+      - score
+    EnrollmentCourse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        category_name:
+          type: string
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        modality:
+          $ref: '#/components/schemas/ModalityEnum'
+        location:
+          type: string
+          maxLength: 255
+        price_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 8
+        is_free:
+          type: boolean
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status137Enum'
+      required:
+      - category_name
+      - id
+      - is_free
+      - title
+    EnrollmentRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        student:
+          type: integer
+          readOnly: true
+        student_name:
+          type: string
+          readOnly: true
+        course:
+          allOf:
+          - $ref: '#/components/schemas/EnrollmentCourse'
+          readOnly: true
+        session:
+          allOf:
+          - $ref: '#/components/schemas/EnrollmentSession'
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EnrollmentReadStatusEnum'
+          readOnly: true
+          default: PENDING
+        payment_status:
+          allOf:
+          - $ref: '#/components/schemas/PaymentStatusEnum'
+          readOnly: true
+        has_payment_proof:
+          type: boolean
+          readOnly: true
+        requested_at:
+          type: string
+          format: date-time
+          readOnly: true
+        decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        decision_note:
+          type: string
+          readOnly: true
+        payment_decided_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - course
+      - created_at
+      - decided_at
+      - decision_note
+      - has_payment_proof
+      - id
+      - payment_decided_at
+      - payment_status
+      - requested_at
+      - session
+      - status
+      - student
+      - student_name
+      - updated_at
+    EnrollmentReadStatusEnum:
+      enum:
+      - PENDING
+      - APPROVED
+      - REJECTED
+      - CANCELLED
+      type: string
+      description: |-
+        * `PENDING` - Pendente
+        * `APPROVED` - Aprovada
+        * `REJECTED` - Rejeitada
+        * `CANCELLED` - Cancelada
+    EnrollmentSession:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Se vazio, usa a capacidade da aula.
+      required:
+      - id
+      - name
+    LearningProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        goals:
+          type: string
+        topics:
+          type: array
+          items:
+            type: integer
+        topic_details:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+        topics_text:
+          type: string
+          description: Tópicos livres ainda sem categoria.
+        level:
+          $ref: '#/components/schemas/LevelEnum'
+        preferred_modality:
+          $ref: '#/components/schemas/PreferredModalityEnum'
+        availability:
+          type: string
+        notes:
+          type: string
+        extracted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - extracted_at
+      - id
+      - topic_details
+      - updated_at
+    LevelEnum:
+      enum:
+      - BEGINNER
+      - INTERMEDIATE
+      - ADVANCED
+      - UNKNOWN
+      type: string
+      description: |-
+        * `BEGINNER` - Iniciante
+        * `INTERMEDIATE` - Intermédio
+        * `ADVANCED` - Avançado
+        * `UNKNOWN` - Desconhecido
+    Mentor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        bio:
+          type: string
+        specialties:
+          type: array
+          items:
+            type: integer
+        specialty_details:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+        experience_description:
+          type: string
+        is_verified:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - is_verified
+      - name
+      - specialty_details
+      - updated_at
+    MentorSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        bio:
+          type: string
+        specialty_details:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+      required:
+      - id
+      - name
+      - specialty_details
+    ModalityEnum:
+      enum:
+      - ONLINE
+      - PRESENTIAL
+      type: string
+      description: |-
+        * `ONLINE` - Online
+        * `PRESENTIAL` - Presencial
+    NestedMeeting:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        location:
+          type: string
+          maxLength: 255
+      required:
+      - ends_at
+      - id
+      - starts_at
+    PaginatedAIConversationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AIConversation'
+    PaginatedCourseListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseList'
+    PaginatedEnrollmentReadList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnrollmentRead'
+    PaginatedMentorList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Mentor'
+    PatchedCourseSession:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        course:
+          type: integer
+        name:
+          type: string
+          maxLength: 150
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Se vazio, usa a capacidade da aula.
+        effective_capacity:
+          type: integer
+          readOnly: true
+        is_active:
+          type: boolean
+        meetings:
+          type: array
+          items:
+            $ref: '#/components/schemas/NestedMeeting'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCourseWrite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        category:
+          type: integer
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        modality:
+          $ref: '#/components/schemas/ModalityEnum'
+        location:
+          type: string
+          maxLength: 255
+        price_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 8
+        capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+          description: Obrigatório para aulas de grupo; deve ser positivo.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status137Enum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedLearningProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        goals:
+          type: string
+        topics:
+          type: array
+          items:
+            type: integer
+        topic_details:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+        topics_text:
+          type: string
+          description: Tópicos livres ainda sem categoria.
+        level:
+          $ref: '#/components/schemas/LevelEnum'
+        preferred_modality:
+          $ref: '#/components/schemas/PreferredModalityEnum'
+        availability:
+          type: string
+        notes:
+          type: string
+        extracted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedMentor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        bio:
+          type: string
+        specialties:
+          type: array
+          items:
+            type: integer
+        specialty_details:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+        experience_description:
+          type: string
+        is_verified:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedSessionMeeting:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        session:
+          type: integer
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        location:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedStudent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 32
+        bio:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PaymentStatusEnum:
+      enum:
+      - NOT_REQUIRED
+      - PENDING
+      - PROOF_SUBMITTED
+      - CONFIRMED
+      - REJECTED
+      type: string
+      description: |-
+        * `NOT_REQUIRED` - Não aplicável
+        * `PENDING` - Pendente
+        * `PROOF_SUBMITTED` - Comprovativo submetido
+        * `CONFIRMED` - Confirmado
+        * `REJECTED` - Rejeitado
+    PreferredModalityEnum:
+      enum:
+      - ONLINE
+      - PRESENTIAL
+      - ANY
+      type: string
+      description: |-
+        * `ONLINE` - Online
+        * `PRESENTIAL` - Presencial
+        * `ANY` - Qualquer
+    Register:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+        password_confirm:
+          type: string
+          writeOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RegisterRoleEnum'
+          default: STUDENT
+        name:
+          type: string
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 32
+        bio:
+          type: string
+        experience_description:
+          type: string
+        specialties:
+          type: array
+          items:
+            type: integer
+      required:
+      - email
+      - name
+      - password
+      - password_confirm
+    RegisterRoleEnum:
+      enum:
+      - STUDENT
+      - MENTOR
+      - BOTH
+      type: string
+      description: |-
+        * `STUDENT` - STUDENT
+        * `MENTOR` - MENTOR
+        * `BOTH` - BOTH
+    SessionMeeting:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        session:
+          type: integer
+        starts_at:
+          type: string
+          format: date-time
+        ends_at:
+          type: string
+          format: date-time
+        location:
+          type: string
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - ends_at
+      - id
+      - session
+      - starts_at
+      - updated_at
+    Status137Enum:
+      enum:
+      - DRAFT
+      - PUBLISHED
+      - CANCELLED
+      - ARCHIVED
+      type: string
+      description: |-
+        * `DRAFT` - Rascunho
+        * `PUBLISHED` - Publicada
+        * `CANCELLED` - Cancelada
+        * `ARCHIVED` - Arquivada
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 32
+        bio:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - updated_at
+    TokenEnvelope:
+      type: object
+      properties:
+        access:
+          type: string
+        refresh:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+      - access
+      - refresh
+      - user
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TypeEnum:
+      enum:
+      - GROUP
+      - INDIVIDUAL
+      type: string
+      description: |-
+        * `GROUP` - Grupo
+        * `INDIVIDUAL` - Individual
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/UserStatusEnum'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        student_profile:
+          allOf:
+          - $ref: '#/components/schemas/Student'
+          readOnly: true
+        mentor_profile:
+          allOf:
+          - $ref: '#/components/schemas/Mentor'
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - id
+      - mentor_profile
+      - status
+      - student_profile
+    UserStatusEnum:
+      enum:
+      - ACTIVE
+      - SUSPENDED
+      type: string
+      description: |-
+        * `ACTIVE` - Ativo
+        * `SUSPENDED` - Suspenso
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
