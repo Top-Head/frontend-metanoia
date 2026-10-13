@@ -62,11 +62,10 @@ export async function deleteSession(id: number) {
   await api.delete(`/api/sessions/${id}/`);
 }
 
-export interface MeetingPayload {
-  starts_at: string;
-  ends_at: string;
-  location?: string;
-}
+export type MeetingPayload = { location?: string } & (
+  | { starts_at: string; ends_at: string }
+  | { day_of_week: number; start_time: string; end_time: string }
+);
 
 export async function createMeeting(sessionId: number, payload: MeetingPayload) {
   const { data } = await api.post<SessionMeeting>(`/api/sessions/${sessionId}/meetings/`, {

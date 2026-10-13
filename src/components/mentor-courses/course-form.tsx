@@ -2,7 +2,8 @@
 
 import { useState, type FormEvent, type ReactNode } from "react";
 import clsx from "clsx";
-import { MapPin, Monitor, Tag, User, Users } from "lucide-react";
+import { CalendarDays, ImageIcon, MapPin, Monitor, Tag, User, Users } from "lucide-react";
+import { CourseCover } from "@/components/courses/course-cover";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/components/ui/form-input";
@@ -72,6 +73,9 @@ export function CourseForm({ initial, submitLabel, onSubmit }: CourseFormProps) 
     initial?.price_amount && !initial.is_free ? String(Number(initial.price_amount)) : ""
   );
   const [capacity, setCapacity] = useState(initial?.capacity != null ? String(initial.capacity) : "");
+  const [image, setImage] = useState(initial?.image ?? "");
+  const [startDate, setStartDate] = useState(initial?.start_date ?? "");
+  const [endDate, setEndDate] = useState(initial?.end_date ?? "");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -83,6 +87,9 @@ export function CourseForm({ initial, submitLabel, onSubmit }: CourseFormProps) 
     if (type === "GROUP" && !(Number(capacity) > 0))
       next.capacity = "Aulas em grupo precisam de uma capacidade (número de alunos).";
     if (modality === "PRESENTIAL" && !location.trim()) next.location = "Indique o local da aula presencial.";
+    if (image.trim() && !/^https?:\/\/\S+$/i.test(image.trim()))
+      next.image = "Use um link completo, começado por https://.";
+    if (startDate && endDate && endDate < startDate) next.end_date = "A data de fim tem de ser depois do início.";
     return next;
   }
 
@@ -99,6 +106,9 @@ export function CourseForm({ initial, submitLabel, onSubmit }: CourseFormProps) 
     try {
       await onSubmit({
         title: title.trim(),
+        image: image.trim(),
+        start_date: startDate || null,
+        end_date: endDate || null,
         description: description.trim(),
         category: Number(category),
         type,
@@ -209,6 +219,44 @@ export function CourseForm({ initial, submitLabel, onSubmit }: CourseFormProps) 
             onChange={(event) => setCapacity(event.target.value)}
           />
         )}
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <FormInput
+          label="Início (opcional)"
+          type="date"
+          icon={<CalendarDays size={18} />}
+          value={startDate}
+          error={errors.start_date}
+          onChange={(event) => setStartDate(event.target.value)}
+        />
+        <FormInput
+          label="Fim (opcional)"
+          type="date"
+          min={startDate || undefined}
+          icon={<CalendarDays size={18} />}
+          value={endDate}
+          error={errors.end_date}
+          onChange={(event) => setEndDate(event.target.value)}
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-[1fr_160px] sm:items-end">
+        <FormInput
+          label="Imagem de capa (opcional)"
+          type="url"
+          placeholder="https://…/capa.jpg"
+          maxLength={500}
+          icon={<ImageIcon size={18} />}
+          value={image}
+          error={errors.image}
+          onChange={(event) => setImage(event.target.value)}
+        />
+        <CourseCover
+          image={image.trim()}
+          categorySlug={categories.data?.find((item) => String(item.id) === category)?.slug}
+          className="h-24 rounded-xl"
+        />
       </div>
 
       <div className="rounded-xl border border-line bg-canvas p-4">

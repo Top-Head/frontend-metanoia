@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import {
@@ -24,6 +25,7 @@ import { useAuth } from "@/hooks/useAuth";
 import type { Enrollment } from "@/lib/api/types";
 import { canSubmitProof, isConfirmed, nextStepFor } from "@/lib/enrollment";
 import { formatCoursePrice } from "@/lib/format";
+import { calendarWindow, expandMeetings } from "@/lib/meeting";
 import { displayName } from "@/services/auth.service";
 import { getCourse } from "@/services/course.service";
 import { listMyEnrollments } from "@/services/enrollment.service";
@@ -31,6 +33,7 @@ import { getRecommendations } from "@/services/onboarding.service";
 
 const ENROLLMENT_LIMIT = 50;
 const CALENDAR_COURSE_LIMIT = 10;
+const WEEK_MS = 7 * 86_400_000;
 
 const isClosed = (enrollment: Enrollment) =>
   enrollment.status === "CANCELLED" || enrollment.status === "REJECTED";
@@ -96,12 +99,15 @@ export default function StudentHome() {
       const courseIds = [...new Set(approved.map((item) => item.course.id))].slice(0, CALENDAR_COURSE_LIMIT);
       const settled = await Promise.allSettled(courseIds.map((id) => getCourse(id)));
       const courses = settled.flatMap((result) => (result.status === "fulfilled" ? [result.value] : []));
+      const { from, to } = calendarWindow();
 
       return approved.flatMap<CalendarMeeting>((enrollment) => {
         const course = courses.find((item) => item.id === enrollment.course.id);
         const session = course?.sessions.find((item) => item.id === enrollment.session.id);
-        return (session?.meetings ?? []).map((meeting) => ({
-          ...meeting,
+        if (!course || !session) return [];
+        return expandMeetings(session.meetings ?? [], course, from, to).map((occurrence) => ({
+          ...occurrence,
+          key: `${enrollment.id}-${occurrence.key}`,
           href: `/aluno/inscricoes/${enrollment.id}`,
           courseTitle: enrollment.course.title,
           sessionName: enrollment.session.name,
@@ -113,7 +119,10 @@ export default function StudentHome() {
   const pending = list.filter((item) => item.status === "PENDING").length;
   const toPay = list.filter(canSubmitProof).length;
   const confirmed = list.filter(isConfirmed).length;
-  const upcoming = (meetings.data ?? []).filter((meeting) => new Date(meeting.ends_at) >= new Date()).length;
+  const [now] = useState(() => Date.now());
+  const upcoming = (meetings.data ?? []).filter(
+    (meeting) => new Date(meeting.ends_at).getTime() >= now && new Date(meeting.starts_at).getTime() <= now + WEEK_MS
+  ).length;
 
   const active = list
     .filter((item) => !isClosed(item) && !isConfirmed(item))
@@ -143,7 +152,7 @@ export default function StudentHome() {
     {
       label: "Próximos encontros",
       value: upcoming,
-      hint: "Nas suas turmas",
+      hint: "Nos próximos 7 dias",
       icon: CalendarDays,
     },
   ];
