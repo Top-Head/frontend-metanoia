@@ -7,7 +7,7 @@ import { CalendarPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatMeetingDate, formatMeetingTime } from "@/lib/format";
 
 export interface CalendarMeeting {
-  id: number;
+  key: string;
   href: string;
   courseTitle: string;
   sessionName: string;
@@ -122,7 +122,7 @@ export default function MeetingsCalendar({
           ) : upcoming.length > 0 ? (
             upcoming.map((meeting) => (
               <Link
-                key={meeting.id}
+                key={meeting.key}
                 href={meeting.href}
                 className="block rounded-xl border border-line-strong bg-panel p-3 transition-colors hover:border-primary/40"
               >

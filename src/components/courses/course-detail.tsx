@@ -11,9 +11,12 @@ import {
   Layers,
   MapPin,
   Monitor,
+  Repeat,
   SearchX,
+  UserCheck,
   Users,
 } from "lucide-react";
+import { CourseCover } from "./course-cover";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { MentorAvatar } from "@/components/mentors/mentor-card";
@@ -26,9 +29,15 @@ import {
   COURSE_TYPE_LABEL,
   MODALITY_LABEL,
   formatCoursePrice,
-  formatMeetingDate,
-  formatMeetingTime,
 } from "@/lib/format";
+import {
+  describeMeeting,
+  formatPeriod,
+  formatWeekdays,
+  isWeekly,
+  seatsLeft,
+  sortMeetings,
+} from "@/lib/meeting";
 import { getCourse } from "@/services/course.service";
 import { requestEnrollment } from "@/services/enrollment.service";
 import { ApiError } from "@/lib/api/client";
@@ -55,43 +64,49 @@ function SessionOption({
   selected: boolean;
   onSelect: () => void;
 }) {
-  const meetings = [...(session.meetings ?? [])].sort((a, b) =>
-    a.starts_at.localeCompare(b.starts_at)
-  );
+  const meetings = sortMeetings(session.meetings ?? []);
+  const seats = seatsLeft(session);
+  const full = seats === 0;
 
   return (
     <button
       type="button"
       role="radio"
       aria-checked={selected}
-      onClick={onSelect}
+      aria-disabled={full}
+      onClick={full ? undefined : onSelect}
       className={clsx(
         "w-full rounded-xl p-4 text-left transition-colors",
-        selected ? "border-2 border-primary bg-primary/5" : "border border-line hover:border-primary/50"
+        full
+          ? "cursor-not-allowed border border-dashed border-line-strong opacity-60"
+          : selected
+            ? "border-2 border-primary bg-primary/5"
+            : "border border-line hover:border-primary/50"
       )}
     >
       <div className="flex items-center justify-between gap-3">
         <span className="font-bold text-ink">{session.name}</span>
-        <span className="shrink-0 text-xs font-semibold text-ink-soft">
-          {session.effective_capacity} {session.effective_capacity === 1 ? "vaga" : "vagas"}
+        <span className={clsx("shrink-0 text-xs font-semibold", full ? "text-warning" : "text-ink-soft")}>
+          {full ? "Lotada" : `${seats} ${seats === 1 ? "vaga livre" : "vagas livres"}`}
         </span>
       </div>
       {meetings.length > 0 ? (
         <ul className="mt-3 space-y-2.5">
-          {meetings.map((meeting) => (
-            <li key={meeting.id} className="flex gap-2.5">
-              <CalendarDays size={14} className="mt-0.5 shrink-0 text-primary" />
-              <div className="min-w-0 text-xs">
-                <p className="font-semibold text-ink first-letter:uppercase">
-                  {formatMeetingDate(meeting.starts_at)}
-                </p>
-                <p className="truncate text-ink-soft">
-                  {formatMeetingTime(meeting.starts_at, meeting.ends_at)}
-                  {meeting.location && ` · ${meeting.location}`}
-                </p>
-              </div>
-            </li>
-          ))}
+          {meetings.map((meeting) => {
+            const { day, time } = describeMeeting(meeting);
+            const Icon = isWeekly(meeting) ? Repeat : CalendarDays;
+            return (
+              <li key={meeting.id} className="flex gap-2.5">
+                <Icon size={14} className="mt-0.5 shrink-0 text-primary" />
+                <div className="min-w-0 text-xs">
+                  <p className="font-semibold text-ink first-letter:uppercase">{day}</p>
+                  <p className="truncate text-ink-soft">
+                    {[time, meeting.location].filter(Boolean).join(" · ")}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <p className="mt-2 text-xs text-ink-faint">Datas a definir pelo mentor.</p>
@@ -104,7 +119,9 @@ function EnrollPanel({ course }: { course: CourseDetail }) {
   const router = useRouter();
   const { status, isStudent, user } = useAuth();
   const sessions = course.sessions.filter((session) => session.is_active !== false);
-  const [selectedId, setSelectedId] = useState<number | null>(sessions[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState<number | null>(
+    sessions.find((session) => seatsLeft(session) > 0)?.id ?? null
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isOwnCourse = user?.mentor_profile?.id === course.mentor.id;
 
@@ -255,10 +272,20 @@ export function CourseDetail({ id, backHref }: { id: number; backHref: string })
 
 function CourseContent({ course }: { course: CourseDetail }) {
   const { icon: Icon, tone } = categoryVisual(course.category?.slug);
+  const period = formatPeriod(course.start_date, course.end_date);
+  const weekdays = formatWeekdays(course.days_of_week ?? []);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
       <div className="min-w-0 space-y-6">
+        {course.image && (
+          <CourseCover
+            image={course.image}
+            categorySlug={course.category?.slug}
+            className="aspect-[21/9] w-full rounded-2xl"
+            iconSize={40}
+          />
+        )}
         <div>
           <div className="mb-4 flex items-center gap-3">
             <span className={clsx("flex size-11 items-center justify-center rounded-xl", tone)}>
@@ -287,9 +314,19 @@ function CourseContent({ course }: { course: CourseDetail }) {
             label="Turmas"
             value={`${course.session_count} ${course.session_count === 1 ? "turma" : "turmas"}`}
           />
-          {course.capacity != null && (
-            <InfoItem icon={<Users size={18} />} label="Capacidade" value={`${course.capacity} alunos`} />
+          {course.total_capacity > 0 ? (
+            <InfoItem
+              icon={<UserCheck size={18} />}
+              label="Inscritos"
+              value={`${course.total_enrolled}/${course.total_capacity} alunos`}
+            />
+          ) : (
+            course.capacity != null && (
+              <InfoItem icon={<Users size={18} />} label="Capacidade" value={`${course.capacity} alunos`} />
+            )
           )}
+          {period && <InfoItem icon={<CalendarDays size={18} />} label="Período" value={period} />}
+          {weekdays && <InfoItem icon={<Repeat size={18} />} label="Dias" value={weekdays} />}
         </div>
 
         {course.location && (

@@ -191,6 +191,25 @@ Isolado em `src/services/onboarding.service.ts`:
   `COMPLETED`.
 - Depois do cadastro, alunos novos vão para `/aluno/onboarding`.
 
+### Atualização do YAML (aulas com capa, período e encontros semanais)
+
+Integrado em `src/lib/meeting.ts`, no formulário da aula, no gestor de turmas, nos cartões e no detalhe da aula, e nos
+calendários dos painéis:
+
+- **Aula:** `image` (URL, até 500 caracteres), `start_date`/`end_date` (graváveis), e `total_capacity`,
+  `total_enrolled` e `days_of_week` (só leitura).
+- **Turma:** `total_students`; vagas livres = `effective_capacity - total_students`. Turmas lotadas não se podem escolher.
+- **Encontros:** pontuais (`starts_at`/`ends_at`) ou semanais (`day_of_week` + `start_time`/`end_time`). Os semanais
+  repetem-se dentro do período da aula e são expandidos no cliente para o calendário.
+
+A confirmar:
+
+- **`day_of_week`:** o YAML não diz a convenção. O frontend assume **0 = segunda … 6 = domingo** (`date.weekday()` do
+  Python), constante `WEEKDAYS` em `src/lib/meeting.ts`.
+- **`image`** é tratado como URL; não há endpoint de upload de imagem.
+- **Horas:** `start_time`/`end_time` são enviados como `HH:MM` e interpretados como hora local.
+- Encontro semanal sem `start_date`/`end_date` na aula é mostrado em toda a janela do calendário (2 meses antes, 6 depois).
+
 ### A confirmar no backend (fase 7)
 
 - Não há endpoint de "encontros do aluno". O painel pede `GET /api/courses/{id}/` de até 10 aulas com

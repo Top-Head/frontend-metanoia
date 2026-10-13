@@ -1689,6 +1689,9 @@ components:
         title:
           type: string
           maxLength: 200
+        image:
+          type: string
+          maxLength: 500
         description:
           type: string
         category:
@@ -1723,6 +1726,25 @@ components:
           format: int64
           nullable: true
           description: Obrigatório para aulas de grupo; deve ser positivo.
+        total_capacity:
+          type: integer
+          readOnly: true
+        total_enrolled:
+          type: integer
+          readOnly: true
+        days_of_week:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
         status:
           $ref: '#/components/schemas/Status137Enum'
         session_count:
@@ -1744,12 +1766,15 @@ components:
       required:
       - category
       - created_at
+      - days_of_week
       - id
       - is_free
       - mentor
       - session_count
       - sessions
       - title
+      - total_capacity
+      - total_enrolled
       - updated_at
     CourseList:
       type: object
@@ -1760,6 +1785,9 @@ components:
         title:
           type: string
           maxLength: 200
+        image:
+          type: string
+          maxLength: 500
         description:
           type: string
         category:
@@ -1794,6 +1822,25 @@ components:
           format: int64
           nullable: true
           description: Obrigatório para aulas de grupo; deve ser positivo.
+        total_capacity:
+          type: integer
+          readOnly: true
+        total_enrolled:
+          type: integer
+          readOnly: true
+        days_of_week:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
         status:
           $ref: '#/components/schemas/Status137Enum'
         session_count:
@@ -1810,11 +1857,14 @@ components:
       required:
       - category
       - created_at
+      - days_of_week
       - id
       - is_free
       - mentor
       - session_count
       - title
+      - total_capacity
+      - total_enrolled
       - updated_at
     CourseSession:
       type: object
@@ -1837,6 +1887,9 @@ components:
         effective_capacity:
           type: integer
           readOnly: true
+        total_students:
+          type: integer
+          readOnly: true
         is_active:
           type: boolean
         meetings:
@@ -1857,6 +1910,7 @@ components:
       - effective_capacity
       - id
       - name
+      - total_students
       - updated_at
     CourseWrite:
       type: object
@@ -1867,6 +1921,9 @@ components:
         title:
           type: string
           maxLength: 200
+        image:
+          type: string
+          maxLength: 500
         description:
           type: string
         category:
@@ -1892,6 +1949,14 @@ components:
           format: int64
           nullable: true
           description: Obrigatório para aulas de grupo; deve ser positivo.
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
         status:
           allOf:
           - $ref: '#/components/schemas/Status137Enum'
@@ -2077,9 +2142,17 @@ components:
           format: int64
           nullable: true
           description: Se vazio, usa a capacidade da aula.
+        effective_capacity:
+          type: integer
+          readOnly: true
+        total_students:
+          type: integer
+          readOnly: true
       required:
+      - effective_capacity
       - id
       - name
+      - total_students
     LearningProfile:
       type: object
       properties:
@@ -2216,19 +2289,33 @@ components:
         id:
           type: integer
           readOnly: true
+        day_of_week:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        start_time:
+          type: string
+          format: time
+          nullable: true
+        end_time:
+          type: string
+          format: time
+          nullable: true
         starts_at:
           type: string
           format: date-time
+          nullable: true
         ends_at:
           type: string
           format: date-time
+          nullable: true
         location:
           type: string
           maxLength: 255
       required:
-      - ends_at
       - id
-      - starts_at
     PaginatedAIConversationList:
       type: object
       required:
@@ -2342,6 +2429,9 @@ components:
         effective_capacity:
           type: integer
           readOnly: true
+        total_students:
+          type: integer
+          readOnly: true
         is_active:
           type: boolean
         meetings:
@@ -2365,6 +2455,9 @@ components:
         title:
           type: string
           maxLength: 200
+        image:
+          type: string
+          maxLength: 500
         description:
           type: string
         category:
@@ -2390,6 +2483,14 @@ components:
           format: int64
           nullable: true
           description: Obrigatório para aulas de grupo; deve ser positivo.
+        start_date:
+          type: string
+          format: date
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          nullable: true
         status:
           allOf:
           - $ref: '#/components/schemas/Status137Enum'
@@ -2486,12 +2587,28 @@ components:
           readOnly: true
         session:
           type: integer
+        day_of_week:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        start_time:
+          type: string
+          format: time
+          nullable: true
+        end_time:
+          type: string
+          format: time
+          nullable: true
         starts_at:
           type: string
           format: date-time
+          nullable: true
         ends_at:
           type: string
           format: date-time
+          nullable: true
         location:
           type: string
           maxLength: 255
@@ -2602,12 +2719,28 @@ components:
           readOnly: true
         session:
           type: integer
+        day_of_week:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        start_time:
+          type: string
+          format: time
+          nullable: true
+        end_time:
+          type: string
+          format: time
+          nullable: true
         starts_at:
           type: string
           format: date-time
+          nullable: true
         ends_at:
           type: string
           format: date-time
+          nullable: true
         location:
           type: string
           maxLength: 255
@@ -2621,10 +2754,8 @@ components:
           readOnly: true
       required:
       - created_at
-      - ends_at
       - id
       - session
-      - starts_at
       - updated_at
     Status137Enum:
       enum:

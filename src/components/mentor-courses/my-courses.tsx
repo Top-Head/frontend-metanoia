@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import { ArrowRight, BookOpen, Layers, Plus } from "lucide-react";
+import { ArrowRight, BookOpen, Layers, Plus, UserCheck } from "lucide-react";
 import { categoryVisual } from "@/components/courses/category-visual";
+import { CourseCover } from "@/components/courses/course-cover";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { useAuth } from "@/hooks/useAuth";
 import { useApiQuery } from "@/hooks/useApiQuery";
@@ -110,9 +111,18 @@ export function MyCourses() {
                 className="group flex flex-col rounded-2xl border border-line bg-panel p-5 shadow-card transition-all hover:border-primary/30 hover:shadow-float"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <span className={clsx("flex size-10 shrink-0 items-center justify-center rounded-xl", tone)}>
-                    <Icon size={18} />
-                  </span>
+                  {course.image ? (
+                    <CourseCover
+                      image={course.image}
+                      categorySlug={course.category?.slug}
+                      className="size-10 shrink-0 rounded-xl"
+                      iconSize={18}
+                    />
+                  ) : (
+                    <span className={clsx("flex size-10 shrink-0 items-center justify-center rounded-xl", tone)}>
+                      <Icon size={18} />
+                    </span>
+                  )}
                   {status && (
                     <span className={clsx("rounded-full px-2.5 py-1 text-xs font-bold", status.tone)}>
                       {status.label}
@@ -127,9 +137,17 @@ export function MyCourses() {
                     .join(" · ")}
                 </p>
                 <div className="mt-auto flex items-center justify-between pt-4">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-soft">
-                    <Layers size={14} />
-                    {course.session_count} {course.session_count === 1 ? "turma" : "turmas"}
+                  <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-ink-soft">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Layers size={14} />
+                      {course.session_count} {course.session_count === 1 ? "turma" : "turmas"}
+                    </span>
+                    {course.total_capacity > 0 && (
+                      <span className="inline-flex items-center gap-1.5">
+                        <UserCheck size={14} />
+                        {course.total_enrolled}/{course.total_capacity} inscritos
+                      </span>
+                    )}
                   </span>
                   <span className="inline-flex items-center gap-1 text-sm font-bold text-primary">
                     Gerir

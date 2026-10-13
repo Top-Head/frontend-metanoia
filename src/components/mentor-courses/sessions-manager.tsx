@@ -2,13 +2,13 @@
 
 import { useState, type FormEvent } from "react";
 import clsx from "clsx";
-import { CalendarDays, CalendarPlus, Layers, Plus, Trash2, Users } from "lucide-react";
+import { CalendarDays, CalendarPlus, Layers, Plus, Repeat, Trash2, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
 import type { CourseDetail, CourseSession } from "@/lib/api/types";
 import { fromLocalInput } from "@/lib/course";
-import { formatMeetingDate, formatMeetingTime } from "@/lib/format";
+import { WEEKDAYS, describeMeeting, isWeekly, sortMeetings } from "@/lib/meeting";
 import {
   createMeeting,
   createSession,
@@ -85,8 +85,12 @@ function NewSessionForm({ course, onCreated }: { course: CourseDetail; onCreated
   );
 }
 
+type MeetingMode = "weekly" | "once";
+
 function NewMeetingForm({ sessionId, onCreated }: { sessionId: number; onCreated: () => void }) {
+  const [mode, setMode] = useState<MeetingMode>("weekly");
   const [date, setDate] = useState("");
+  const [weekday, setWeekday] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [location, setLocation] = useState("");
@@ -94,8 +98,13 @@ function NewMeetingForm({ sessionId, onCreated }: { sessionId: number; onCreated
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!date || !start || !end) {
-      toast.error("Indique a data, a hora de início e a hora de fim.");
+    const when = mode === "weekly" ? weekday : date;
+    if (!when || !start || !end) {
+      toast.error(
+        mode === "weekly"
+          ? "Indique o dia da semana, a hora de início e a hora de fim."
+          : "Indique a data, a hora de início e a hora de fim."
+      );
       return;
     }
     if (end <= start) {
@@ -104,13 +113,19 @@ function NewMeetingForm({ sessionId, onCreated }: { sessionId: number; onCreated
     }
     setIsSaving(true);
     try {
-      await createMeeting(sessionId, {
-        starts_at: fromLocalInput(`${date}T${start}`),
-        ends_at: fromLocalInput(`${date}T${end}`),
-        location: location.trim(),
-      });
-      toast.success("Encontro agendado.");
+      await createMeeting(
+        sessionId,
+        mode === "weekly"
+          ? { day_of_week: Number(weekday), start_time: start, end_time: end, location: location.trim() }
+          : {
+              starts_at: fromLocalInput(`${date}T${start}`),
+              ends_at: fromLocalInput(`${date}T${end}`),
+              location: location.trim(),
+            }
+      );
+      toast.success(mode === "weekly" ? "Encontro semanal adicionado." : "Encontro agendado.");
       setDate("");
+      setWeekday("");
       setStart("");
       setEnd("");
       setLocation("");
@@ -123,22 +138,67 @@ function NewMeetingForm({ sessionId, onCreated }: { sessionId: number; onCreated
   }
 
   return (
-    <form onSubmit={submit} className="mt-3 grid gap-2 rounded-xl bg-canvas p-3 sm:grid-cols-[1fr_110px_110px] lg:grid-cols-[1fr_110px_110px_1fr_auto]">
-      <input aria-label="Data do encontro" type="date" value={date} onChange={(event) => setDate(event.target.value)} className={inputClass} />
-      <input aria-label="Hora de início" type="time" value={start} onChange={(event) => setStart(event.target.value)} className={inputClass} />
-      <input aria-label="Hora de fim" type="time" value={end} onChange={(event) => setEnd(event.target.value)} className={inputClass} />
-      <input
-        aria-label="Local ou link do encontro"
-        placeholder="Local ou link (opcional)"
-        maxLength={255}
-        value={location}
-        onChange={(event) => setLocation(event.target.value)}
-        className={clsx(inputClass, "sm:col-span-2 lg:col-span-1")}
-      />
-      <Button type="submit" size="md" isLoading={isSaving}>
-        {!isSaving && <CalendarPlus size={16} />}
-        Agendar
-      </Button>
+    <form onSubmit={submit} className="mt-3 rounded-xl bg-canvas p-3">
+      <div role="radiogroup" aria-label="Tipo de encontro" className="mb-3 inline-flex gap-1 rounded-lg bg-panel p-1">
+        {(
+          [
+            ["weekly", "Semanal"],
+            ["once", "Data única"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            role="radio"
+            aria-checked={mode === value}
+            onClick={() => setMode(value)}
+            className={clsx(
+              "rounded-md px-3 py-1.5 text-xs font-bold transition-colors",
+              mode === value ? "bg-primary text-white" : "text-ink-soft hover:text-ink"
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="grid gap-2 sm:grid-cols-[1fr_110px_110px] lg:grid-cols-[1fr_110px_110px_1fr_auto]">
+        {mode === "weekly" ? (
+          <select
+            aria-label="Dia da semana"
+            value={weekday}
+            onChange={(event) => setWeekday(event.target.value)}
+            className={inputClass}
+          >
+            <option value="">Dia da semana</option>
+            {WEEKDAYS.map((label, index) => (
+              <option key={label} value={index}>
+                {label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input aria-label="Data do encontro" type="date" value={date} onChange={(event) => setDate(event.target.value)} className={inputClass} />
+        )}
+        <input aria-label="Hora de início" type="time" value={start} onChange={(event) => setStart(event.target.value)} className={inputClass} />
+        <input aria-label="Hora de fim" type="time" value={end} onChange={(event) => setEnd(event.target.value)} className={inputClass} />
+        <input
+          aria-label="Local ou link do encontro"
+          placeholder="Local ou link (opcional)"
+          maxLength={255}
+          value={location}
+          onChange={(event) => setLocation(event.target.value)}
+          className={clsx(inputClass, "sm:col-span-2 lg:col-span-1")}
+        />
+        <Button type="submit" size="md" isLoading={isSaving}>
+          {!isSaving && <CalendarPlus size={16} />}
+          {mode === "weekly" ? "Adicionar" : "Agendar"}
+        </Button>
+      </div>
+      {mode === "weekly" && (
+        <p className="mt-2 text-xs text-ink-soft">
+          Repete-se todas as semanas dentro do período da aula (definido em Detalhes da aula).
+        </p>
+      )}
     </form>
   );
 }
@@ -148,7 +208,7 @@ function SessionCard({ session, onChanged }: { session: CourseSession; onChanged
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [showMeetingForm, setShowMeetingForm] = useState(false);
   const active = session.is_active !== false;
-  const meetings = [...(session.meetings ?? [])].sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+  const meetings = sortMeetings(session.meetings ?? []);
 
   async function run(key: string, task: () => Promise<unknown>, success: string, fallback: string) {
     setBusy(key);
@@ -175,7 +235,7 @@ function SessionCard({ session, onChanged }: { session: CourseSession; onChanged
           </p>
           <p className="mt-0.5 flex items-center gap-1.5 text-xs text-ink-soft">
             <Users size={12} />
-            {session.effective_capacity} {session.effective_capacity === 1 ? "vaga" : "vagas"}
+            {session.total_students ?? 0}/{session.effective_capacity} alunos
             {session.capacity == null && " (capacidade da aula)"}
           </p>
         </div>
@@ -236,29 +296,32 @@ function SessionCard({ session, onChanged }: { session: CourseSession; onChanged
         <p className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-faint">Encontros</p>
         {meetings.length > 0 ? (
           <ul className="space-y-2">
-            {meetings.map((meeting) => (
-              <li key={meeting.id} className="flex items-center gap-3 rounded-lg px-1 py-1">
-                <CalendarDays size={16} className="shrink-0 text-primary" />
-                <div className="min-w-0 flex-1 text-sm">
-                  <p className="font-semibold text-ink first-letter:uppercase">{formatMeetingDate(meeting.starts_at)}</p>
-                  <p className="truncate text-xs text-ink-soft">
-                    {formatMeetingTime(meeting.starts_at, meeting.ends_at)}
-                    {meeting.location && ` · ${meeting.location}`}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  aria-label="Remover encontro"
-                  disabled={busy !== null}
-                  onClick={() =>
-                    run(`meeting-${meeting.id}`, () => deleteMeeting(meeting.id), "Encontro removido.", "Não foi possível remover o encontro.")
-                  }
-                  className="rounded-lg p-1.5 text-ink-faint transition-colors hover:bg-danger/5 hover:text-danger disabled:opacity-50"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </li>
-            ))}
+            {meetings.map((meeting) => {
+              const { day, time } = describeMeeting(meeting);
+              const Icon = isWeekly(meeting) ? Repeat : CalendarDays;
+              return (
+                <li key={meeting.id} className="flex items-center gap-3 rounded-lg px-1 py-1">
+                  <Icon size={16} className="shrink-0 text-primary" />
+                  <div className="min-w-0 flex-1 text-sm">
+                    <p className="font-semibold text-ink first-letter:uppercase">{day}</p>
+                    <p className="truncate text-xs text-ink-soft">
+                      {[time, meeting.location].filter(Boolean).join(" · ")}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Remover encontro"
+                    disabled={busy !== null}
+                    onClick={() =>
+                      run(`meeting-${meeting.id}`, () => deleteMeeting(meeting.id), "Encontro removido.", "Não foi possível remover o encontro.")
+                    }
+                    className="rounded-lg p-1.5 text-ink-faint transition-colors hover:bg-danger/5 hover:text-danger disabled:opacity-50"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className="text-sm text-ink-faint">Nenhum encontro agendado.</p>

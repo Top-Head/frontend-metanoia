@@ -92,10 +92,15 @@ export interface Category {
   is_active?: boolean;
 }
 
+/** Encontro pontual (`starts_at`/`ends_at`) ou semanal (`day_of_week` + horas). */
 export interface NestedMeeting {
   id: number;
-  starts_at: string;
-  ends_at: string;
+  day_of_week?: number | null;
+  /** "HH:MM:SS" */
+  start_time?: string | null;
+  end_time?: string | null;
+  starts_at?: string | null;
+  ends_at?: string | null;
   location?: string;
 }
 
@@ -111,6 +116,7 @@ export interface CourseSession {
   name: string;
   capacity: number | null;
   effective_capacity: number;
+  total_students: number;
   is_active?: boolean;
   meetings?: NestedMeeting[];
   created_at: string;
@@ -120,6 +126,7 @@ export interface CourseSession {
 export interface CourseList {
   id: number;
   title: string;
+  image?: string;
   description?: string;
   category: Category;
   mentor: MentorSummary;
@@ -131,6 +138,12 @@ export interface CourseList {
   currency?: string;
   is_free: boolean;
   capacity: number | null;
+  total_capacity: number;
+  total_enrolled: number;
+  days_of_week: number[];
+  /** "YYYY-MM-DD" */
+  start_date?: string | null;
+  end_date?: string | null;
   status?: CourseStatus;
   session_count: number;
   created_at: string;
@@ -143,6 +156,9 @@ export interface CourseDetail extends CourseList {
 
 export interface CourseWrite {
   title: string;
+  image?: string;
+  start_date?: string | null;
+  end_date?: string | null;
   description?: string;
   category: number;
   type?: CourseType;
@@ -177,6 +193,8 @@ export interface EnrollmentSession {
   id: number;
   name: string;
   capacity: number | null;
+  effective_capacity: number;
+  total_students: number;
 }
 
 export interface Enrollment {

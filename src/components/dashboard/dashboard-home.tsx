@@ -3,6 +3,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import type { Enrollment } from "@/lib/api/types";
+import { calendarWindow, expandMeetings } from "@/lib/meeting";
 import { getCourseForEdit, listMyCourses } from "@/services/mentor-course.service";
 import { listReceivedEnrollments } from "@/services/mentor-enrollment.service";
 import DashboardTopbar from "./topbar";
@@ -29,10 +30,13 @@ export default function DashboardHome() {
         .slice(0, CALENDAR_COURSE_LIMIT);
       const details = await Promise.all(withSessions.map((course) => getCourseForEdit(course.id)));
 
+      const { from, to } = calendarWindow();
+
       return details.flatMap<CalendarMeeting>((course) =>
         course.sessions.flatMap((session) =>
-          (session.meetings ?? []).map((meeting) => ({
-            ...meeting,
+          expandMeetings(session.meetings ?? [], course, from, to).map((occurrence) => ({
+            ...occurrence,
+            key: `${session.id}-${occurrence.key}`,
             href: `/dashboard/aulas/${course.id}`,
             courseTitle: course.title,
             sessionName: session.name,
