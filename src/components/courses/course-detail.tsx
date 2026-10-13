@@ -201,6 +201,20 @@ function DetailSkeleton() {
 }
 
 export function CourseDetailView({ id }: { id: number }) {
+  return (
+    <div className="flex min-h-screen flex-col bg-canvas font-sans text-ink">
+      <Header forceSolid />
+
+      <main className="mx-auto w-full max-w-6xl flex-1 px-6 pb-16 pt-28 lg:px-10">
+        <CourseDetail id={id} backHref="/#catalogo" />
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+
+export function CourseDetail({ id, backHref }: { id: number; backHref: string }) {
   const valid = Number.isInteger(id) && id > 0;
   const { data: course, error, isLoading, reload } = useApiQuery(
     valid ? `course-${id}` : null,
@@ -210,38 +224,32 @@ export function CourseDetailView({ id }: { id: number }) {
   const notFound = !valid || error?.status === 404;
 
   return (
-    <div className="flex min-h-screen flex-col bg-canvas font-sans text-ink">
-      <Header forceSolid />
+    <>
+      <Link
+        href={backHref}
+        className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-ink-soft transition-colors hover:text-primary"
+      >
+        <ArrowLeft size={16} />
+        Voltar às aulas
+      </Link>
 
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 pb-16 pt-28 lg:px-10">
-        <Link
-          href="/#catalogo"
-          className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-ink-soft transition-colors hover:text-primary"
-        >
-          <ArrowLeft size={16} />
-          Voltar às aulas
-        </Link>
-
-        {notFound ? (
-          <EmptyState
-            icon={<SearchX size={22} />}
-            title="Aula não encontrada"
-            description="Esta aula pode ter sido removida ou o link está incorreto."
-            action={
-              <Link href="/#catalogo" className="text-sm font-bold text-primary hover:underline">
-                Ver aulas disponíveis
-              </Link>
-            }
-          />
-        ) : isLoading || !course ? (
-          error ? <ErrorState message={error.message} onRetry={reload} /> : <DetailSkeleton />
-        ) : (
-          <CourseContent course={course} />
-        )}
-      </main>
-
-      <Footer />
-    </div>
+      {notFound ? (
+        <EmptyState
+          icon={<SearchX size={22} />}
+          title="Aula não encontrada"
+          description="Esta aula pode ter sido removida ou o link está incorreto."
+          action={
+            <Link href={backHref} className="text-sm font-bold text-primary hover:underline">
+              Ver aulas disponíveis
+            </Link>
+          }
+        />
+      ) : isLoading || !course ? (
+        error ? <ErrorState message={error.message} onRetry={reload} /> : <DetailSkeleton />
+      ) : (
+        <CourseContent course={course} />
+      )}
+    </>
   );
 }
 

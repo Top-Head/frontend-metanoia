@@ -5,13 +5,13 @@ import type { DiscoveryResult } from "@/lib/api/types";
 import { COURSE_TYPE_LABEL, MODALITY_LABEL, formatCoursePrice } from "@/lib/format";
 import { categoryVisual } from "./category-visual";
 
-export function CourseCard({ result }: { result: DiscoveryResult }) {
+export function CourseCard({ result, href }: { result: DiscoveryResult; href?: string }) {
   const { course, has_capacity, reasons } = result;
   const { icon: Icon, tone } = categoryVisual(course.category?.slug);
 
   return (
     <Link
-      href={`/aulas/${course.id}`}
+      href={href ?? `/aulas/${course.id}`}
       className="group flex flex-col rounded-2xl border border-line bg-panel p-5 shadow-card transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-float"
     >
       <div className="mb-4 flex items-start justify-between gap-3">

@@ -397,7 +397,7 @@ export function EnrollmentDetailView({ id }: { id: number }) {
             <h2 className="mb-3 text-sm font-bold text-ink">Sobre a aula</h2>
             {course.location && <p className="mb-2 text-sm text-ink-soft">{course.location}</p>}
             <Link
-              href={`/aulas/${course.id}`}
+              href={`/aluno/catalogo/${course.id}`}
               className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline"
             >
               Ver página da aula e encontros
