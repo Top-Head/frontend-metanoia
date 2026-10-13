@@ -233,7 +233,7 @@ export function ForYou() {
       ) : recommendations.data && recommendations.data.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {recommendations.data.map((result) => (
-            <CourseCard key={result.course.id} result={result} />
+            <CourseCard key={result.course.id} result={result} href={`/aluno/catalogo/${result.course.id}`} />
           ))}
         </div>
       ) : (
@@ -246,7 +246,7 @@ export function ForYou() {
               : "Converse com o assistente ou escreva o que quer aprender acima."
           }
           action={
-            <Link href="/#catalogo" className="text-sm font-bold text-primary hover:underline">
+            <Link href="/aluno/catalogo" className="text-sm font-bold text-primary hover:underline">
               Ver todas as aulas
             </Link>
           }

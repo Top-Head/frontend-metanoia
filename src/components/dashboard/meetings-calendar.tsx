@@ -8,7 +8,7 @@ import { formatMeetingDate, formatMeetingTime } from "@/lib/format";
 
 export interface CalendarMeeting {
   id: number;
-  courseId: number;
+  href: string;
   courseTitle: string;
   sessionName: string;
   starts_at: string;
@@ -24,9 +24,16 @@ const dayKey = (date: Date) => `${date.getFullYear()}-${date.getMonth()}-${date.
 interface MeetingsCalendarProps {
   meetings: CalendarMeeting[];
   isLoading: boolean;
+  action?: { href: string; label: string };
+  emptyText?: string;
 }
 
-export default function MeetingsCalendar({ meetings, isLoading }: MeetingsCalendarProps) {
+export default function MeetingsCalendar({
+  meetings,
+  isLoading,
+  action,
+  emptyText = "Nenhum encontro agendado.",
+}: MeetingsCalendarProps) {
   const [now] = useState(() => new Date());
   const [cursor, setCursor] = useState(() => new Date(now.getFullYear(), now.getMonth(), 1));
 
@@ -116,7 +123,7 @@ export default function MeetingsCalendar({ meetings, isLoading }: MeetingsCalend
             upcoming.map((meeting) => (
               <Link
                 key={meeting.id}
-                href={`/dashboard/aulas/${meeting.courseId}`}
+                href={meeting.href}
                 className="block rounded-xl border border-line-strong bg-panel p-3 transition-colors hover:border-primary/40"
               >
                 <div className="flex items-start justify-between gap-2">
@@ -133,19 +140,21 @@ export default function MeetingsCalendar({ meetings, isLoading }: MeetingsCalend
             ))
           ) : (
             <p className="rounded-xl border border-dashed border-line-strong px-4 py-6 text-center text-xs text-ink-faint">
-              Nenhum encontro agendado.
+              {emptyText}
             </p>
           )}
         </div>
       </div>
 
-      <Link
-        href="/dashboard/aulas"
-        className="mt-8 flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-line-strong text-sm font-bold text-ink-soft transition-colors hover:border-primary hover:text-primary"
-      >
-        <CalendarPlus size={16} />
-        Agendar encontros
-      </Link>
+      {action && (
+        <Link
+          href={action.href}
+          className="mt-8 flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed border-line-strong text-sm font-bold text-ink-soft transition-colors hover:border-primary hover:text-primary"
+        >
+          <CalendarPlus size={16} />
+          {action.label}
+        </Link>
+      )}
     </aside>
   );
 }

@@ -9,7 +9,7 @@ interface StatsProps {
   isLoading: boolean;
 }
 
-interface Stat {
+export interface Stat {
   label: string;
   value: number;
   hint: string;
@@ -53,6 +53,10 @@ export default function Stats({
     },
   ];
 
+  return <StatGrid stats={stats} isLoading={isLoading} />;
+}
+
+export function StatGrid({ stats, isLoading }: { stats: Stat[]; isLoading: boolean }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-4">
       {stats.map(({ label, value, hint, icon: Icon, attention }) => (

@@ -98,6 +98,7 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 | 4 | Área do mentor: `/dashboard` com inscrições reais, `/dashboard/aulas` (lista, nova, editor com turmas e encontros) | ✅ feito (validar no backend real) |
 | 5 | Perfis: `/dashboard/perfil` (mentor) e `/aluno/perfil` (aluno), criar o segundo perfil na mesma conta | ✅ feito (validar no backend real) |
 | 6 | Onboarding com IA (`/aluno/onboarding`), perfil de aprendizagem e recomendações (`/aluno/para-voce`, faixa na página inicial) | ✅ feito (validar no backend real) |
+| 7 | Painel do aluno (`/aluno`): resumo das inscrições, próximos passos, encontros e recomendações; área do aluno com sidebar | ✅ feito (validar no backend real) |
 
 ## Sem endpoint na API (continuam mock ou ficam desativados)
 
@@ -189,3 +190,9 @@ Isolado em `src/services/onboarding.service.ts`:
 - O frontend esconde mensagens com `role: SYSTEM` e considera a conversa terminada quando `status` passa a
   `COMPLETED`.
 - Depois do cadastro, alunos novos vão para `/aluno/onboarding`.
+
+### A confirmar no backend (fase 7)
+
+- Não há endpoint de "encontros do aluno". O painel pede `GET /api/courses/{id}/` de até 10 aulas com
+  inscrição aprovada e mostra os encontros da turma inscrita. Confirmar que o detalhe continua acessível
+  ao aluno quando a aula é arquivada (falhas são ignoradas).

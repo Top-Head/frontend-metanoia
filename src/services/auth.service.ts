@@ -43,5 +43,6 @@ export function displayName(user: User | null) {
 }
 
 export function homePathFor(user: User | null) {
-  return isMentor(user) ? "/dashboard" : "/";
+  if (isMentor(user)) return "/dashboard";
+  return isStudent(user) ? "/aluno" : "/";
 }

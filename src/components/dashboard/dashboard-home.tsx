@@ -33,7 +33,7 @@ export default function DashboardHome() {
         course.sessions.flatMap((session) =>
           (session.meetings ?? []).map((meeting) => ({
             ...meeting,
-            courseId: course.id,
+            href: `/dashboard/aulas/${course.id}`,
             courseTitle: course.title,
             sessionName: session.name,
           }))
@@ -77,6 +77,7 @@ export default function DashboardHome() {
         <MeetingsCalendar
           meetings={meetings.data ?? []}
           isLoading={courses.isLoading || meetings.isLoading}
+          action={{ href: "/dashboard/aulas", label: "Agendar encontros" }}
         />
       </div>
     </>

@@ -96,6 +96,17 @@ export function UserMenu({ tone = "default" }: UserMenuProps) {
             )}
             {isStudent && (
               <Link
+                href="/aluno"
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-canvas"
+              >
+                <LayoutDashboard size={16} className="text-ink-soft" />
+                Painel do aluno
+              </Link>
+            )}
+            {isStudent && (
+              <Link
                 href="/aluno/para-voce"
                 role="menuitem"
                 onClick={() => setIsOpen(false)}

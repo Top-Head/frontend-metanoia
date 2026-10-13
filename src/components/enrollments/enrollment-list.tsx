@@ -94,7 +94,7 @@ export function EnrollmentList() {
           <h1 className="text-3xl font-bold tracking-tight text-ink">Minhas inscrições</h1>
         </div>
         <Link
-          href="/#catalogo"
+          href="/aluno/catalogo"
           className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
         >
           <Search size={16} />
@@ -154,7 +154,7 @@ export function EnrollmentList() {
           description="Escolha uma aula no catálogo e peça inscrição numa turma."
           action={
             <Link
-              href="/#catalogo"
+              href="/aluno/catalogo"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-strong"
             >
               Ver aulas
