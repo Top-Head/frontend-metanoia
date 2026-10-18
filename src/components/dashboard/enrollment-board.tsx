@@ -71,12 +71,6 @@ function RequestCard({
         <span className="font-semibold text-ink-soft">{formatCoursePrice(enrollment.course)}</span>
       </div>
 
-      {enrollment.payment_status !== "NOT_REQUIRED" && (
-        <div className="mt-3">
-          <StatusBadge kind="payment" status={enrollment.payment_status} />
-        </div>
-      )}
-
       {column === "pedidos" && (
         <div className="mt-4 flex gap-2">
           <Button size="sm" onClick={() => act("approve", "Pedido aprovado.")} isLoading={busy === "approve"} disabled={busy !== null}>

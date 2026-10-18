@@ -115,21 +115,12 @@ function Steps({ steps }: { steps: Step[] }) {
 function InvestmentSection({ enrollment }: { enrollment: Enrollment }) {
   return (
     <section className="rounded-2xl border border-line bg-panel p-6 shadow-card">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-ink">Investimento</h2>
-        <StatusBadge kind="payment" status={enrollment.payment_status} />
-      </div>
+      <h2 className="mb-4 text-lg font-bold text-ink">Investimento</h2>
 
       <div className="flex items-baseline justify-between rounded-xl bg-canvas p-4">
         <span className="text-sm text-ink-soft">Valor da aula</span>
         <span className="text-xl font-bold text-ink">{formatCoursePrice(enrollment.course)}</span>
       </div>
-
-      {enrollment.payment_status === "CONFIRMED" && enrollment.payment_decided_at && (
-        <p className="mt-3 text-sm text-ink-soft">
-          Pagamento confirmado em {formatDateTime(enrollment.payment_decided_at)}.
-        </p>
-      )}
     </section>
   );
 }

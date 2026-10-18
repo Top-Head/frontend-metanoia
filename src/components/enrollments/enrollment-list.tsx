@@ -51,9 +51,6 @@ function EnrollmentRow({ enrollment }: { enrollment: Enrollment }) {
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <StatusBadge kind="enrollment" status={enrollment.status} />
-          {enrollment.payment_status !== "NOT_REQUIRED" && enrollment.status !== "CANCELLED" && (
-            <StatusBadge kind="payment" status={enrollment.payment_status} />
-          )}
         </div>
       </div>
 
