@@ -237,13 +237,28 @@ export interface ChatRoom {
   created_at: string;
 }
 
+export interface ChatAttachment {
+  id: number;
+  filename: string;
+  content_type: string;
+  size: number;
+  file: string;
+  expires_in: number;
+}
+
+export interface ChatAttachmentUrl {
+  url: string;
+  expires_in: number;
+}
+
 export interface ChatMessage {
   id: number;
   author: number;
   author_name: string;
   content: string;
-  attachments?: unknown[];
+  attachments: ChatAttachment[];
   created_at: string;
+  updated_at?: string;
 }
 
 export interface VideoCallInactive {

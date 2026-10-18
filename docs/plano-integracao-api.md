@@ -102,7 +102,6 @@ Legenda: 🔓 público · 🔒 requer JWT · **P0** bloqueia tudo · **P1** núc
 
 ## Sem endpoint na API (continuam mock ou ficam desativados)
 
-- **Mensagens** (`/messages`): não há API de chat.
 - **Contacto** (`/contact`): não há endpoint de envio.
 - **Recuperar senha** (`/auth/recuperar-senha`): não há endpoint de reset.
 - **Login social** (Google/LinkedIn): não existe.
@@ -215,3 +214,17 @@ A confirmar:
 - Não há endpoint de "encontros do aluno". O painel pede `GET /api/courses/{id}/` de até 10 aulas com
   inscrição aprovada e mostra os encontros da turma inscrita. Confirmar que o detalhe continua acessível
   ao aluno quando a aula é arquivada (falhas são ignoradas).
+
+### Chat e videochamada (confirmado na API real)
+
+Contrato em `docs.yaml`. Implementado em `src/services/message.service.ts`, `chat-socket.service.ts` e `src/components/message/`.
+
+- `ChatMessage` usa `author` / `author_name` (o `Metanoia Mentorship API.yaml` ainda diz `sender`).
+- `GET /api/chat/rooms/{id}/messages/` pagina em **ordem cronológica** (página 1 = mais antigas) e ignora
+  `ordering`. O frontend lê `count` e carrega as duas últimas páginas.
+- WebSocket `/ws/chat/{id}/?token=` (um por sala, partilhado com a videochamada):
+  `{type: "message", data}`, `{type: "message.updated", data}`, `{type: "message.deleted", id}`,
+  `video_call.started` / `video_call.ended`. O polling (60 s) só reconcilia.
+- Não há campo de resposta: a citação vai no início de `content` (`src/lib/chat-reply.ts`).
+- **Anexos falham no backend**: `POST` multipart devolve `500 NoSuchBucket` (bucket S3 não configurado
+  no Render). A página de erro é a do Django com `DEBUG=True` em produção.

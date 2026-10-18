@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, LayoutDashboard, RefreshCw } from "lucide-react";
 import toast from "react-hot-toast";
@@ -8,33 +8,89 @@ import { UserMenu } from "@/components/user-menu";
 import { useAuth } from "@/hooks/useAuth";
 import type { ChatMessage, ChatRoom } from "@/lib/api/types";
 import {
+  deleteRoomMessage,
+  editRoomMessage,
   listChatRooms,
   listRoomMessages,
   sendRoomMessage,
 } from "@/services/message.service";
-import { replyReferenceFor, withReply, type ReplyReference } from "@/lib/chat-reply";
+import { subscribeToRoom, type RoomEvent } from "@/services/chat-socket.service";
+import {
+  parseMessageContent,
+  replyReferenceFor,
+  withReply,
+  type ReplyReference,
+} from "@/lib/chat-reply";
+import { addFiles } from "@/lib/chat-attachments";
 import Profile from "./Profile";
 import Sidebar from "./Sidebar";
 import { MessageComposer } from "./Send-sms";
 import { ChatThread } from "./sms";
+import DeleteMessageDialog from "./delete-message-dialog";
 import VideoCall from "./video-call";
 
 const ROOM_PAGE_SIZE = 50;
 const MESSAGE_PAGE_SIZE = 50;
-const REFRESH_INTERVAL = 20_000;
+// O WebSocket entrega as mensagens em tempo real; o polling só reconcilia.
+const REFRESH_INTERVAL = 60_000;
 
 function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
 }
 
+function byCreatedAt(first: ChatMessage, second: ChatMessage) {
+  return new Date(first.created_at).getTime() - new Date(second.created_at).getTime();
+}
+
 function mergeMessages(current: ChatMessage[], incoming: ChatMessage[]) {
   const byId = new Map(current.map((message) => [message.id, message]));
   for (const message of incoming) byId.set(message.id, message);
-  return [...byId.values()].sort(
-    (first, second) =>
-      new Date(first.created_at).getTime() -
-      new Date(second.created_at).getTime()
+  return [...byId.values()].sort(byCreatedAt);
+}
+
+// Substitui a janela mais recente pelo que veio da API (remove as apagadas).
+function reconcileLatest(current: ChatMessage[], latest: ChatMessage[]) {
+  if (latest.length === 0) return current.filter((message) => message.id < 0);
+  const windowStart = new Date(latest[0].created_at).getTime();
+  const maxId = Math.max(...latest.map((message) => message.id));
+  const kept = current.filter(
+    (message) => new Date(message.created_at).getTime() < windowStart || message.id > maxId
   );
+  return mergeMessages(kept, latest);
+}
+
+function eventMessage(event: RoomEvent): ChatMessage | null {
+  const data = event.data ?? event.message;
+  if (data && typeof data === "object" && "id" in data && "content" in data) {
+    return data as ChatMessage;
+  }
+  return null;
+}
+
+function eventMessageId(event: RoomEvent): number | null {
+  const id = event.id ?? eventMessage(event)?.id ?? (event.data as { id?: unknown } | undefined)?.id;
+  return typeof id === "number" ? id : typeof id === "string" ? Number(id) : null;
+}
+
+/**
+ * A API pagina em ordem cronológica (página 1 = mais antigas) e ignora `ordering`.
+ * Carrega as duas últimas páginas para mostrar sempre as mensagens recentes.
+ */
+async function fetchLatestMessages(roomId: number, signal?: AbortSignal) {
+  const first = await listRoomMessages(roomId, 1, MESSAGE_PAGE_SIZE, signal);
+  const lastPage = Math.max(1, Math.ceil(first.count / MESSAGE_PAGE_SIZE));
+  if (lastPage === 1) return { messages: first.results, oldestPage: 1 };
+
+  const [previous, last] = await Promise.all([
+    lastPage - 1 === 1
+      ? Promise.resolve(first)
+      : listRoomMessages(roomId, lastPage - 1, MESSAGE_PAGE_SIZE, signal),
+    listRoomMessages(roomId, lastPage, MESSAGE_PAGE_SIZE, signal),
+  ]);
+  return {
+    messages: [...previous.results, ...last.results].sort(byCreatedAt),
+    oldestPage: lastPage - 1,
+  };
 }
 
 export default function Message() {
@@ -52,19 +108,44 @@ export default function Message() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [messagesLoadingOlder, setMessagesLoadingOlder] = useState(false);
-  const [messagesHasOlder, setMessagesHasOlder] = useState(false);
-  const [messagesPage, setMessagesPage] = useState(1);
+  const [oldestPage, setOldestPage] = useState(1);
   const [messagesError, setMessagesError] = useState<string | null>(null);
   const [sendError, setSendError] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
   const [replyTo, setReplyTo] = useState<ReplyReference | null>(null);
+  const [editing, setEditing] = useState<ChatMessage | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ChatMessage | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [pendingMessage, setPendingMessage] = useState<{
     roomId: number;
     content: string;
+    fileNames: string[];
   } | null>(null);
   const [sending, setSending] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const selectedRoomIdRef = useRef<number | null>(selectedRoomId);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const nearBottomRef = useRef(true);
+  const lastMessageIdRef = useRef<number | null>(null);
+
+  // Desce até a última mensagem ao abrir a sala, ao enviar, ou quando chega
+  // uma nova e o utilizador já está perto do fim (não ao carregar antigas).
+  useLayoutEffect(() => {
+    const container = scrollRef.current;
+    const last = messages.at(-1);
+    const previousLastId = lastMessageIdRef.current;
+    lastMessageIdRef.current = last?.id ?? null;
+    if (!container) return;
+    const appended = last !== undefined && last.id !== previousLastId;
+    if (
+      pendingMessage ||
+      (appended && (previousLastId === null || nearBottomRef.current || last.author === currentUserId))
+    ) {
+      container.scrollTop = container.scrollHeight;
+      nearBottomRef.current = true;
+    }
+  }, [messages, pendingMessage, currentUserId]);
 
   useEffect(() => {
     selectedRoomIdRef.current = selectedRoomId;
@@ -97,23 +178,12 @@ export default function Message() {
   const selectedRoom =
     rooms.find((room) => room.id === selectedRoomId) ?? null;
 
-  const loadMessages = useCallback(
-    async (roomId: number, pageNumber = 1, signal?: AbortSignal) => {
-      const result = await listRoomMessages(
-        roomId,
-        pageNumber,
-        MESSAGE_PAGE_SIZE,
-        signal
-      );
-      const chronological = [...result.results].reverse();
+  const loadLatest = useCallback(
+    async (roomId: number, initial: boolean, signal?: AbortSignal) => {
+      const latest = await fetchLatestMessages(roomId, signal);
       if (selectedRoomIdRef.current !== roomId) return;
-
-      setMessages((current) =>
-        pageNumber === 1
-          ? mergeMessages(current, chronological)
-          : mergeMessages(chronological, current)
-      );
-      setMessagesHasOlder(Boolean(result.next));
+      setMessages((current) => reconcileLatest(current, latest.messages));
+      setOldestPage((current) => (initial ? latest.oldestPage : Math.min(current, latest.oldestPage)));
       setMessagesError(null);
     },
     []
@@ -130,18 +200,21 @@ export default function Message() {
     let disposed = false;
     let refreshTimer: ReturnType<typeof setTimeout> | undefined;
     let refreshInFlight = false;
+    let initialLoaded = false;
 
     setMessages([]);
-    setMessagesHasOlder(false);
-    setMessagesPage(1);
+    setOldestPage(1);
     setMessagesError(null);
     setSendError(null);
     setReplyTo(null);
+    setEditing(null);
+    setFiles([]);
     setMessagesLoading(true);
 
     const refreshLatest = async () => {
       if (
         disposed ||
+        !initialLoaded ||
         refreshInFlight ||
         document.visibilityState !== "visible"
       ) {
@@ -150,7 +223,7 @@ export default function Message() {
       refreshInFlight = true;
       setRefreshing(true);
       try {
-        await loadMessages(roomId, 1, controller.signal);
+        await loadLatest(roomId, false, controller.signal);
       } catch (error) {
         if (!controller.signal.aborted && selectedRoomIdRef.current === roomId) {
           setMessagesError(errorMessage(error, "Não foi possível atualizar."));
@@ -169,7 +242,7 @@ export default function Message() {
       }, REFRESH_INTERVAL);
     };
 
-    void loadMessages(roomId, 1, controller.signal)
+    void loadLatest(roomId, true, controller.signal)
       .catch((error: unknown) => {
         if (!controller.signal.aborted && selectedRoomIdRef.current === roomId) {
           setMessagesError(
@@ -178,11 +251,29 @@ export default function Message() {
         }
       })
       .finally(() => {
+        initialLoaded = true;
         if (!disposed && selectedRoomIdRef.current === roomId) {
           setMessagesLoading(false);
         }
         scheduleRefresh();
       });
+
+    const unsubscribe = subscribeToRoom(roomId, {
+      // Ao (re)conectar, recupera o que possa ter chegado sem o socket.
+      onOpen: () => void refreshLatest(),
+      onEvent: (event) => {
+        if (disposed) return;
+        if (event.type === "message" || event.type === "message.updated") {
+          const message = eventMessage(event);
+          if (message) setMessages((current) => mergeMessages(current, [message]));
+        } else if (event.type === "message.deleted") {
+          const id = eventMessageId(event);
+          if (id !== null) {
+            setMessages((current) => current.filter((message) => message.id !== id));
+          }
+        }
+      },
+    });
 
     const onVisibilityChange = () => {
       if (document.visibilityState === "visible") void refreshLatest();
@@ -192,10 +283,19 @@ export default function Message() {
     return () => {
       disposed = true;
       controller.abort();
+      unsubscribe();
       if (refreshTimer) clearTimeout(refreshTimer);
       document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [loadMessages, selectedRoomId]);
+  }, [loadLatest, selectedRoomId]);
+
+  // Se a mensagem em edição for apagada (por exemplo noutra aba), sai do modo de edição.
+  useEffect(() => {
+    if (editing && !messages.some((message) => message.id === editing.id)) {
+      setEditing(null);
+      setDraft("");
+    }
+  }, [editing, messages]);
 
   async function loadMoreRooms() {
     if (roomsLoadingMore || !roomsHasMore) return;
@@ -220,14 +320,17 @@ export default function Message() {
   }
 
   async function loadOlderMessages() {
-    if (selectedRoomId === null || messagesLoadingOlder || !messagesHasOlder) {
+    if (selectedRoomId === null || messagesLoadingOlder || oldestPage <= 1) {
       return;
     }
-    const nextPage = messagesPage + 1;
+    const roomId = selectedRoomId;
+    const page = oldestPage - 1;
     setMessagesLoadingOlder(true);
     try {
-      await loadMessages(selectedRoomId, nextPage);
-      setMessagesPage(nextPage);
+      const result = await listRoomMessages(roomId, page, MESSAGE_PAGE_SIZE);
+      if (selectedRoomIdRef.current !== roomId) return;
+      setMessages((current) => mergeMessages(current, result.results));
+      setOldestPage(page);
     } catch (error) {
       setMessagesError(
         errorMessage(error, "Não foi possível carregar mensagens anteriores.")
@@ -237,18 +340,54 @@ export default function Message() {
     }
   }
 
-  async function sendMessage() {
-    if (selectedRoomId === null || !draft.trim() || sending) return;
-    const roomId = selectedRoomId;
-    const content = withReply(draft.trim(), replyTo);
+  function handleAddFiles(incoming: File[]) {
+    const result = addFiles(files, incoming);
+    setFiles(result.files);
+    if (result.error) toast.error(result.error);
+  }
+
+  async function saveEdit(target: ChatMessage, roomId: number) {
+    const { reply } = parseMessageContent(target.content);
+    const content = withReply(draft.trim(), reply);
     setSending(true);
     setSendError(null);
-    setPendingMessage({ roomId, content });
     try {
-      const sent = await sendRoomMessage(roomId, content);
+      const updated = await editRoomMessage(roomId, target.id, content);
+      if (selectedRoomIdRef.current === roomId) {
+        setMessages((current) => mergeMessages(current, [updated]));
+        setEditing(null);
+        setDraft("");
+      }
+    } catch (error) {
+      const message = errorMessage(error, "Não foi possível editar a mensagem.");
+      setSendError(message);
+      toast.error(message);
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function sendMessage() {
+    if (selectedRoomId === null || sending) return;
+    const roomId = selectedRoomId;
+    if (editing) {
+      await saveEdit(editing, roomId);
+      return;
+    }
+    if (!draft.trim() && files.length === 0) return;
+
+    const sentDraft = draft;
+    const sentFiles = files;
+    const content = draft.trim() ? withReply(draft.trim(), replyTo) : "";
+    setSending(true);
+    setSendError(null);
+    setPendingMessage({ roomId, content, fileNames: sentFiles.map((file) => file.name) });
+    try {
+      const sent = await sendRoomMessage(roomId, content, sentFiles);
       if (selectedRoomIdRef.current === roomId) {
         setMessages((current) => mergeMessages(current, [sent]));
-        setDraft((current) => (current === draft ? "" : current));
+        setDraft((current) => (current === sentDraft ? "" : current));
+        setFiles((current) => (current === sentFiles ? [] : current));
         setReplyTo(null);
       }
     } catch (error) {
@@ -261,6 +400,49 @@ export default function Message() {
     }
   }
 
+  function startReply(message: ChatMessage) {
+    if (editing) {
+      setEditing(null);
+      setDraft("");
+    }
+    setReplyTo(replyReferenceFor(message));
+  }
+
+  function startEdit(message: ChatMessage) {
+    setReplyTo(null);
+    setFiles([]);
+    setSendError(null);
+    setEditing(message);
+    setDraft(parseMessageContent(message.content).body);
+  }
+
+  function cancelEdit() {
+    setEditing(null);
+    setDraft("");
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget || selectedRoomId === null || deleting) return;
+    const roomId = selectedRoomId;
+    const target = deleteTarget;
+    setDeleting(true);
+    try {
+      await deleteRoomMessage(roomId, target.id);
+      if (selectedRoomIdRef.current === roomId) {
+        setMessages((current) => current.filter((message) => message.id !== target.id));
+      }
+      if (replyTo?.id === target.id) setReplyTo(null);
+      setDeleteTarget(null);
+      toast.success("Mensagem apagada.");
+    } catch (error) {
+      toast.error(errorMessage(error, "Não foi possível apagar a mensagem."));
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  const closeDeleteDialog = useCallback(() => setDeleteTarget(null), []);
+
   function selectRoom(roomId: number) {
     setSelectedRoomId(roomId);
     setDraft("");
@@ -271,7 +453,7 @@ export default function Message() {
   function refreshMessages() {
     if (selectedRoomId === null || refreshing) return;
     setRefreshing(true);
-    void loadMessages(selectedRoomId)
+    void loadLatest(selectedRoomId, false)
       .catch((error: unknown) =>
         setMessagesError(errorMessage(error, "Não foi possível atualizar."))
       )
@@ -281,7 +463,7 @@ export default function Message() {
   function retryMessages() {
     if (selectedRoomId === null) return;
     setMessagesLoading(true);
-    void loadMessages(selectedRoomId)
+    void loadLatest(selectedRoomId, true)
       .catch((error: unknown) =>
         setMessagesError(
           errorMessage(error, "Não foi possível carregar as mensagens.")
@@ -395,17 +577,33 @@ export default function Message() {
               </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            <div
+              ref={scrollRef}
+              onScroll={(event) => {
+                const target = event.currentTarget;
+                nearBottomRef.current =
+                  target.scrollHeight - target.scrollTop - target.clientHeight < 120;
+              }}
+              onLoadCapture={(event) => {
+                // Imagens de anexos aumentam a altura depois de carregar.
+                if (nearBottomRef.current) {
+                  event.currentTarget.scrollTop = event.currentTarget.scrollHeight;
+                }
+              }}
+              className="min-h-0 flex-1 overflow-y-auto"
+            >
               <ChatThread
                 messages={messages}
                 currentUserId={currentUserId}
                 loading={messagesLoading}
                 error={messagesError}
-                hasOlder={messagesHasOlder}
+                hasOlder={oldestPage > 1}
                 loadingOlder={messagesLoadingOlder}
                 onLoadOlder={() => void loadOlderMessages()}
                 onRetry={retryMessages}
-                onReply={(message) => setReplyTo(replyReferenceFor(message))}
+                onReply={startReply}
+                onEdit={startEdit}
+                onDelete={setDeleteTarget}
                 pendingMessage={
                   pendingMessage?.roomId === selectedRoom.id
                     ? pendingMessage
@@ -420,6 +618,14 @@ export default function Message() {
               onSend={() => void sendMessage()}
               replyTo={replyTo}
               onCancelReply={() => setReplyTo(null)}
+              editing={editing ? replyReferenceFor(editing) : null}
+              editingHasAttachments={(editing?.attachments.length ?? 0) > 0}
+              onCancelEdit={cancelEdit}
+              files={files}
+              onAddFiles={handleAddFiles}
+              onRemoveFile={(index) =>
+                setFiles((current) => current.filter((_, position) => position !== index))
+              }
               disabled={sending}
               error={sendError}
             />
@@ -442,6 +648,13 @@ export default function Message() {
           <Profile room={selectedRoom} isMentor={isMentor} />
         )}
       </div>
+
+      <DeleteMessageDialog
+        message={deleteTarget}
+        deleting={deleting}
+        onCancel={closeDeleteDialog}
+        onConfirm={() => void confirmDelete()}
+      />
     </main>
   );
 }
