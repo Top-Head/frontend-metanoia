@@ -66,8 +66,8 @@ export default function DashboardHome() {
           <Stats
             isLoading={enrollments.isLoading || courses.isLoading}
             pending={pending}
-            proofsToReview={count((item) => item.payment_status === "PROOF_SUBMITTED" && item.status === "APPROVED")}
             confirmedStudents={count((item) => columnOf(item) === "confirmados")}
+            totalEnrollments={list?.length ?? 0}
             publishedCourses={courses.data?.filter((course) => course.status === "PUBLISHED").length ?? 0}
           />
           <EnrollmentBoard

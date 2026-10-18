@@ -8,7 +8,6 @@ export type EnrollmentStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED"
 export type PaymentStatus =
   | "NOT_REQUIRED"
   | "PENDING"
-  | "PROOF_SUBMITTED"
   | "CONFIRMED"
   | "REJECTED";
 export type Level = "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "UNKNOWN";
@@ -205,7 +204,6 @@ export interface Enrollment {
   session: EnrollmentSession;
   status: EnrollmentStatus;
   payment_status: PaymentStatus;
-  has_payment_proof: boolean;
   requested_at: string;
   decided_at: string | null;
   decision_note: string;

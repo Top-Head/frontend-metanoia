@@ -19,7 +19,7 @@ const TABS: Array<{ value: Tab; label: string; match: (enrollment: Enrollment) =
   {
     value: "andamento",
     label: "Em andamento",
-    match: (e) => (e.status === "PENDING" || e.status === "APPROVED") && !isConfirmed(e),
+    match: (e) => e.status === "PENDING",
   },
   { value: "confirmadas", label: "Confirmadas", match: isConfirmed },
   {
@@ -35,7 +35,7 @@ const FETCH_LIMIT = 50;
 function EnrollmentRow({ enrollment }: { enrollment: Enrollment }) {
   const { course, session } = enrollment;
   const step = nextStepFor(enrollment);
-  const needsAction = enrollment.payment_status === "PENDING" || enrollment.payment_status === "REJECTED";
+  const isPending = enrollment.status === "PENDING";
 
   return (
     <Link
@@ -63,7 +63,7 @@ function EnrollmentRow({ enrollment }: { enrollment: Enrollment }) {
           Pedido em {formatDateTime(enrollment.requested_at)}
         </p>
         {step && (
-          <p className={clsx("max-w-64 text-sm", needsAction && enrollment.status === "APPROVED" ? "font-bold text-warning" : "text-ink-soft")}>
+          <p className={clsx("max-w-64 text-sm", isPending ? "font-bold text-warning" : "text-ink-soft")}>
             {step}
           </p>
         )}

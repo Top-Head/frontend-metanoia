@@ -8,19 +8,11 @@ export async function listReceivedEnrollments(params: { page_size?: number } = {
   return data;
 }
 
-type Action = "approve" | "reject" | "confirm-payment" | "reject-payment";
+type Action = "approve" | "reject";
 
-export async function decideEnrollment(id: number, action: Action, note?: string) {
+export async function decideEnrollment(id: number, action: Action) {
   const { data } = await api.post<Enrollment>(
-    `/api/mentor/enrollments/${id}/${action}/`,
-    note ? { decision_note: note } : {}
+    `/api/mentor/enrollments/${id}/${action}/`
   );
-  return data;
-}
-
-export async function downloadStudentProof(id: number) {
-  const { data } = await api.get<Blob>(`/api/mentor/enrollments/${id}/download-proof/`, {
-    responseType: "blob",
-  });
   return data;
 }
