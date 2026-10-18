@@ -227,6 +227,24 @@ export interface AIConversation {
   updated_at: string;
 }
 
+export interface ChatRoom {
+  id: number;
+  course_title: string;
+  session_name: string;
+  mentor_name: string;
+  member_count: number;
+  created_at: string;
+}
+
+export interface ChatMessage {
+  id: number;
+  room: number;
+  sender: number;
+  sender_name: string;
+  content: string;
+  created_at: string;
+}
+
 export interface LearningProfile {
   id: number;
   goals?: string;
