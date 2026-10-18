@@ -101,7 +101,7 @@ export function UserMenu({ tone = "default" }: UserMenuProps) {
                 Painel do mentor
               </Link>
             )}
-            { !isAlunoArea &&  (
+            { !isAlunoArea && isStudent && (
               <Link
                 href="/aluno"
                 role="menuitem"
@@ -137,7 +137,7 @@ export function UserMenu({ tone = "default" }: UserMenuProps) {
             )}
 
  */}
-             {isStudent &&  !isHome &&(
+             {isStudent &&  !isHome && isMentor &&(
               <Link
                 href="/aluno/notificacoes"
                 role="menuitem"
