@@ -7,33 +7,24 @@ import {
   ArrowLeft,
   Check,
   Clock,
-  Download,
   ExternalLink,
   FileSearch,
   PartyPopper,
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { Button } from "@/components/ui/button";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { ApiError } from "@/lib/api/client";
-import { openBlob } from "@/lib/download";
 import type { Enrollment } from "@/lib/api/types";
 import {
   canCancel,
-  canSubmitProof,
   formatDateTime,
   isConfirmed,
   nextStepFor,
 } from "@/lib/enrollment";
 import { COURSE_TYPE_LABEL, MODALITY_LABEL, formatCoursePrice } from "@/lib/format";
-import {
-  cancelEnrollment,
-  downloadMyPaymentProof,
-  getMyEnrollment,
-} from "@/services/enrollment.service";
-import { ProofUploader } from "./proof-uploader";
+import { cancelEnrollment, getMyEnrollment } from "@/services/enrollment.service";
 import { StatusBadge } from "./status-badge";
 
 type StepState = "done" | "current" | "failed" | "upcoming";
@@ -45,9 +36,8 @@ interface Step {
 }
 
 function buildSteps(enrollment: Enrollment): Step[] {
-  const { status, payment_status: payment } = enrollment;
+  const { status } = enrollment;
   const cancelled = status === "CANCELLED";
-  const paid = payment !== "NOT_REQUIRED";
 
   const steps: Step[] = [
     {
@@ -72,31 +62,15 @@ function buildSteps(enrollment: Enrollment): Step[] {
     },
   ];
 
-  if (paid) {
-    steps.push({
-      title: "Pagamento",
-      description:
-        payment === "CONFIRMED"
-          ? "Comprovativo confirmado"
-          : payment === "PROOF_SUBMITTED"
-            ? "Comprovativo em análise"
-            : payment === "REJECTED"
-              ? "Comprovativo recusado — envie outro"
-              : "Envie o comprovativo",
-      state:
-        payment === "CONFIRMED"
-          ? "done"
-          : payment === "REJECTED"
-            ? "failed"
-            : status === "APPROVED" && !cancelled
-              ? "current"
-              : "upcoming",
-    });
-  }
-
   steps.push({
     title: "Inscrição confirmada",
-    description: isConfirmed(enrollment) ? "Vaga garantida" : "Pendente",
+    description: isConfirmed(enrollment)
+      ? "Acesso à aula disponível"
+      : cancelled
+        ? "Inscrição cancelada"
+        : status === "REJECTED"
+          ? "Pedido recusado"
+          : "Pendente",
     state: isConfirmed(enrollment) ? "done" : "upcoming",
   });
 
@@ -138,85 +112,23 @@ function Steps({ steps }: { steps: Step[] }) {
   );
 }
 
-function PaymentSection({
-  enrollment,
-  onChange,
-}: {
-  enrollment: Enrollment;
-  onChange: (next: Enrollment) => void;
-}) {
-  const [isDownloading, setIsDownloading] = useState(false);
-
-  async function download() {
-    setIsDownloading(true);
-    try {
-      const blob = await downloadMyPaymentProof(enrollment.id);
-      openBlob(blob);
-    } catch (reason) {
-      toast.error(reason instanceof ApiError ? reason.message : "Não foi possível abrir o comprovativo.");
-    } finally {
-      setIsDownloading(false);
-    }
-  }
-
-  if (enrollment.payment_status === "NOT_REQUIRED") return null;
-
+function InvestmentSection({ enrollment }: { enrollment: Enrollment }) {
   return (
     <section className="rounded-2xl border border-line bg-panel p-6 shadow-card">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-ink">Pagamento</h2>
+        <h2 className="text-lg font-bold text-ink">Investimento</h2>
         <StatusBadge kind="payment" status={enrollment.payment_status} />
       </div>
 
-      <div className="mb-5 flex items-baseline justify-between rounded-xl bg-canvas p-4">
+      <div className="flex items-baseline justify-between rounded-xl bg-canvas p-4">
         <span className="text-sm text-ink-soft">Valor da aula</span>
         <span className="text-xl font-bold text-ink">{formatCoursePrice(enrollment.course)}</span>
       </div>
 
-      {enrollment.status === "PENDING" && (
-        <p className="text-sm text-ink-soft">
-          O envio do comprovativo fica disponível depois de o mentor aprovar o pedido.
-        </p>
-      )}
-
-      {canSubmitProof(enrollment) && enrollment.status === "APPROVED" && (
-        <>
-          {enrollment.payment_status === "REJECTED" && (
-            <p className="mb-4 rounded-xl bg-danger/5 p-3 text-sm text-danger">
-              O mentor recusou o comprovativo anterior. Verifique o valor e envie um novo ficheiro.
-            </p>
-          )}
-          <p className="mb-4 text-sm text-ink-soft">
-            Faça o pagamento pelos dados combinados com o mentor e envie aqui o comprovativo.
-          </p>
-          <ProofUploader enrollmentId={enrollment.id} onUploaded={onChange} />
-        </>
-      )}
-
-      {enrollment.payment_status === "PROOF_SUBMITTED" && (
-        <p className="flex items-start gap-2 text-sm text-ink-soft">
-          <FileSearch size={16} className="mt-0.5 shrink-0 text-primary" />
-          Recebemos o seu comprovativo. O mentor vai validá-lo em breve.
-        </p>
-      )}
-
       {enrollment.payment_status === "CONFIRMED" && enrollment.payment_decided_at && (
-        <p className="text-sm text-ink-soft">
+        <p className="mt-3 text-sm text-ink-soft">
           Pagamento confirmado em {formatDateTime(enrollment.payment_decided_at)}.
         </p>
-      )}
-
-      {enrollment.has_payment_proof && (
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={download}
-          isLoading={isDownloading}
-          className="mt-4 w-full"
-        >
-          {!isDownloading && <Download size={16} />}
-          Ver comprovativo enviado
-        </Button>
       )}
     </section>
   );
@@ -391,7 +303,7 @@ export function EnrollmentDetailView({ id }: { id: number }) {
         </div>
 
         <div className="space-y-6">
-          <PaymentSection enrollment={enrollment} onChange={mutate} />
+          <InvestmentSection enrollment={enrollment} />
 
           <section className="rounded-2xl border border-line bg-panel p-6">
             <h2 className="mb-3 text-sm font-bold text-ink">Sobre a aula</h2>

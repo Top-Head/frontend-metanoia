@@ -195,9 +195,7 @@ function EnrollPanel({ course }: { course: CourseDetail }) {
         </Button>
       )}
       <p className="mt-3 text-center text-xs text-ink-soft">
-        {course.is_free
-          ? "Aula gratuita: basta a aprovação do mentor."
-          : "O pagamento é feito após a aprovação, com envio do comprovativo."}
+        O acesso à aula fica disponível após a aprovação do mentor.
       </p>
     </div>
   );

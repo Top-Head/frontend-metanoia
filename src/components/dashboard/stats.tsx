@@ -1,10 +1,10 @@
 import clsx from "clsx";
-import { BookOpen, FileSearch, Inbox, UserCheck, type LucideIcon } from "lucide-react";
+import { BookOpen, ClipboardList, Inbox, UserCheck, type LucideIcon } from "lucide-react";
 
 interface StatsProps {
   pending: number;
-  proofsToReview: number;
   confirmedStudents: number;
+  totalEnrollments: number;
   publishedCourses: number;
   isLoading: boolean;
 }
@@ -19,8 +19,8 @@ export interface Stat {
 
 export default function Stats({
   pending,
-  proofsToReview,
   confirmedStudents,
+  totalEnrollments,
   publishedCourses,
   isLoading,
 }: StatsProps) {
@@ -33,11 +33,10 @@ export default function Stats({
       attention: pending > 0,
     },
     {
-      label: "Comprovativos",
-      value: proofsToReview,
-      hint: proofsToReview ? "Por validar" : "Tudo validado",
-      icon: FileSearch,
-      attention: proofsToReview > 0,
+      label: "Inscrições",
+      value: totalEnrollments,
+      hint: "Pedidos recebidos",
+      icon: ClipboardList,
     },
     {
       label: "Alunos confirmados",

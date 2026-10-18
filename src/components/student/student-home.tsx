@@ -11,7 +11,6 @@ import {
   Compass,
   Hourglass,
   MessageCircleHeart,
-  Receipt,
   Sparkles,
 } from "lucide-react";
 import { CourseCard, CourseCardSkeleton } from "@/components/courses/course-card";
@@ -23,7 +22,7 @@ import { UserMenu } from "@/components/user-menu";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { useAuth } from "@/hooks/useAuth";
 import type { Enrollment } from "@/lib/api/types";
-import { canSubmitProof, isConfirmed, nextStepFor } from "@/lib/enrollment";
+import { isConfirmed, nextStepFor } from "@/lib/enrollment";
 import { formatCoursePrice } from "@/lib/format";
 import { calendarWindow, expandMeetings } from "@/lib/meeting";
 import { displayName } from "@/services/auth.service";
@@ -38,23 +37,23 @@ const WEEK_MS = 7 * 86_400_000;
 const isClosed = (enrollment: Enrollment) =>
   enrollment.status === "CANCELLED" || enrollment.status === "REJECTED";
 
-function summaryFor(toPay: number, pending: number) {
-  if (toPay > 0)
-    return `Tem ${toPay} ${toPay === 1 ? "inscrição" : "inscrições"} à espera do comprovativo de pagamento.`;
+function summaryFor(pending: number, confirmed: number) {
   if (pending > 0)
     return `${pending} ${pending === 1 ? "pedido está" : "pedidos estão"} em análise pelo mentor.`;
+  if (confirmed > 0)
+    return `${confirmed} ${confirmed === 1 ? "aula aprovada" : "aulas aprovadas"}. Consulte os próximos encontros no calendário.`;
   return "Está tudo em dia. Que tal descobrir uma nova aula?";
 }
 
 function ActiveEnrollment({ enrollment }: { enrollment: Enrollment }) {
-  const needsAction = canSubmitProof(enrollment);
+  const isPending = enrollment.status === "PENDING";
 
   return (
     <Link
       href={`/aluno/inscricoes/${enrollment.id}`}
       className={clsx(
         "flex flex-col gap-3 rounded-xl border bg-panel p-4 shadow-card transition-colors sm:flex-row sm:items-center",
-        needsAction ? "border-warning/40 hover:border-warning" : "border-line-strong hover:border-primary/40"
+        isPending ? "border-warning/40 hover:border-warning" : "border-line-strong hover:border-primary/40"
       )}
     >
       <div className="min-w-0 flex-1">
@@ -65,14 +64,10 @@ function ActiveEnrollment({ enrollment }: { enrollment: Enrollment }) {
         <p className="mt-2 text-sm text-ink-soft">{nextStepFor(enrollment)}</p>
       </div>
       <div className="flex shrink-0 flex-wrap items-center gap-2 sm:flex-col sm:items-end">
-        {enrollment.status === "APPROVED" && enrollment.payment_status !== "NOT_REQUIRED" ? (
-          <StatusBadge kind="payment" status={enrollment.payment_status} />
-        ) : (
-          <StatusBadge kind="enrollment" status={enrollment.status} />
-        )}
-        {needsAction && (
+        <StatusBadge kind="enrollment" status={enrollment.status} />
+        {isPending && (
           <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
-            Enviar comprovativo
+            A aguardar aprovação
             <ArrowRight size={12} />
           </span>
         )}
@@ -117,7 +112,6 @@ export default function StudentHome() {
   );
 
   const pending = list.filter((item) => item.status === "PENDING").length;
-  const toPay = list.filter(canSubmitProof).length;
   const confirmed = list.filter(isConfirmed).length;
   const [now] = useState(() => Date.now());
   const upcoming = (meetings.data ?? []).filter(
@@ -126,7 +120,6 @@ export default function StudentHome() {
 
   const active = list
     .filter((item) => !isClosed(item) && !isConfirmed(item))
-    .sort((a, b) => Number(canSubmitProof(b)) - Number(canSubmitProof(a)))
     .slice(0, 4);
 
   const stats = [
@@ -137,11 +130,10 @@ export default function StudentHome() {
       icon: Hourglass,
     },
     {
-      label: "Pagamentos",
-      value: toPay,
-      hint: toPay ? "Envie o comprovativo" : "Nada por pagar",
-      icon: Receipt,
-      attention: toPay > 0,
+      label: "Inscrições",
+      value: list.length,
+      hint: "Pedidos enviados",
+      icon: ClipboardList,
     },
     {
       label: "Confirmadas",
@@ -167,7 +159,7 @@ export default function StudentHome() {
             Olá{firstName ? `, ${firstName}` : ""}
           </h1>
           <p className="text-sm text-ink-soft">
-            {enrollments.data ? summaryFor(toPay, pending) : "A carregar as suas inscrições…"}
+            {enrollments.data ? summaryFor(pending, confirmed) : "A carregar as suas inscrições…"}
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-3">

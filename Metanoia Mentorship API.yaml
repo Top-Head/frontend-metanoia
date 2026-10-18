@@ -440,13 +440,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CourseSessionCreate'
+              $ref: '#/components/schemas/CourseList'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CourseSessionCreate'
+              $ref: '#/components/schemas/CourseList'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CourseSessionCreate'
+              $ref: '#/components/schemas/CourseList'
         required: true
       security:
       - jwtAuth: []
@@ -455,7 +455,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseSession'
+                $ref: '#/components/schemas/CourseList'
           description: ''
   /api/discovery/recommendations/:
     get:
@@ -955,94 +955,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/EnrollmentRead'
           description: ''
-  /api/mentor/enrollments/{id}/confirm-payment/:
-    post:
-      operationId: mentor_enrollments_confirm_payment_create
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this enrollment.
-        required: true
-      tags:
-      - mentor
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EnrollmentRead'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/EnrollmentRead'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/EnrollmentRead'
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnrollmentRead'
-          description: ''
-  /api/mentor/enrollments/{id}/download-proof/:
-    get:
-      operationId: mentor_enrollments_download_proof_retrieve
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this enrollment.
-        required: true
-      tags:
-      - mentor
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnrollmentRead'
-          description: ''
   /api/mentor/enrollments/{id}/reject/:
     post:
       operationId: mentor_enrollments_reject_create
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this enrollment.
-        required: true
-      tags:
-      - mentor
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EnrollmentRead'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/EnrollmentRead'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/EnrollmentRead'
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnrollmentRead'
-          description: ''
-  /api/mentor/enrollments/{id}/reject-payment/:
-    post:
-      operationId: mentor_enrollments_reject_payment_create
       parameters:
       - in: path
         name: id
@@ -1197,7 +1112,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OnboardingMessage'
+              $ref: '#/components/schemas/AIConversation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AIConversation'
       security:
       - jwtAuth: []
       responses:
@@ -1400,13 +1321,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SessionMeetingCreate'
+              $ref: '#/components/schemas/CourseSession'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/SessionMeetingCreate'
+              $ref: '#/components/schemas/CourseSession'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SessionMeetingCreate'
+              $ref: '#/components/schemas/CourseSession'
         required: true
       security:
       - jwtAuth: []
@@ -1415,7 +1336,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SessionMeeting'
+                $ref: '#/components/schemas/CourseSession'
           description: ''
   /api/student/enrollments/:
     get:
@@ -1533,53 +1454,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/EnrollmentRead'
           description: ''
-  /api/student/enrollments/{id}/download-proof/:
-    get:
-      operationId: student_enrollments_download_proof_retrieve
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this enrollment.
-        required: true
-      tags:
-      - student
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnrollmentRead'
-          description: ''
-  /api/student/enrollments/{id}/proof/:
-    post:
-      operationId: student_enrollments_proof_create
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this enrollment.
-        required: true
-      tags:
-      - student
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PaymentProofUpload'
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnrollmentRead'
-          description: ''
 components:
   schemas:
     AIConversation:
@@ -1637,14 +1511,6 @@ components:
       - created_at
       - id
       - role
-    OnboardingMessage:
-      type: object
-      properties:
-        content:
-          type: string
-          minLength: 1
-      required:
-      - content
     AIMessageRoleEnum:
       enum:
       - USER
@@ -1908,21 +1774,6 @@ components:
       - name
       - total_students
       - updated_at
-    CourseSessionCreate:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 150
-        capacity:
-          type: integer
-          minimum: 0
-          nullable: true
-          description: Se vazio, usa a capacidade da aula.
-        is_active:
-          type: boolean
-      required:
-      - name
     CourseWrite:
       type: object
       properties:
@@ -2082,9 +1933,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/PaymentStatusEnum'
           readOnly: true
-        has_payment_proof:
-          type: boolean
-          readOnly: true
         requested_at:
           type: string
           format: date-time
@@ -2115,7 +1963,6 @@ components:
       - created_at
       - decided_at
       - decision_note
-      - has_payment_proof
       - id
       - payment_decided_at
       - payment_status
@@ -2125,14 +1972,6 @@ components:
       - student
       - student_name
       - updated_at
-    PaymentProofUpload:
-      type: object
-      properties:
-        payment_proof:
-          type: string
-          format: binary
-      required:
-      - payment_proof
     EnrollmentReadStatusEnum:
       enum:
       - PENDING
@@ -2665,14 +2504,12 @@ components:
       enum:
       - NOT_REQUIRED
       - PENDING
-      - PROOF_SUBMITTED
       - CONFIRMED
       - REJECTED
       type: string
       description: |-
         * `NOT_REQUIRED` - Não aplicável
         * `PENDING` - Pendente
-        * `PROOF_SUBMITTED` - Comprovativo submetido
         * `CONFIRMED` - Confirmado
         * `REJECTED` - Rejeitado
     PreferredModalityEnum:
@@ -2776,41 +2613,6 @@ components:
       - id
       - session
       - updated_at
-    SessionMeetingCreate:
-      type: object
-      properties:
-        day_of_week:
-          type: integer
-          minimum: 0
-          maximum: 6
-          nullable: true
-        start_time:
-          type: string
-          format: time
-          nullable: true
-        end_time:
-          type: string
-          format: time
-          nullable: true
-        starts_at:
-          type: string
-          format: date-time
-          nullable: true
-        ends_at:
-          type: string
-          format: date-time
-          nullable: true
-        location:
-          type: string
-          maxLength: 255
-      oneOf:
-      - required:
-        - day_of_week
-        - start_time
-        - end_time
-      - required:
-        - starts_at
-        - ends_at
     Status137Enum:
       enum:
       - DRAFT

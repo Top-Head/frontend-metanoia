@@ -269,7 +269,7 @@ export function CourseForm({ initial, submitLabel, onSubmit }: CourseFormProps) 
           />
           <span>
             <span className="block text-sm font-bold text-ink">Aula gratuita</span>
-            <span className="block text-xs text-ink-soft">Os alunos não precisam de enviar comprovativo.</span>
+            <span className="block text-xs text-ink-soft">A aprovação do mentor confirma a inscrição.</span>
           </span>
         </label>
         {!isFree && (
