@@ -440,13 +440,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CourseList'
+              $ref: '#/components/schemas/CourseSessionCreate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CourseList'
+              $ref: '#/components/schemas/CourseSessionCreate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CourseList'
+              $ref: '#/components/schemas/CourseSessionCreate'
         required: true
       security:
       - jwtAuth: []
@@ -455,7 +455,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseList'
+                $ref: '#/components/schemas/CourseSession'
           description: ''
   /api/discovery/recommendations/:
     get:
@@ -1197,13 +1197,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AIConversation'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/AIConversation'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/AIConversation'
+              $ref: '#/components/schemas/OnboardingMessage'
       security:
       - jwtAuth: []
       responses:
@@ -1406,13 +1400,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CourseSession'
+              $ref: '#/components/schemas/SessionMeetingCreate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/CourseSession'
+              $ref: '#/components/schemas/SessionMeetingCreate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/CourseSession'
+              $ref: '#/components/schemas/SessionMeetingCreate'
         required: true
       security:
       - jwtAuth: []
@@ -1421,7 +1415,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CourseSession'
+                $ref: '#/components/schemas/SessionMeeting'
           description: ''
   /api/student/enrollments/:
     get:
@@ -1574,15 +1568,9 @@ paths:
       - student
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EnrollmentRead'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/EnrollmentRead'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/EnrollmentRead'
+              $ref: '#/components/schemas/PaymentProofUpload'
       security:
       - jwtAuth: []
       responses:
@@ -1649,6 +1637,14 @@ components:
       - created_at
       - id
       - role
+    OnboardingMessage:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+      required:
+      - content
     AIMessageRoleEnum:
       enum:
       - USER
@@ -1912,6 +1908,21 @@ components:
       - name
       - total_students
       - updated_at
+    CourseSessionCreate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        capacity:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Se vazio, usa a capacidade da aula.
+        is_active:
+          type: boolean
+      required:
+      - name
     CourseWrite:
       type: object
       properties:
@@ -2114,6 +2125,14 @@ components:
       - student
       - student_name
       - updated_at
+    PaymentProofUpload:
+      type: object
+      properties:
+        payment_proof:
+          type: string
+          format: binary
+      required:
+      - payment_proof
     EnrollmentReadStatusEnum:
       enum:
       - PENDING
@@ -2757,6 +2776,41 @@ components:
       - id
       - session
       - updated_at
+    SessionMeetingCreate:
+      type: object
+      properties:
+        day_of_week:
+          type: integer
+          minimum: 0
+          maximum: 6
+          nullable: true
+        start_time:
+          type: string
+          format: time
+          nullable: true
+        end_time:
+          type: string
+          format: time
+          nullable: true
+        starts_at:
+          type: string
+          format: date-time
+          nullable: true
+        ends_at:
+          type: string
+          format: date-time
+          nullable: true
+        location:
+          type: string
+          maxLength: 255
+      oneOf:
+      - required:
+        - day_of_week
+        - start_time
+        - end_time
+      - required:
+        - starts_at
+        - ends_at
     Status137Enum:
       enum:
       - DRAFT

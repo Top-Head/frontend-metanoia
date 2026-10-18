@@ -1,13 +1,6 @@
 import { api } from "@/lib/api/client";
 import type { Enrollment, Paginated } from "@/lib/api/types";
 
-/**
- * O YAML não documenta o nome do campo do ficheiro em
- * POST /api/student/enrollments/{id}/proof/. Enviamos os dois nomes
- * prováveis; reduzir para um quando o backend confirmar.
- */
-const PROOF_FIELD_NAMES = ["payment_proof", "proof"];
-
 /** Tamanho máximo aceite no envio de comprovativos (validação no cliente). */
 export const MAX_PROOF_BYTES = 5 * 1024 * 1024;
 export const PROOF_ACCEPT = "image/jpeg,image/png,image/webp,application/pdf";
@@ -47,7 +40,7 @@ export async function cancelEnrollment(id: number) {
 /** POST /api/student/enrollments/{id}/proof/ — upload multipart do comprovativo. */
 export async function submitPaymentProof(id: number, file: File) {
   const form = new FormData();
-  PROOF_FIELD_NAMES.forEach((field) => form.append(field, file));
+  form.append("payment_proof", file);
 
   const { data } = await api.post<Enrollment>(`/api/student/enrollments/${id}/proof/`, form);
   return data;

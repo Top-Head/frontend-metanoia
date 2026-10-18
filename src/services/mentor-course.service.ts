@@ -47,7 +47,6 @@ export interface SessionPayload {
 
 export async function createSession(courseId: number, payload: SessionPayload) {
   const { data } = await api.post<CourseSession>(`/api/courses/${courseId}/sessions/`, {
-    course: courseId,
     ...payload,
   });
   return data;
@@ -69,7 +68,6 @@ export type MeetingPayload = { location?: string } & (
 
 export async function createMeeting(sessionId: number, payload: MeetingPayload) {
   const { data } = await api.post<SessionMeeting>(`/api/sessions/${sessionId}/meetings/`, {
-    session: sessionId,
     ...payload,
   });
   return data;

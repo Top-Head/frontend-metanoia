@@ -25,11 +25,9 @@ export async function startConversation() {
   return data;
 }
 
-// Corpo não documentado no YAML: enviamos o texto como `content` e `message`.
 export async function sendOnboardingMessage(id: number, text: string) {
   const { data } = await api.post<AIConversation>(`/api/onboarding/${id}/message/`, {
     content: text,
-    message: text,
   });
   return data;
 }
