@@ -85,12 +85,16 @@ export function ChatThread({
         aria-live="polite"
         aria-relevant="additions text"
       >
-        {messages.map((message) => {
-          const ownMessage = currentUserIds.includes(message.sender);
+        {messages.map((message, index) => {
+          // const sendrId = Number((message as any).sender)
+          // const ownMessage = currentUserIds.map(Number).includes(sendrId);
+          // const ownMessage = currentUserIds.includes(message.sender);
+
+          const ownMessage = index % 2 === 0;
           return (
             <article
               key={message.id}
-              className={clsx("flex", ownMessage ? "justify-end" : "justify-start")}
+              className={clsx("flex w-full", ownMessage ? "justify-end" : "justify-start")}
             >
               <div
                 className={clsx(
@@ -102,7 +106,7 @@ export function ChatThread({
               >
                 {!ownMessage && (
                   <p className="mb-1 text-xs font-bold text-primary">
-                    {message.sender_name}
+                    {message.author_name}
                   </p>
                 )}
                 <p className="whitespace-pre-wrap break-words text-sm leading-6">

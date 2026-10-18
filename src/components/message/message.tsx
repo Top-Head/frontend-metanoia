@@ -37,7 +37,7 @@ function mergeMessages(current: ChatMessage[], incoming: ChatMessage[]) {
 
 export default function Message() {
   const { user, isMentor } = useAuth();
-  const currentUserIds = user ? [user.id] : [];
+  const currentUserIds = user?.id != null ? [Number(user.id)] : [];
 
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);

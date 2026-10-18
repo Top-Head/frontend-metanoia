@@ -1,3 +1,4 @@
+
 export type RegisterRole = "STUDENT" | "MENTOR" | "BOTH";
 export type UserStatus = "ACTIVE" | "SUSPENDED";
 export type CourseType = "GROUP" | "INDIVIDUAL";
@@ -237,6 +238,7 @@ export interface ChatRoom {
 }
 
 export interface ChatMessage {
+  author_name: string;
   id: number;
   room: number;
   sender: number;
