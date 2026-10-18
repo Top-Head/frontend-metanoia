@@ -137,7 +137,7 @@ export function UserMenu({ tone = "default" }: UserMenuProps) {
             )}
 
  */}
-             {isStudent &&  !isHome && isMentor &&(
+             {  !isHome && (
               <Link
                 href="/aluno/notificacoes"
                 role="menuitem"
