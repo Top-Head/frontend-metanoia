@@ -1,0 +1,334 @@
+openapi: 3.1.0
+info:
+  title: Metanoia API - Integração de videochamada
+  version: 1.0.0
+  description: |
+    Contrato para integrar a videochamada em grupo do frontend com a API Django
+    e o LiveKit. O frontend nunca deve receber LIVEKIT_API_KEY ou
+    LIVEKIT_API_SECRET; recebe somente um token LiveKit temporário.
+servers:
+  - url: /api
+    description: Prefixo da API no mesmo host da aplicação
+security:
+  - bearerAuth: []
+tags:
+  - name: Videochamadas
+    description: Gestão e entrada em videochamadas das salas de chat por turma
+paths:
+  /chat/rooms/{roomId}/video-call/:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    get:
+      tags: [Videochamadas]
+      operationId: getVideoCallStatus
+      summary: Consultar chamada ativa da turma
+      description: Requer autenticação e associação à sala. Use também para recuperar o estado após reconectar.
+      responses:
+        '200':
+          description: Estado da chamada
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/NoActiveVideoCall'
+                  - $ref: '#/components/schemas/ActiveVideoCall'
+              examples:
+                inactive:
+                  value:
+                    active: false
+                active:
+                  value:
+                    active: true
+                    id: 17
+                    started_at: '2026-10-18T18:30:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/RoomNotFound'
+  /chat/rooms/{roomId}/video-call/start/:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      tags: [Videochamadas]
+      operationId: startVideoCall
+      summary: Iniciar chamada como mentor
+      description: |
+        Apenas o mentor proprietário da aula pode iniciar a chamada. Disponível
+        somente para turmas GROUP com modalidade ONLINE. Cria a sala LiveKit,
+        persiste a chamada e devolve o token do próprio mentor.
+      responses:
+        '201':
+          description: Chamada criada; conectar ao LiveKit com o token retornado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoCallJoin'
+        '400':
+          $ref: '#/components/responses/UnsupportedCourse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/RoomNotFound'
+        '409':
+          description: Já existe uma chamada ativa nesta turma
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '503':
+          $ref: '#/components/responses/LiveKitUnavailable'
+  /chat/rooms/{roomId}/video-call/token/:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      tags: [Videochamadas]
+      operationId: getVideoCallJoinToken
+      summary: Obter token para entrar na chamada
+      description: |
+        Qualquer membro atual da sala (mentor ou aluno aprovado) pode pedir um
+        token enquanto a chamada estiver ativa. A API revalida a associação em
+        cada pedido. Alunos não podem iniciar nem encerrar chamadas.
+      responses:
+        '200':
+          description: Token LiveKit temporário, escopado à sala ativa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoCallJoin'
+        '400':
+          $ref: '#/components/responses/UnsupportedCourse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Sala inacessível ou chamada inativa/inexistente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '503':
+          $ref: '#/components/responses/LiveKitUnavailable'
+  /chat/rooms/{roomId}/video-call/end/:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+    post:
+      tags: [Videochamadas]
+      operationId: endVideoCall
+      summary: Encerrar chamada como mentor
+      description: Remove a sala LiveKit, desconecta os participantes e notifica os membros via WebSocket.
+      responses:
+        '200':
+          description: Chamada encerrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VideoCallEnded'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/RoomNotFound'
+        '409':
+          description: Não existe chamada ativa nesta turma
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '503':
+          $ref: '#/components/responses/LiveKitUnavailable'
+  /chat/webhooks/livekit/:
+    post:
+      tags: [Videochamadas]
+      operationId: receiveLiveKitWebhook
+      summary: Webhook interno de encerramento LiveKit
+      description: |
+        Endpoint exclusivo para o LiveKit Cloud, não deve ser chamado pelo
+        frontend. Registre a URL pública deste endpoint no LiveKit Cloud e
+        selecione o evento room_finished. O backend valida a assinatura no
+        cabeçalho Authorization e o hash do corpo bruto.
+      security: []
+      x-internal: true
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: JWT assinado pelo LiveKit WebhookReceiver.
+      requestBody:
+        required: true
+        content:
+          application/webhook+json:
+            schema:
+              type: object
+              description: Evento WebhookEvent LiveKit serializado em JSON.
+      responses:
+        '204':
+          description: Evento validado e processado (ou evento ignorado)
+        '401':
+          description: Assinatura do webhook inválida
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token JWT da API Metanoia.
+  parameters:
+    RoomId:
+      name: roomId
+      in: path
+      required: true
+      description: ID da sala de chat/turma retornado por GET /chat/rooms/.
+      schema:
+        type: integer
+        minimum: 1
+  schemas:
+    NoActiveVideoCall:
+      type: object
+      additionalProperties: false
+      required: [active]
+      properties:
+        active:
+          type: boolean
+          const: false
+    ActiveVideoCall:
+      type: object
+      additionalProperties: false
+      required: [active, id, started_at]
+      properties:
+        active:
+          type: boolean
+          const: true
+        id:
+          type: integer
+        started_at:
+          type: string
+          format: date-time
+    VideoCallJoin:
+      type: object
+      additionalProperties: false
+      required: [id, status, started_at, server_url, token, participant_identity, participant_role]
+      properties:
+        id:
+          type: integer
+          description: ID interno da chamada; não é a identidade LiveKit.
+        status:
+          type: string
+          const: ACTIVE
+        started_at:
+          type: string
+          format: date-time
+        server_url:
+          type: string
+          format: uri
+          description: URL LiveKit, normalmente wss://...
+        token:
+          type: string
+          description: Token LiveKit bearer temporário (10 minutos). Não persistir nem registrar em logs.
+        participant_identity:
+          type: string
+          description: Identidade pseudônima desta pessoa nesta chamada.
+        participant_role:
+          type: string
+          enum: [mentor, participant]
+    VideoCallEnded:
+      type: object
+      additionalProperties: false
+      required: [id, status, ended_at]
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+          const: ENDED
+        ended_at:
+          type: string
+          format: date-time
+    ApiError:
+      type: object
+      properties:
+        detail:
+          type: string
+        code:
+          type: string
+    LiveKitUnavailableError:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: O serviço de videochamada não está configurado ou está indisponível.
+        code:
+          type: string
+          example: livekit_unavailable
+  responses:
+    Unauthorized:
+      description: JWT da API ausente, inválido ou expirado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: Utilizador autenticado sem permissão para esta ação
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    RoomNotFound:
+      description: Sala inexistente ou não visível ao utilizador autenticado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    UnsupportedCourse:
+      description: Chamada disponível somente para turma de grupo online
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    LiveKitUnavailable:
+      description: LiveKit não configurado ou indisponível; tentar novamente mais tarde
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LiveKitUnavailableError'
+x-frontend-integration:
+  requirements:
+    - Usar o JWT Metanoia nas chamadas HTTP como Authorization: Bearer <api-jwt>.
+    - Descobrir salas através de GET /api/chat/rooms/; nunca aceitar roomId arbitrário sem usar a API.
+    - Apenas o mentor chama start; alunos aguardam video_call.started ou consultam o estado.
+    - Cada participante chama token e conecta usando server_url e token com o SDK cliente LiveKit.
+    - Renovar token chamando token novamente; tokens duram 10 minutos e só autenticam uma conexão nova.
+    - Ao sair, desconectar o cliente LiveKit; o mentor pode encerrar a sessão para todos.
+    - Não enviar mídia pelo WebSocket Django; o WebSocket do chat serve somente para presença/eventos.
+  livekit-client-pseudocode: |
+    // Pseudocódigo agnóstico de framework; instale o SDK cliente oficial LiveKit.
+    const join = await api.post(`/chat/rooms/${roomId}/video-call/token/`);
+    const livekitRoom = new Room();
+    await livekitRoom.connect(join.server_url, join.token);
+    await livekitRoom.localParticipant.setCameraEnabled(true);
+    await livekitRoom.localParticipant.setMicrophoneEnabled(true);
+  websocket:
+    url: /ws/chat/{roomId}/?token={metanoia-api-jwt}
+    events:
+      - type: video_call.started
+        fields: [call_id, started_at]
+      - type: video_call.ended
+        fields: [call_id, started_at]
+    notes:
+      - A mensagem de início/fim não inclui token LiveKit. Solicitar token via REST após video_call.started.
+      - Reconsultar GET /api/chat/rooms/{roomId}/video-call/ após reconectar.
+  environment:
+    frontend:
+      required: []
+      never_expose: [LIVEKIT_API_KEY, LIVEKIT_API_SECRET]
+    backend:
+      required: [LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET]
+  permissions:
+    start_end: Mentor proprietário da aula.
+    join: Mentor e membros atuais da sala.
+    media: Câmera/microfone; dados LiveKit e gravação não são permitidos pelo token.

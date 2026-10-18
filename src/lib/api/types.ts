@@ -247,6 +247,34 @@ export interface ChatMessage {
   created_at: string;
 }
 
+export interface VideoCallInactive {
+  active: false;
+}
+
+export interface VideoCallActive {
+  active: true;
+  id: number;
+  started_at: string;
+}
+
+export type VideoCallStatus = VideoCallInactive | VideoCallActive;
+
+export interface VideoCallJoin {
+  id: number;
+  status: "ACTIVE";
+  started_at: string;
+  server_url: string;
+  token: string;
+  participant_identity: string;
+  participant_role: "mentor" | "participant";
+}
+
+export interface VideoCallEnded {
+  id: number;
+  status: "ENDED";
+  ended_at: string;
+}
+
 export interface LearningProfile {
   id: number;
   goals?: string;
