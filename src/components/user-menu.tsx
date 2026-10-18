@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
-import { ChevronDown, ClipboardList, LayoutDashboard, LogOut, Sparkles, UserRound } from "lucide-react";
+import { Bell, ChevronDown, ClipboardList, LayoutDashboard, LogOut, Sparkles, UserRound } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { displayName } from "@/services/auth.service";
@@ -21,6 +21,13 @@ interface UserMenuProps {
 
 export function UserMenu({ tone = "default" }: UserMenuProps) {
   const router = useRouter();
+
+  const pathname = usePathname()
+  const isHome = pathname === "/";
+
+  const isAlunoArea = pathname.startsWith("/aluno") ;
+   const hideStudentLinks =  isAlunoArea;
+
   const { user, isMentor, isStudent, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -94,7 +101,7 @@ export function UserMenu({ tone = "default" }: UserMenuProps) {
                 Painel do mentor
               </Link>
             )}
-            {isStudent && (
+            { !isAlunoArea &&  (
               <Link
                 href="/aluno"
                 role="menuitem"
@@ -105,7 +112,8 @@ export function UserMenu({ tone = "default" }: UserMenuProps) {
                 Painel do aluno
               </Link>
             )}
-            {isStudent && (
+
+            {/* {isStudent && hideStudentLinks && !isAlunoArea && (
               <Link
                 href="/aluno/para-voce"
                 role="menuitem"
@@ -115,8 +123,8 @@ export function UserMenu({ tone = "default" }: UserMenuProps) {
                 <Sparkles size={16} className="text-ink-soft" />
                 Para você
               </Link>
-            )}
-            {isStudent && (
+            )} */}
+            {/* {isStudent &&  !isHome  && (
               <Link
                 href="/aluno/inscricoes"
                 role="menuitem"
@@ -127,6 +135,21 @@ export function UserMenu({ tone = "default" }: UserMenuProps) {
                 Minhas inscrições
               </Link>
             )}
+
+ */}
+             {isStudent &&  !isHome &&(
+              <Link
+                href="/aluno/notificacoes"
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-canvas"
+              >
+                <Bell size={16} className="text-ink-soft" />
+                Minhas notificações
+              </Link>
+             )}
+
+            { !isHome &&(
             <Link
               href={isMentor ? "/dashboard/perfil" : "/aluno/perfil"}
               role="menuitem"
@@ -136,6 +159,8 @@ export function UserMenu({ tone = "default" }: UserMenuProps) {
               <UserRound size={16} className="text-ink-soft" />
               Meu perfil
             </Link>
+             )}
+
             <button
               type="button"
               role="menuitem"
