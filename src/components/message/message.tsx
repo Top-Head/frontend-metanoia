@@ -12,6 +12,7 @@ import {
   listRoomMessages,
   sendRoomMessage,
 } from "@/services/message.service";
+import { replyReferenceFor, withReply, type ReplyReference } from "@/lib/chat-reply";
 import Profile from "./Profile";
 import Sidebar from "./Sidebar";
 import { MessageComposer } from "./Send-sms";
@@ -38,7 +39,7 @@ function mergeMessages(current: ChatMessage[], incoming: ChatMessage[]) {
 
 export default function Message() {
   const { user, isMentor } = useAuth();
-  const currentUserIds = user?.id != null ? [Number(user.id)] : [];
+  const currentUserId = user?.id ?? null;
 
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
@@ -56,6 +57,7 @@ export default function Message() {
   const [messagesError, setMessagesError] = useState<string | null>(null);
   const [sendError, setSendError] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
+  const [replyTo, setReplyTo] = useState<ReplyReference | null>(null);
   const [pendingMessage, setPendingMessage] = useState<{
     roomId: number;
     content: string;
@@ -134,6 +136,7 @@ export default function Message() {
     setMessagesPage(1);
     setMessagesError(null);
     setSendError(null);
+    setReplyTo(null);
     setMessagesLoading(true);
 
     const refreshLatest = async () => {
@@ -237,7 +240,7 @@ export default function Message() {
   async function sendMessage() {
     if (selectedRoomId === null || !draft.trim() || sending) return;
     const roomId = selectedRoomId;
-    const content = draft.trim();
+    const content = withReply(draft.trim(), replyTo);
     setSending(true);
     setSendError(null);
     setPendingMessage({ roomId, content });
@@ -246,6 +249,7 @@ export default function Message() {
       if (selectedRoomIdRef.current === roomId) {
         setMessages((current) => mergeMessages(current, [sent]));
         setDraft((current) => (current === draft ? "" : current));
+        setReplyTo(null);
       }
     } catch (error) {
       const message = errorMessage(error, "Não foi possível enviar a mensagem.");
@@ -394,13 +398,14 @@ export default function Message() {
             <div className="min-h-0 flex-1 overflow-y-auto">
               <ChatThread
                 messages={messages}
-                currentUserIds={currentUserIds}
+                currentUserId={currentUserId}
                 loading={messagesLoading}
                 error={messagesError}
                 hasOlder={messagesHasOlder}
                 loadingOlder={messagesLoadingOlder}
                 onLoadOlder={() => void loadOlderMessages()}
                 onRetry={retryMessages}
+                onReply={(message) => setReplyTo(replyReferenceFor(message))}
                 pendingMessage={
                   pendingMessage?.roomId === selectedRoom.id
                     ? pendingMessage
@@ -413,6 +418,8 @@ export default function Message() {
               value={draft}
               onChange={setDraft}
               onSend={() => void sendMessage()}
+              replyTo={replyTo}
+              onCancelReply={() => setReplyTo(null)}
               disabled={sending}
               error={sendError}
             />

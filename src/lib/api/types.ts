@@ -238,12 +238,11 @@ export interface ChatRoom {
 }
 
 export interface ChatMessage {
-  author_name: string;
   id: number;
-  room: number;
-  sender: number;
-  sender_name: string;
+  author: number;
+  author_name: string;
   content: string;
+  attachments?: unknown[];
   created_at: string;
 }
 
