@@ -43,7 +43,7 @@ const AREAS: Record<Area, { home: string; profile: string; items: NavItem[] }> =
     ],
   },
   student: {
-    home: "/aluno",
+    home: "/",
     profile: "/aluno/perfil",
     items: [
       { label: "Painel", href: "/aluno", icon: LayoutDashboard, exact: true },
