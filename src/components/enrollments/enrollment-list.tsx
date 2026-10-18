@@ -111,7 +111,7 @@ export function EnrollmentList() {
               onClick={() => setTab(value)}
               className={clsx(
                 "flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
-                tab === value ? "bg-ink text-white" : "text-ink-soft hover:bg-canvas hover:text-ink"
+                tab === value ? "bg-indigo-500 text-white" : "text-ink-soft hover:bg-canvas hover:text-ink"
               )}
             >
               {label}

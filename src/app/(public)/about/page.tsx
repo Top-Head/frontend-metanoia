@@ -147,7 +147,7 @@ export default function AboutPage() {
               </h2>
             </div>
 
-            <div className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line md:grid-cols-3">
+            <div className="grid gap-px overflow-hidden bg-line md:grid-cols-3">
               {VALUES.map(({ icon: Icon, title, text }, index) => (
                 <article key={title} className="flex flex-col bg-panel p-8">
                   <div className="mb-8 flex items-center justify-between">
