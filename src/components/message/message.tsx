@@ -16,6 +16,7 @@ import Profile from "./Profile";
 import Sidebar from "./Sidebar";
 import { MessageComposer } from "./Send-sms";
 import { ChatThread } from "./sms";
+import VideoCall from "./video-call";
 
 const ROOM_PAGE_SIZE = 50;
 const MESSAGE_PAGE_SIZE = 50;
@@ -384,6 +385,9 @@ export default function Message() {
                     ? `${selectedRoom.member_count} participantes`
                     : `Mentor ${selectedRoom.mentor_name} · ${selectedRoom.member_count} participantes`}
                 </p>
+              </div>
+              <div className="ml-auto">
+                <VideoCall room={selectedRoom} isMentor={isMentor} />
               </div>
             </div>
 
