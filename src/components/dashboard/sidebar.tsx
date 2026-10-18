@@ -59,7 +59,7 @@ export default function SidebarDashboard({ area = "mentor" }: { area?: Area }) {
   const pathname = usePathname();
   const { signOut } = useAuth();
   const { home, profile, items } = AREAS[area];
-  const nav = [...items, { label: "Meu perfil", href: profile, icon: UserRound, exact: true }];
+   const nav = [...items, { label: "Meu perfil", href: profile, icon: UserRound, exact: true }];
 
   const isActive = ({ href, exact }: NavItem) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
@@ -91,15 +91,15 @@ export default function SidebarDashboard({ area = "mentor" }: { area?: Area }) {
           })}
         </nav>
 
-        <div className="mt-auto flex flex-col gap-1 border-t border-line pt-4">
-          <Link
+        {/* <div className="mt-auto flex flex-col gap-1 border-t border-line pt-4">
+           <Link
             href={profile}
             aria-current={pathname === profile ? "page" : undefined}
             className={linkClass(pathname === profile)}
           >
             <UserRound size={18} />
             Meu perfil
-          </Link>
+          </Link> 
           <button
             type="button"
             onClick={() => {
@@ -111,7 +111,7 @@ export default function SidebarDashboard({ area = "mentor" }: { area?: Area }) {
             <LogOut size={18} />
             Sair
           </button>
-        </div>
+        </div> */}
       </aside>
 
       <div className="sticky top-0 z-40 border-b border-line bg-panel/95 backdrop-blur-md md:hidden">
@@ -122,7 +122,7 @@ export default function SidebarDashboard({ area = "mentor" }: { area?: Area }) {
           </Link>
           <UserMenu />
         </div>
-        <nav className="flex gap-1 overflow-x-auto px-3 pb-2">
+         <nav className="flex gap-1 overflow-x-auto px-3 pb-2">
           {nav.map((item) => {
             const { label, href, icon: Icon } = item;
             const active = isActive(item);
@@ -138,7 +138,7 @@ export default function SidebarDashboard({ area = "mentor" }: { area?: Area }) {
               </Link>
             );
           })}
-        </nav>
+        </nav> 
       </div>
     </>
   );
