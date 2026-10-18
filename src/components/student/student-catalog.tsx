@@ -29,12 +29,12 @@ export function StudentCatalog() {
         </label>
       </div>
 
-      <CourseCatalog
+      {/* <CourseCatalog
         query={query}
         onClearQuery={() => setSearchTerm("")}
         courseHref={(id) => `/aluno/catalogo/${id}`}
         gridClassName="md:grid-cols-2 2xl:grid-cols-3"
-      />
+      /> */}
     </>
   );
 }
