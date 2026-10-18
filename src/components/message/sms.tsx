@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import clsx from "clsx";
-import { Reply } from "lucide-react";
+import { Paperclip, Pencil, Reply, Trash2 } from "lucide-react";
 import type { ChatMessage } from "@/lib/api/types";
 import { parseMessageContent, type ReplyReference } from "@/lib/chat-reply";
+import { MessageAttachments } from "./attachments";
 
 interface ChatThreadProps {
   messages: ChatMessage[];
@@ -16,7 +17,43 @@ interface ChatThreadProps {
   onLoadOlder: () => void;
   onRetry: () => void;
   onReply: (message: ChatMessage) => void;
-  pendingMessage?: { content: string } | null;
+  onEdit: (message: ChatMessage) => void;
+  onDelete: (message: ChatMessage) => void;
+  pendingMessage?: { content: string; fileNames: string[] } | null;
+}
+
+function wasEdited(message: ChatMessage) {
+  if (!message.updated_at) return false;
+  return (
+    new Date(message.updated_at).getTime() - new Date(message.created_at).getTime() > 1_000
+  );
+}
+
+function ActionButton({
+  label,
+  danger = false,
+  onClick,
+  children,
+}: {
+  label: string;
+  danger?: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={clsx(
+        "flex size-8 items-center justify-center rounded-full text-ink-faint transition hover:bg-slate-200/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+        danger ? "hover:text-danger" : "hover:text-ink"
+      )}
+    >
+      {children}
+    </button>
+  );
 }
 
 const HIGHLIGHT_DURATION = 1_600;
@@ -84,6 +121,8 @@ export function ChatThread({
   onLoadOlder,
   onRetry,
   onReply,
+  onEdit,
+  onDelete,
   pendingMessage,
 }: ChatThreadProps) {
   const [highlightedId, setHighlightedId] = useState<number | null>(null);
@@ -188,28 +227,42 @@ export function ChatThread({
                     onSelect={() => jumpTo(reply.id)}
                   />
                 )}
-                <p className="whitespace-pre-wrap break-words text-sm leading-6">
-                  {body}
-                </p>
-                <time
-                  dateTime={message.created_at}
+                <MessageAttachments attachments={message.attachments ?? []} own={ownMessage} />
+                {body && (
+                  <p className="whitespace-pre-wrap break-words text-sm leading-6">
+                    {body}
+                  </p>
+                )}
+                <p
                   className={clsx(
-                    "mt-1 block text-right text-[10px]",
+                    "mt-1 text-right text-[10px]",
                     ownMessage ? "text-white/70" : "text-ink-faint"
                   )}
                 >
-                  {messageTime(message.created_at)}
-                </time>
+                  {wasEdited(message) && <span className="mr-1 italic">editada ·</span>}
+                  <time dateTime={message.created_at}>{messageTime(message.created_at)}</time>
+                </p>
               </div>
-              <button
-                type="button"
-                onClick={() => onReply(message)}
-                aria-label={`Responder a ${message.author_name}`}
-                title="Responder"
-                className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-faint transition hover:bg-slate-200/70 hover:text-ink focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:opacity-0 md:group-hover:opacity-100"
+              <div
+                className={clsx(
+                  "flex shrink-0 gap-0.5 transition-opacity focus-within:opacity-100 md:opacity-0 md:group-hover:opacity-100",
+                  ownMessage ? "flex-row-reverse" : "flex-row"
+                )}
               >
-                <Reply size={16} aria-hidden="true" />
-              </button>
+                <ActionButton label={`Responder a ${message.author_name}`} onClick={() => onReply(message)}>
+                  <Reply size={16} aria-hidden="true" />
+                </ActionButton>
+                {ownMessage && (
+                  <>
+                    <ActionButton label="Editar mensagem" onClick={() => onEdit(message)}>
+                      <Pencil size={15} aria-hidden="true" />
+                    </ActionButton>
+                    <ActionButton label="Apagar mensagem" danger onClick={() => onDelete(message)}>
+                      <Trash2 size={15} aria-hidden="true" />
+                    </ActionButton>
+                  </>
+                )}
+              </div>
             </article>
           );
         })}
@@ -223,9 +276,17 @@ export function ChatThread({
                   onSelect={() => pending.reply && jumpTo(pending.reply.id)}
                 />
               )}
-              <p className="whitespace-pre-wrap break-words text-sm leading-6">
-                {pending.body}
-              </p>
+              {pendingMessage?.fileNames.map((name) => (
+                <p key={name} className="mb-1 flex items-center gap-2 truncate text-xs text-white/90">
+                  <Paperclip size={13} aria-hidden="true" />
+                  {name}
+                </p>
+              ))}
+              {pending.body && (
+                <p className="whitespace-pre-wrap break-words text-sm leading-6">
+                  {pending.body}
+                </p>
+              )}
               <p className="mt-1 text-right text-[10px] text-white/75">
                 A enviar…
               </p>
