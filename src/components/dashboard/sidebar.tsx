@@ -50,6 +50,7 @@ const AREAS: Record<Area, { home: string; profile: string; items: NavItem[] }> =
       { label: "Minhas inscrições", href: "/aluno/inscricoes", icon: ClipboardList },
       { label: "Para você", href: "/aluno/para-voce", icon: Sparkles },
       { label: "Meus objetivos", href: "/aluno/onboarding", icon: MessageCircleHeart },
+      { label: "Mensagens", href: "/messages", icon: MessagesSquare },
       { label: "Catálogo", href: "/aluno/catalogo", icon: Presentation },
     ],
   },

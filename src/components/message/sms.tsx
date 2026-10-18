@@ -1,93 +1,152 @@
-import Image from "next/image";
-import { Check, CheckCheck } from "lucide-react";
 import clsx from "clsx";
-
-export type MessageStatus = "sent" | "delivered" | "read";
-
-export interface ChatMessage {
-  id: number;
-  sender: "student" | "mentor";
-  text: string;
-  time: string;
-  hasAttachment?: boolean;
-  status?: MessageStatus;
-}
+import type { ChatMessage } from "@/lib/api/types";
 
 interface ChatThreadProps {
   messages: ChatMessage[];
-  studentName: string;
+  currentUserIds: number[];
+  loading: boolean;
+  error: string | null;
+  hasOlder: boolean;
+  loadingOlder: boolean;
+  onLoadOlder: () => void;
+  onRetry: () => void;
+  pendingMessage?: { content: string } | null;
 }
 
-export function ChatThread({ messages, studentName }: ChatThreadProps) {
+function messageTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+export function ChatThread({
+  messages,
+  currentUserIds,
+  loading,
+  error,
+  hasOlder,
+  loadingOlder,
+  onLoadOlder,
+  onRetry,
+  pendingMessage,
+}: ChatThreadProps) {
   return (
-    <section className="space-y-4 px-5 py-6" aria-label="Histórico de mensagens">
-      {messages.map((message) => {
-        const incoming = message.sender === "student";
-        const avatarSrc = incoming ? "/Margin.png" : "/Image+Border.svg";
+    <section
+      className="flex min-h-full flex-col px-4 py-5 sm:px-6"
+      aria-label="Histórico de mensagens"
+    >
+      {hasOlder && (
+        <button
+          type="button"
+          onClick={onLoadOlder}
+          disabled={loadingOlder}
+          className="mx-auto mb-5 rounded-full border border-line bg-panel px-4 py-2 text-xs font-semibold text-primary shadow-sm hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60"
+        >
+          {loadingOlder ? "A carregar mensagens…" : "Ver mensagens anteriores"}
+        </button>
+      )}
 
-        return (
-          <div
-            key={message.id}
-            className={clsx(
-              "flex gap-3",
-              !incoming && "justify-end"
-            )}
+      {loading && messages.length === 0 && (
+        <p className="m-auto py-12 text-sm text-ink-soft" role="status">
+          A carregar mensagens…
+        </p>
+      )}
+
+      {error && messages.length === 0 && (
+        <div className="m-auto max-w-sm py-12 text-center">
+          <p className="text-sm text-ink">{error}</p>
+          <button
+            type="button"
+            onClick={onRetry}
+            className="mt-3 text-sm font-semibold text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
-            {incoming && (
-              <Image
-                src={avatarSrc}
-                alt={`${studentName}`}
-                width={40}
-                height={48}
-                className="h-12 w-10 shrink-0 pt-1"
-              />
-            )}
+            Tentar novamente
+          </button>
+        </div>
+      )}
 
-            <div
-              className={clsx(
-                "max-w-[70%] rounded-2xl p-4 text-sm md:max-w-[407px]",
-                incoming
-                  ? "rounded-bl-sm bg-slate-100 text-ink"
-                  : "rounded-br-sm bg-primary text-white"
-              )}
+      {!loading && !error && messages.length === 0 && (
+        <div className="m-auto max-w-sm py-12 text-center">
+          <p className="font-display text-lg font-bold text-ink">
+            Comece a conversa
+          </p>
+          <p className="mt-2 text-sm leading-6 text-ink-soft">
+            Partilhe uma dúvida ou uma atualização com as pessoas desta turma.
+          </p>
+        </div>
+      )}
+
+      <div
+        className="mt-auto space-y-3"
+        role="log"
+        aria-live="polite"
+        aria-relevant="additions text"
+      >
+        {messages.map((message) => {
+          const ownMessage = currentUserIds.includes(message.sender);
+          return (
+            <article
+              key={message.id}
+              className={clsx("flex", ownMessage ? "justify-end" : "justify-start")}
             >
-              <p>{message.text}</p>
-              {message.hasAttachment && (
-                <div className="mt-3 h-[52px] w-full rounded-lg border border-line-strong bg-panel" />
-              )}
-              <p
+              <div
                 className={clsx(
-                  "mt-2 flex items-center justify-end gap-1 text-[10px] font-medium",
-                  incoming ? "text-ink-faint" : "text-white/70"
+                  "max-w-[88%] rounded-2xl px-4 py-3 sm:max-w-[75%] lg:max-w-[68%]",
+                  ownMessage
+                    ? "rounded-br-md bg-primary text-white"
+                    : "rounded-bl-md border border-line bg-panel text-ink"
                 )}
               >
-                {incoming ? (
-                  message.time
-                ) : (
-                  <>
-                    {message.time}
-                    <span className="inline-flex items-center">
-                      {message.status === "sent" ? (
-                        <Check size={14} strokeWidth={2.5} />
-                      ) : (
-                        <CheckCheck
-                          size={14}
-                          strokeWidth={2.5}
-                          className={
-                            message.status === "read"
-                              ? "text-sky-400"
-                              : "text-white/70"
-                          }
-                        />
-                      )}
-                    </span>
-                  </>
+                {!ownMessage && (
+                  <p className="mb-1 text-xs font-bold text-primary">
+                    {message.sender_name}
+                  </p>
                 )}
+                <p className="whitespace-pre-wrap break-words text-sm leading-6">
+                  {message.content}
+                </p>
+                <time
+                  dateTime={message.created_at}
+                  className={clsx(
+                    "mt-1 block text-right text-[10px]",
+                    ownMessage ? "text-white/70" : "text-ink-faint"
+                  )}
+                >
+                  {messageTime(message.created_at)}
+                </time>
+              </div>
+            </article>
+          );
+        })}
+        {pendingMessage && (
+          <article className="flex justify-end">
+            <div className="max-w-[88%] rounded-2xl rounded-br-md bg-primary/75 px-4 py-3 text-white sm:max-w-[75%]">
+              <p className="whitespace-pre-wrap break-words text-sm leading-6">
+                {pendingMessage.content}
+              </p>
+              <p className="mt-1 text-right text-[10px] text-white/75">
+                A enviar…
               </p>
             </div>
-          </div>
-        );
-      })}
+          </article>
+        )}
+      </div>
+
+      {error && messages.length > 0 && (
+        <p className="mt-4 text-center text-xs text-danger" role="status">
+          {error}{" "}
+          <button
+            type="button"
+            onClick={onRetry}
+            className="font-semibold underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            Atualizar
+          </button>
+        </p>
+      )}
     </section>
   );
 }
