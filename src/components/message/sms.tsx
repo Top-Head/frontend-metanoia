@@ -1,17 +1,25 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import clsx from "clsx";
+import { Reply } from "lucide-react";
 import type { ChatMessage } from "@/lib/api/types";
+import { parseMessageContent, type ReplyReference } from "@/lib/chat-reply";
 
 interface ChatThreadProps {
   messages: ChatMessage[];
-  currentUserIds: number[];
+  currentUserId: number | null;
   loading: boolean;
   error: string | null;
   hasOlder: boolean;
   loadingOlder: boolean;
   onLoadOlder: () => void;
   onRetry: () => void;
+  onReply: (message: ChatMessage) => void;
   pendingMessage?: { content: string } | null;
 }
+
+const HIGHLIGHT_DURATION = 1_600;
 
 function messageTime(value: string) {
   const date = new Date(value);
@@ -22,17 +30,79 @@ function messageTime(value: string) {
   }).format(date);
 }
 
+function messageElementId(id: number) {
+  return `chat-message-${id}`;
+}
+
+function QuotedReply({
+  reply,
+  own,
+  onSelect,
+}: {
+  reply: ReplyReference;
+  own: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={clsx(
+        "mb-2 block w-full rounded-lg border-l-4 px-3 py-1.5 text-left focus-visible:outline-2 focus-visible:outline-offset-2",
+        own
+          ? "border-white/70 bg-white/15 hover:bg-white/20 focus-visible:outline-white"
+          : "border-primary bg-primary/5 hover:bg-primary/10 focus-visible:outline-primary"
+      )}
+    >
+      <span
+        className={clsx(
+          "block truncate text-xs font-bold",
+          own ? "text-white" : "text-primary"
+        )}
+      >
+        {reply.authorName}
+      </span>
+      <span
+        className={clsx(
+          "block truncate text-xs",
+          own ? "text-white/80" : "text-ink-soft"
+        )}
+      >
+        {reply.excerpt}
+      </span>
+    </button>
+  );
+}
+
 export function ChatThread({
   messages,
-  currentUserIds,
+  currentUserId,
   loading,
   error,
   hasOlder,
   loadingOlder,
   onLoadOlder,
   onRetry,
+  onReply,
   pendingMessage,
 }: ChatThreadProps) {
+  const [highlightedId, setHighlightedId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (highlightedId === null) return;
+    const timer = setTimeout(() => setHighlightedId(null), HIGHLIGHT_DURATION);
+    return () => clearTimeout(timer);
+  }, [highlightedId]);
+
+  function jumpTo(id: number) {
+    const target = document.getElementById(messageElementId(id));
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlightedId(id);
+  }
+
+  const pending = pendingMessage ? parseMessageContent(pendingMessage.content) : null;
+
   return (
     <section
       className="flex min-h-full flex-col px-4 py-5 sm:px-6"
@@ -85,23 +155,25 @@ export function ChatThread({
         aria-live="polite"
         aria-relevant="additions text"
       >
-        {messages.map((message, index) => {
-          // const sendrId = Number((message as any).sender)
-          // const ownMessage = currentUserIds.map(Number).includes(sendrId);
-          // const ownMessage = currentUserIds.includes(message.sender);
-
-          const ownMessage = index % 2 === 0;
+        {messages.map((message) => {
+          const ownMessage = currentUserId !== null && message.author === currentUserId;
+          const { reply, body } = parseMessageContent(message.content);
           return (
             <article
               key={message.id}
-              className={clsx("flex w-full", ownMessage ? "justify-end" : "justify-start")}
+              id={messageElementId(message.id)}
+              className={clsx(
+                "group flex w-full items-center gap-1",
+                ownMessage ? "flex-row-reverse" : "flex-row"
+              )}
             >
               <div
                 className={clsx(
-                  "max-w-[88%] rounded-2xl px-4 py-3 sm:max-w-[75%] lg:max-w-[68%]",
+                  "max-w-[85%] rounded-2xl px-4 py-3 transition-shadow duration-300 sm:max-w-[72%] lg:max-w-[64%]",
                   ownMessage
                     ? "rounded-br-md bg-primary text-white"
-                    : "rounded-bl-md border border-line bg-panel text-ink"
+                    : "rounded-bl-md border border-line bg-panel text-ink",
+                  highlightedId === message.id && "ring-4 ring-primary/30"
                 )}
               >
                 {!ownMessage && (
@@ -109,8 +181,15 @@ export function ChatThread({
                     {message.author_name}
                   </p>
                 )}
+                {reply && (
+                  <QuotedReply
+                    reply={reply}
+                    own={ownMessage}
+                    onSelect={() => jumpTo(reply.id)}
+                  />
+                )}
                 <p className="whitespace-pre-wrap break-words text-sm leading-6">
-                  {message.content}
+                  {body}
                 </p>
                 <time
                   dateTime={message.created_at}
@@ -122,14 +201,30 @@ export function ChatThread({
                   {messageTime(message.created_at)}
                 </time>
               </div>
+              <button
+                type="button"
+                onClick={() => onReply(message)}
+                aria-label={`Responder a ${message.author_name}`}
+                title="Responder"
+                className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-faint transition hover:bg-slate-200/70 hover:text-ink focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:opacity-0 md:group-hover:opacity-100"
+              >
+                <Reply size={16} aria-hidden="true" />
+              </button>
             </article>
           );
         })}
-        {pendingMessage && (
+        {pending && (
           <article className="flex justify-end">
-            <div className="max-w-[88%] rounded-2xl rounded-br-md bg-primary/75 px-4 py-3 text-white sm:max-w-[75%]">
+            <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary/75 px-4 py-3 text-white sm:max-w-[72%]">
+              {pending.reply && (
+                <QuotedReply
+                  reply={pending.reply}
+                  own
+                  onSelect={() => pending.reply && jumpTo(pending.reply.id)}
+                />
+              )}
               <p className="whitespace-pre-wrap break-words text-sm leading-6">
-                {pendingMessage.content}
+                {pending.body}
               </p>
               <p className="mt-1 text-right text-[10px] text-white/75">
                 A enviar…
