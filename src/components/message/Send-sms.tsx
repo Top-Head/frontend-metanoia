@@ -14,6 +14,7 @@ import clsx from "clsx";
 import { FileText, Paperclip, Pencil, Reply, SendHorizontal, X } from "lucide-react";
 import type { ReplyReference } from "@/lib/chat-reply";
 import { ACCEPT_ATTRIBUTE, formatBytes } from "@/lib/chat-attachments";
+import { EmojiPicker } from "./emoji-picker";
 
 interface MessageComposerProps {
   value: string;
@@ -88,6 +89,18 @@ export function MessageComposer({
   useEffect(() => {
     if (replyTo || editing) textareaRef.current?.focus();
   }, [replyTo, editing]);
+
+  function insertEmoji(emoji: string) {
+    const field = textareaRef.current;
+    const start = field?.selectionStart ?? value.length;
+    const end = field?.selectionEnd ?? value.length;
+    onChange(value.slice(0, start) + emoji + value.slice(end));
+    requestAnimationFrame(() => {
+      if (!field) return;
+      field.focus();
+      field.setSelectionRange(start + emoji.length, start + emoji.length);
+    });
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -187,7 +200,8 @@ export function MessageComposer({
           </ul>
         )}
 
-        <div className="flex items-end gap-2 p-2">
+        <div className="flex items-end gap-1 p-2">
+          <EmojiPicker onPick={insertEmoji} disabled={disabled} />
           {!editing && (
             <>
               <input
