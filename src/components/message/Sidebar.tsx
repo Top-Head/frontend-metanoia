@@ -25,7 +25,7 @@ function initials(value: string) {
     .slice(0, 2)
     .map((part) => part[0])
     .join("")
-    .toLocaleUpperCase("pt-BR");
+    .toLocaleUpperCase("pt-PT");
 }
 
 export default function Sidebar({
@@ -42,106 +42,80 @@ export default function Sidebar({
 }: SidebarProps) {
   const [query, setQuery] = useState("");
   const conversations = useMemo(() => {
-    const search = query.trim().toLocaleLowerCase("pt-BR");
+    const search = query.trim().toLocaleLowerCase("pt-PT");
     if (!search) return rooms;
-
     return rooms.filter((room) =>
-      [room.course_title, room.session_name, room.mentor_name]
-        .join(" ")
-        .toLocaleLowerCase("pt-BR")
-        .includes(search)
+      [room.course_title, room.session_name, room.mentor_name].join(" ").toLocaleLowerCase("pt-PT").includes(search)
     );
   }, [query, rooms]);
 
   return (
     <aside
       className={clsx(
-        "w-full shrink-0 flex-col border-r border-line bg-panel md:flex md:w-[22rem]",
+        "w-full shrink-0 flex-col border-r border-line bg-panel md:flex md:w-80",
         selectedRoomId !== null ? "hidden" : "flex"
       )}
       aria-label="Conversas"
     >
-      <div className="shrink-0 border-b border-line px-5 pb-5 pt-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-          Mentorias
-        </p>
-        <h1 className="mt-1 font-display text-2xl font-bold text-ink">
-          Mensagens
-        </h1>
-        <p className="mt-1 text-sm text-ink-soft">
-          Salas das suas turmas, num só lugar.
-        </p>
-
-        <label className="relative mt-5 block">
-          <Search
-            size={17}
-            aria-hidden="true"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft"
-          />
+      <div className="shrink-0 px-4 pb-4 pt-6">
+        <h1 className="px-1 font-display text-[22px] font-semibold tracking-[-0.02em] text-ink">Mensagens</h1>
+        <p className="mt-0.5 px-1 text-[13px] text-ink-soft">Uma conversa por turma.</p>
+        <label className="relative mt-4 block">
+          <Search size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
           <input
             type="search"
-            placeholder="Buscar curso ou mentor"
+            placeholder={isMentor ? "Buscar aula ou turma" : "Buscar aula ou mentor"}
             aria-label="Buscar conversas"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="h-11 w-full rounded-xl border border-line bg-canvas pl-10 pr-3 text-sm text-ink outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/15"
+            className="h-10 w-full rounded-md bg-tone pl-9 pr-3 text-sm text-ink outline-none transition placeholder:text-ink-faint focus:bg-panel focus:ring-2 focus:ring-primary/20"
           />
         </label>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-3">
+      <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
         {error && rooms.length > 0 && (
-          <div
-            className="mb-3 rounded-xl border border-danger/20 bg-danger/5 p-3"
-            role="alert"
-          >
-            <p className="text-xs text-danger">{error}</p>
-            <button
-              type="button"
-              onClick={onRetry}
-              className="mt-2 text-xs font-semibold text-danger underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger"
-            >
+          <div className="mx-2 mb-3 rounded-md bg-danger-soft p-3" role="alert">
+            <p className="text-[13px] text-ink">{error}</p>
+            <button type="button" onClick={onRetry} className="mt-1 text-[13px] font-semibold text-danger hover:underline">
               Atualizar salas
             </button>
           </div>
         )}
 
         {loading && rooms.length === 0 && (
-          <p className="px-3 py-8 text-center text-sm text-ink-soft" role="status">
-            A carregar as suas conversas…
-          </p>
+          <div className="space-y-1 px-2" role="status" aria-label="A carregar conversas">
+            {Array.from({ length: 4 }, (_, index) => (
+              <span key={index} className="block h-16 animate-pulse rounded-md bg-tone" />
+            ))}
+          </div>
         )}
 
         {error && rooms.length === 0 && (
           <div className="px-3 py-8 text-center">
             <p className="text-sm text-ink">{error}</p>
-            <button
-              type="button"
-              onClick={onRetry}
-              className="mt-3 text-sm font-semibold text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
+            <button type="button" onClick={onRetry} className="mt-3 text-sm font-semibold text-primary hover:underline">
               Tentar novamente
             </button>
           </div>
         )}
 
         {!loading && !error && rooms.length === 0 && (
-          <div className="px-5 py-12 text-center">
-            <p className="font-semibold text-ink">Ainda não há salas</p>
-            <p className="mt-2 text-sm leading-6 text-ink-soft">
-              As conversas das suas mentorias vão aparecer aqui quando tiver
-              acesso a uma turma.
+          <div className="mx-2 rounded-md bg-tone px-4 py-8 text-center">
+            <p className="font-semibold text-ink">Ainda não há conversas</p>
+            <p className="mt-1 text-[13px] leading-5 text-ink-soft">
+              {isMentor
+                ? "Cada turma que abrir tem a sua conversa. Aparece aqui quando a turma for criada."
+                : "Quando o mentor aprovar uma inscrição, a conversa da turma aparece aqui."}
             </p>
           </div>
         )}
 
         {rooms.length > 0 && conversations.length === 0 && (
-          <p className="px-3 py-8 text-center text-sm text-ink-soft">
-            Nenhuma conversa corresponde à busca.
-          </p>
+          <p className="px-3 py-8 text-center text-sm text-ink-soft">Nenhuma conversa corresponde à busca.</p>
         )}
 
-        <ul className="space-y-1">
+        <ul className="space-y-0.5">
           {conversations.map((room) => {
             const active = room.id === selectedRoomId;
             return (
@@ -151,35 +125,29 @@ export default function Sidebar({
                   aria-current={active ? "true" : undefined}
                   onClick={() => onSelect(room.id)}
                   className={clsx(
-                    "flex w-full items-center gap-3 rounded-xl border-l-[3px] px-3 py-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
-                    active
-                      ? "border-primary bg-primary/5"
-                      : "border-transparent hover:bg-slate-50"
+                    "flex w-full items-center gap-3 rounded-md px-2.5 py-2.5 text-left transition-colors focus-visible:outline-2 focus-visible:outline-primary",
+                    active ? "bg-primary-soft" : "hover:bg-tone"
                   )}
                 >
                   <span
                     aria-hidden="true"
                     className={clsx(
-                      "flex size-11 shrink-0 items-center justify-center rounded-xl font-display text-sm font-bold",
-                      active
-                        ? "bg-primary text-white"
-                        : "bg-primary/10 text-primary"
+                      "flex size-10 shrink-0 items-center justify-center rounded-md font-display text-sm font-semibold",
+                      active ? "bg-primary text-white" : "bg-rail text-white"
                     )}
                   >
                     {initials(room.course_title || room.session_name)}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-ink">
+                    <span className={clsx("block truncate text-sm font-semibold", active ? "text-primary" : "text-ink")}>
                       {room.course_title}
                     </span>
-                    <span className="mt-1 block truncate text-xs text-ink-soft">
-                      {isMentor
-                        ? room.session_name
-                        : `${room.session_name} · ${room.mentor_name}`}
+                    <span className="block truncate text-[13px] text-ink-soft">
+                      {isMentor ? room.session_name : `${room.session_name} · ${room.mentor_name}`}
                     </span>
-                    <span className="mt-1 block text-xs text-ink-faint">
-                      Sala da turma · {room.member_count} participantes
-                    </span>
+                  </span>
+                  <span className="shrink-0 text-xs tabular-nums text-ink-faint" title="Participantes">
+                    {room.member_count}
                   </span>
                 </button>
               </li>
@@ -192,9 +160,9 @@ export default function Sidebar({
             type="button"
             onClick={onLoadMore}
             disabled={loadingMore}
-            className="mt-3 w-full rounded-lg px-3 py-2 text-sm font-semibold text-primary hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60"
+            className="mt-2 w-full rounded-md px-3 py-2 text-sm font-semibold text-primary hover:bg-primary-soft disabled:opacity-60"
           >
-            {loadingMore ? "A carregar…" : "Carregar mais salas"}
+            {loadingMore ? "A carregar…" : "Carregar mais conversas"}
           </button>
         )}
       </div>

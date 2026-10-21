@@ -1,10 +1,11 @@
+import type { Tone } from "@/components/app/ui";
 import type { CourseStatus } from "./api/types";
 
-export const COURSE_STATUS: Record<CourseStatus, { label: string; tone: string }> = {
-  DRAFT: { label: "Rascunho", tone: "bg-line text-ink-soft" },
-  PUBLISHED: { label: "Publicada", tone: "bg-success-soft text-success" },
-  ARCHIVED: { label: "Arquivada", tone: "bg-warning-soft text-warning" },
-  CANCELLED: { label: "Cancelada", tone: "bg-danger/10 text-danger" },
+export const COURSE_STATUS: Record<CourseStatus, { label: string; tone: Tone }> = {
+  DRAFT: { label: "Rascunho", tone: "neutral" },
+  PUBLISHED: { label: "Publicada", tone: "success" },
+  ARCHIVED: { label: "Arquivada", tone: "warning" },
+  CANCELLED: { label: "Cancelada", tone: "danger" },
 };
 
 /** ISO (UTC) → valor de <input type="datetime-local"> na hora local. */

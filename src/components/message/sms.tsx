@@ -47,7 +47,7 @@ function ActionButton({
       aria-label={label}
       title={label}
       className={clsx(
-        "flex size-8 items-center justify-center rounded-full text-ink-faint transition hover:bg-slate-200/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+        "flex size-8 items-center justify-center rounded-full text-ink-faint transition hover:bg-tone focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
         danger ? "hover:text-danger" : "hover:text-ink"
       )}
     >
@@ -88,7 +88,7 @@ function QuotedReply({
         "mb-2 block w-full rounded-lg border-l-4 px-3 py-1.5 text-left focus-visible:outline-2 focus-visible:outline-offset-2",
         own
           ? "border-white/70 bg-white/15 hover:bg-white/20 focus-visible:outline-white"
-          : "border-primary bg-primary/5 hover:bg-primary/10 focus-visible:outline-primary"
+          : "border-primary bg-primary/5 hover:bg-primary-soft focus-visible:outline-primary"
       )}
     >
       <span
@@ -152,7 +152,7 @@ export function ChatThread({
           type="button"
           onClick={onLoadOlder}
           disabled={loadingOlder}
-          className="mx-auto mb-5 rounded-full border border-line bg-panel px-4 py-2 text-xs font-semibold text-primary shadow-sm hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60"
+          className="mx-auto mb-5 rounded-full border border-line bg-panel px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60"
         >
           {loadingOlder ? "A carregar mensagens…" : "Ver mensagens anteriores"}
         </button>

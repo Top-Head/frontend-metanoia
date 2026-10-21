@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" fill="none" stroke="#0d131b" stroke-opacity="0.07" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <g id="book"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></g>
+    <g id="pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></g>
+    <g id="bulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></g>
+    <g id="cap"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></g>
+    <g id="globe"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></g>
+    <g id="chat"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></g>
+    <g id="star"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></g>
+    <g id="dot"><circle cx="12" cy="12" r="1.5"/></g>
+  </defs>
+  <use href="#book" transform="translate(22 18) rotate(-12 12 12)"/>
+  <use href="#bulb" transform="translate(118 34) rotate(10 12 12)"/>
+  <use href="#globe" transform="translate(212 14) rotate(-6 12 12)"/>
+  <use href="#pencil" transform="translate(276 92) rotate(18 12 12)"/>
+  <use href="#chat" transform="translate(60 108) rotate(8 12 12)"/>
+  <use href="#cap" transform="translate(168 112) rotate(-10 12 12)"/>
+  <use href="#star" transform="translate(16 200) rotate(14 12 12)"/>
+  <use href="#pencil" transform="translate(104 186) rotate(-24 12 12)"/>
+  <use href="#book" transform="translate(236 190) rotate(9 12 12)"/>
+  <use href="#bulb" transform="translate(178 254) rotate(-14 12 12)"/>
+  <use href="#cap" transform="translate(62 270) rotate(12 12 12)"/>
+  <use href="#globe" transform="translate(286 268) rotate(4 12 12)"/>
+  <use href="#dot" transform="translate(94 66)"/>
+  <use href="#dot" transform="translate(246 60)"/>
+  <use href="#dot" transform="translate(140 236)"/>
+  <use href="#dot" transform="translate(28 138)"/>
+  <use href="#dot" transform="translate(220 150)"/>
+</svg>

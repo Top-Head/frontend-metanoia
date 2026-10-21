@@ -1,23 +1,23 @@
+import type { Tone } from "@/components/app/ui";
 import type { Enrollment, EnrollmentStatus, PaymentStatus } from "./api/types";
 
 interface Badge {
   label: string;
-  /** Classes de fundo e texto. */
-  tone: string;
+  tone: Tone;
 }
 
 export const ENROLLMENT_STATUS: Record<EnrollmentStatus, Badge> = {
-  PENDING: { label: "Aguarda aprovação", tone: "bg-warning-soft text-warning" },
-  APPROVED: { label: "Aprovada", tone: "bg-success-soft text-success" },
-  REJECTED: { label: "Recusada", tone: "bg-danger/10 text-danger" },
-  CANCELLED: { label: "Cancelada", tone: "bg-line text-ink-soft" },
+  PENDING: { label: "Aguarda aprovação", tone: "warning" },
+  APPROVED: { label: "Aprovada", tone: "success" },
+  REJECTED: { label: "Recusada", tone: "danger" },
+  CANCELLED: { label: "Cancelada", tone: "neutral" },
 };
 
 export const PAYMENT_STATUS: Record<PaymentStatus, Badge> = {
-  NOT_REQUIRED: { label: "Sem pagamento", tone: "bg-line text-ink-soft" },
-  PENDING: { label: "Pagamento pendente", tone: "bg-warning-soft text-warning" },
-  CONFIRMED: { label: "Pagamento confirmado", tone: "bg-success-soft text-success" },
-  REJECTED: { label: "Pagamento recusado", tone: "bg-danger/10 text-danger" },
+  NOT_REQUIRED: { label: "Sem pagamento", tone: "neutral" },
+  PENDING: { label: "Pagamento pendente", tone: "warning" },
+  CONFIRMED: { label: "Pagamento confirmado", tone: "success" },
+  REJECTED: { label: "Pagamento recusado", tone: "danger" },
 };
 
 const isClosed = (enrollment: Enrollment) =>

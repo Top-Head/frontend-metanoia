@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Trash2 } from "lucide-react";
 import type { ChatMessage } from "@/lib/api/types";
 import { replyReferenceFor } from "@/lib/chat-reply";
 
@@ -45,12 +44,9 @@ export default function DeleteMessageDialog({
         aria-labelledby="delete-message-title"
         aria-describedby="delete-message-description"
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-sm rounded-2xl bg-panel p-6 shadow-float"
+        className="w-full max-w-sm rounded-lg bg-panel p-6 shadow-float"
       >
-        <span className="mb-4 flex size-11 items-center justify-center rounded-xl bg-red-50 text-danger">
-          <Trash2 size={20} aria-hidden="true" />
-        </span>
-        <h2 id="delete-message-title" className="text-lg font-bold text-ink">
+        <h2 id="delete-message-title" className="font-display text-lg font-semibold text-ink">
           Apagar mensagem?
         </h2>
         <p id="delete-message-description" className="mt-2 text-sm leading-6 text-ink-soft">
@@ -68,7 +64,7 @@ export default function DeleteMessageDialog({
             type="button"
             onClick={onCancel}
             disabled={deleting}
-            className="rounded-xl px-4 py-2.5 text-sm font-semibold text-ink-soft hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60"
+            className="rounded-md px-4 py-2.5 text-sm font-semibold text-ink-soft hover:bg-tone focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-60"
           >
             Cancelar
           </button>
@@ -76,7 +72,7 @@ export default function DeleteMessageDialog({
             type="button"
             onClick={onConfirm}
             disabled={deleting}
-            className="rounded-xl bg-danger px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger disabled:opacity-60"
+            className="rounded-md bg-danger px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger disabled:opacity-60"
           >
             {deleting ? "A apagar…" : "Apagar"}
           </button>

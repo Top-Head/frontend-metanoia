@@ -55,7 +55,7 @@ function ContextBar({
         type="button"
         onClick={onCancel}
         aria-label={cancelLabel}
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-soft hover:bg-slate-200/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-soft hover:bg-tone focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
         <X size={16} aria-hidden="true" />
       </button>
@@ -178,7 +178,7 @@ export function MessageComposer({
                   type="button"
                   onClick={() => onRemoveFile(index)}
                   aria-label={`Remover ${file.name}`}
-                  className="flex size-6 shrink-0 items-center justify-center rounded-md text-ink-soft hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-primary"
+                  className="flex size-6 shrink-0 items-center justify-center rounded-md text-ink-soft hover:bg-tone focus-visible:outline-2 focus-visible:outline-primary"
                 >
                   <X size={13} aria-hidden="true" />
                 </button>
@@ -207,7 +207,7 @@ export function MessageComposer({
                 disabled={disabled}
                 aria-label="Anexar ficheiros"
                 title="Anexar ficheiros"
-                className="flex size-10 shrink-0 items-center justify-center rounded-xl text-ink-soft transition-colors hover:bg-slate-200/70 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
+                className="flex size-10 shrink-0 items-center justify-center rounded-xl text-ink-soft transition-colors hover:bg-tone hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
               >
                 <Paperclip size={18} aria-hidden="true" />
               </button>

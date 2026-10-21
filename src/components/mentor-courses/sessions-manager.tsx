@@ -2,13 +2,13 @@
 
 import { useState, type FormEvent } from "react";
 import clsx from "clsx";
-import { CalendarDays, CalendarPlus, Layers, Plus, Repeat, Trash2, Users } from "lucide-react";
+import { CalendarPlus, Trash2, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { Button } from "@/components/ui/button";
+import { Spinner, Status, buttonClass } from "@/components/app/ui";
 import { ApiError } from "@/lib/api/client";
 import type { CourseDetail, CourseSession } from "@/lib/api/types";
 import { fromLocalInput } from "@/lib/course";
-import { WEEKDAYS, describeMeeting, isWeekly, sortMeetings } from "@/lib/meeting";
+import { WEEKDAYS, describeMeeting, sortMeetings } from "@/lib/meeting";
 import {
   createMeeting,
   createSession,
@@ -18,13 +18,13 @@ import {
 } from "@/services/mentor-course.service";
 
 const inputClass =
-  "h-10 w-full rounded-lg border border-line-strong bg-panel px-3 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-primary focus:ring-1 focus:ring-primary";
+  "h-10 w-full rounded-md border border-line-strong bg-panel px-3 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-primary focus:ring-2 focus:ring-primary/15";
 
 function errorMessage(reason: unknown, fallback: string) {
   return reason instanceof ApiError ? reason.message : fallback;
 }
 
-function NewSessionForm({ course, onCreated }: { course: CourseDetail; onCreated: () => void }) {
+function NewSessionForm({ course, onCreated, first }: { course: CourseDetail; onCreated: () => void; first: boolean }) {
   const [name, setName] = useState("");
   const [capacity, setCapacity] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -54,12 +54,14 @@ function NewSessionForm({ course, onCreated }: { course: CourseDetail; onCreated
   }
 
   return (
-    <form onSubmit={submit} className="rounded-2xl border border-dashed border-line-strong bg-panel p-5">
-      <p className="mb-3 flex items-center gap-2 text-sm font-bold text-ink">
-        <Plus size={16} className="text-primary" />
-        Nova turma
+    <form onSubmit={submit} className={clsx("rounded-lg p-5", first ? "bg-rail text-rail-ink" : "bg-tone")}>
+      <h3 className={clsx("font-display text-[17px] font-semibold", first ? "text-white" : "text-ink")}>
+        {first ? "Abra a primeira turma" : "Abrir outra turma"}
+      </h3>
+      <p className={clsx("mb-4 mt-1 text-[13px]", first ? "text-rail-muted" : "text-ink-soft")}>
+        Os alunos inscrevem-se numa turma, e cada turma tem os seus próprios encontros e a sua conversa.
       </p>
-      <div className="grid gap-3 sm:grid-cols-[1fr_180px_auto]">
+      <div className="grid gap-2 sm:grid-cols-[1fr_200px_auto]">
         <input
           aria-label="Nome da turma"
           placeholder="Ex.: Turma de Novembro"
@@ -69,7 +71,7 @@ function NewSessionForm({ course, onCreated }: { course: CourseDetail; onCreated
           className={inputClass}
         />
         <input
-          aria-label="Capacidade da turma"
+          aria-label="Vagas da turma"
           type="number"
           min={1}
           placeholder={course.capacity ? `Vagas (padrão ${course.capacity})` : "Vagas (opcional)"}
@@ -77,9 +79,10 @@ function NewSessionForm({ course, onCreated }: { course: CourseDetail; onCreated
           onChange={(event) => setCapacity(event.target.value)}
           className={inputClass}
         />
-        <Button type="submit" isLoading={isSaving}>
+        <button type="submit" disabled={isSaving} className={buttonClass("primary")}>
+          {isSaving && <Spinner />}
           Criar turma
-        </Button>
+        </button>
       </div>
     </form>
   );
@@ -87,7 +90,7 @@ function NewSessionForm({ course, onCreated }: { course: CourseDetail; onCreated
 
 type MeetingMode = "weekly" | "once";
 
-function NewMeetingForm({ sessionId, onCreated }: { sessionId: number; onCreated: () => void }) {
+function NewMeetingForm({ sessionId, onCreated, onClose }: { sessionId: number; onCreated: () => void; onClose: () => void }) {
   const [mode, setMode] = useState<MeetingMode>("weekly");
   const [date, setDate] = useState("");
   const [weekday, setWeekday] = useState("");
@@ -138,37 +141,37 @@ function NewMeetingForm({ sessionId, onCreated }: { sessionId: number; onCreated
   }
 
   return (
-    <form onSubmit={submit} className="mt-3 rounded-xl bg-canvas p-3">
-      <div role="radiogroup" aria-label="Tipo de encontro" className="mb-3 inline-flex gap-1 rounded-lg bg-panel p-1">
-        {(
-          [
-            ["weekly", "Semanal"],
-            ["once", "Data única"],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            role="radio"
-            aria-checked={mode === value}
-            onClick={() => setMode(value)}
-            className={clsx(
-              "rounded-md px-3 py-1.5 text-xs font-bold transition-colors",
-              mode === value ? "bg-primary text-white" : "text-ink-soft hover:text-ink"
-            )}
-          >
-            {label}
-          </button>
-        ))}
+    <form onSubmit={submit} className="mt-4 rounded-md bg-tone p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div role="radiogroup" aria-label="Tipo de encontro" className="inline-flex gap-1 rounded-md bg-panel p-1">
+          {(
+            [
+              ["weekly", "Todas as semanas"],
+              ["once", "Uma data"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              role="radio"
+              aria-checked={mode === value}
+              onClick={() => setMode(value)}
+              className={clsx(
+                "h-7 rounded px-3 text-[13px] font-semibold transition-colors",
+                mode === value ? "bg-ink text-white" : "text-ink-soft hover:text-ink"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <button type="button" onClick={onClose} aria-label="Fechar formulário" className="flex size-8 items-center justify-center rounded-md text-ink-soft hover:bg-panel hover:text-ink">
+          <X size={16} />
+        </button>
       </div>
       <div className="grid gap-2 sm:grid-cols-[1fr_110px_110px] lg:grid-cols-[1fr_110px_110px_1fr_auto]">
         {mode === "weekly" ? (
-          <select
-            aria-label="Dia da semana"
-            value={weekday}
-            onChange={(event) => setWeekday(event.target.value)}
-            className={inputClass}
-          >
+          <select aria-label="Dia da semana" value={weekday} onChange={(event) => setWeekday(event.target.value)} className={inputClass}>
             <option value="">Dia da semana</option>
             {WEEKDAYS.map((label, index) => (
               <option key={label} value={index}>
@@ -189,15 +192,13 @@ function NewMeetingForm({ sessionId, onCreated }: { sessionId: number; onCreated
           onChange={(event) => setLocation(event.target.value)}
           className={clsx(inputClass, "sm:col-span-2 lg:col-span-1")}
         />
-        <Button type="submit" size="md" isLoading={isSaving}>
-          {!isSaving && <CalendarPlus size={16} />}
+        <button type="submit" disabled={isSaving} className={buttonClass("primary")}>
+          {isSaving ? <Spinner /> : <CalendarPlus size={15} aria-hidden="true" />}
           {mode === "weekly" ? "Adicionar" : "Agendar"}
-        </Button>
+        </button>
       </div>
       {mode === "weekly" && (
-        <p className="mt-2 text-xs text-ink-soft">
-          Repete-se todas as semanas dentro do período da aula (definido em Detalhes da aula).
-        </p>
+        <p className="mt-2 text-xs text-ink-soft">Repete-se todas as semanas dentro do período da aula, definido em Detalhes da aula.</p>
       )}
     </form>
   );
@@ -209,6 +210,8 @@ function SessionCard({ session, onChanged }: { session: CourseSession; onChanged
   const [showMeetingForm, setShowMeetingForm] = useState(false);
   const active = session.is_active !== false;
   const meetings = sortMeetings(session.meetings ?? []);
+  const enrolled = session.total_students ?? 0;
+  const ratio = session.effective_capacity ? Math.min(enrolled / session.effective_capacity, 1) : 0;
 
   async function run(key: string, task: () => Promise<unknown>, success: string, fallback: string) {
     setBusy(key);
@@ -224,20 +227,22 @@ function SessionCard({ session, onChanged }: { session: CourseSession; onChanged
   }
 
   return (
-    <div className={clsx("rounded-2xl border bg-panel p-5 shadow-card", active ? "border-line" : "border-dashed border-line-strong opacity-80")}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="flex items-center gap-2 font-bold text-ink">
-            {session.name}
-            {!active && (
-              <span className="rounded-full bg-line px-2 py-0.5 text-[11px] font-bold text-ink-soft">Fechada</span>
-            )}
-          </p>
-          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-ink-soft">
-            <Users size={12} />
-            {session.total_students ?? 0}/{session.effective_capacity} alunos
-            {session.capacity == null && " (capacidade da aula)"}
-          </p>
+    <article className="rounded-lg border border-line bg-panel">
+      <div className="flex flex-wrap items-start justify-between gap-4 p-5">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h3 className="font-display text-[17px] font-semibold text-ink">{session.name}</h3>
+            <Status tone={active ? "success" : "neutral"}>{active ? "Inscrições abertas" : "Inscrições fechadas"}</Status>
+          </div>
+          <div className="mt-3 flex items-center gap-3">
+            <span aria-hidden="true" className="block h-1 w-32 overflow-hidden rounded-full bg-tone">
+              <span className="block h-full rounded-full bg-primary" style={{ width: `${ratio * 100}%` }} />
+            </span>
+            <span className="text-[13px] tabular-nums text-ink-soft">
+              {enrolled} de {session.effective_capacity} vagas ocupadas
+              {session.capacity == null && " (capacidade da aula)"}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -251,62 +256,65 @@ function SessionCard({ session, onChanged }: { session: CourseSession; onChanged
                 "Não foi possível atualizar a turma."
               )
             }
-            className="rounded-lg px-3 py-1.5 text-xs font-bold text-ink-soft transition-colors hover:bg-canvas hover:text-ink disabled:opacity-50"
+            className={buttonClass("quiet", "sm")}
           >
-            {active ? "Fechar inscrições" : "Reabrir"}
+            {busy === "toggle" && <Spinner />}
+            {active ? "Fechar inscrições" : "Reabrir inscrições"}
           </button>
           <button
             type="button"
             aria-label={`Remover ${session.name}`}
             disabled={busy !== null}
             onClick={() => setConfirmingDelete(true)}
-            className="rounded-lg p-2 text-ink-faint transition-colors hover:bg-danger/5 hover:text-danger disabled:opacity-50"
+            className="flex size-8 items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-danger-soft hover:text-danger disabled:opacity-50"
           >
-            <Trash2 size={16} />
+            <Trash2 size={15} />
           </button>
         </div>
       </div>
 
       {confirmingDelete && (
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-danger/5 p-3">
-          <p className="text-sm text-danger">Remover a turma e os seus encontros?</p>
+        <div className="mx-5 mb-4 flex flex-wrap items-center justify-between gap-3 rounded-md bg-danger-soft px-4 py-3">
+          <p className="text-sm text-ink">Remover a turma e todos os seus encontros?</p>
           <div className="flex gap-2">
-            <button
-              type="button"
-              disabled={busy !== null}
-              onClick={() =>
-                run("delete", () => deleteSession(session.id), "Turma removida.", "Não foi possível remover a turma.")
-              }
-              className="rounded-md bg-danger px-3 py-1.5 text-xs font-bold text-white disabled:opacity-60"
-            >
-              {busy === "delete" ? "A remover…" : "Remover"}
+            <button type="button" onClick={() => setConfirmingDelete(false)} className={buttonClass("secondary", "sm")}>
+              Voltar
             </button>
             <button
               type="button"
-              onClick={() => setConfirmingDelete(false)}
-              className="rounded-md px-3 py-1.5 text-xs font-bold text-ink-soft hover:bg-line"
+              disabled={busy !== null}
+              onClick={() => run("delete", () => deleteSession(session.id), "Turma removida.", "Não foi possível remover a turma.")}
+              className={buttonClass("danger", "sm")}
             >
-              Voltar
+              {busy === "delete" && <Spinner />}
+              Remover
             </button>
           </div>
         </div>
       )}
 
-      <div className="mt-4 border-t border-line pt-4">
-        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-faint">Encontros</p>
+      <div className="border-t border-line px-5 pb-5 pt-4">
+        <div className="flex items-center justify-between gap-3">
+          <h4 className="text-sm font-semibold text-ink">
+            Encontros <span className="font-normal tabular-nums text-ink-soft">{meetings.length}</span>
+          </h4>
+          {!showMeetingForm && (
+            <button type="button" onClick={() => setShowMeetingForm(true)} className={buttonClass("secondary", "sm")}>
+              <CalendarPlus size={14} aria-hidden="true" />
+              Agendar encontro
+            </button>
+          )}
+        </div>
+
         {meetings.length > 0 ? (
-          <ul className="space-y-2">
+          <ul className="mt-3 divide-y divide-line">
             {meetings.map((meeting) => {
               const { day, time } = describeMeeting(meeting);
-              const Icon = isWeekly(meeting) ? Repeat : CalendarDays;
               return (
-                <li key={meeting.id} className="flex items-center gap-3 rounded-lg px-1 py-1">
-                  <Icon size={16} className="shrink-0 text-primary" />
-                  <div className="min-w-0 flex-1 text-sm">
-                    <p className="font-semibold text-ink first-letter:uppercase">{day}</p>
-                    <p className="truncate text-xs text-ink-soft">
-                      {[time, meeting.location].filter(Boolean).join(" · ")}
-                    </p>
+                <li key={meeting.id} className="flex items-center gap-4 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-ink first-letter:uppercase">{day}</p>
+                    <p className="truncate text-[13px] tabular-nums text-ink-soft">{[time, meeting.location].filter(Boolean).join(" · ")}</p>
                   </div>
                   <button
                     type="button"
@@ -315,51 +323,33 @@ function SessionCard({ session, onChanged }: { session: CourseSession; onChanged
                     onClick={() =>
                       run(`meeting-${meeting.id}`, () => deleteMeeting(meeting.id), "Encontro removido.", "Não foi possível remover o encontro.")
                     }
-                    className="rounded-lg p-1.5 text-ink-faint transition-colors hover:bg-danger/5 hover:text-danger disabled:opacity-50"
+                    className="flex size-8 items-center justify-center rounded-md text-ink-faint transition-colors hover:bg-danger-soft hover:text-danger disabled:opacity-50"
                   >
-                    <Trash2 size={14} />
+                    {busy === `meeting-${meeting.id}` ? <Spinner /> : <Trash2 size={14} />}
                   </button>
                 </li>
               );
             })}
           </ul>
         ) : (
-          <p className="text-sm text-ink-faint">Nenhum encontro agendado.</p>
+          !showMeetingForm && <p className="mt-2 text-sm text-ink-soft">Ainda sem encontros. Agende o primeiro para a turma aparecer na agenda.</p>
         )}
 
-        {showMeetingForm ? (
-          <NewMeetingForm sessionId={session.id} onCreated={onChanged} />
-        ) : (
-          <button
-            type="button"
-            onClick={() => setShowMeetingForm(true)}
-            className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline"
-          >
-            <CalendarPlus size={14} />
-            Agendar encontro
-          </button>
+        {showMeetingForm && (
+          <NewMeetingForm sessionId={session.id} onCreated={onChanged} onClose={() => setShowMeetingForm(false)} />
         )}
       </div>
-    </div>
+    </article>
   );
 }
 
 export function SessionsManager({ course, onChanged }: { course: CourseDetail; onChanged: () => void }) {
   return (
     <div className="space-y-4">
-      {course.sessions.length === 0 && (
-        <div className="flex items-start gap-3 rounded-2xl bg-primary/5 p-5 text-sm text-ink-soft">
-          <Layers size={18} className="mt-0.5 shrink-0 text-primary" />
-          <p>
-            <span className="font-bold text-ink">Abra a primeira turma.</span> Os alunos inscrevem-se numa turma, e cada
-            turma tem os seus encontros com data e hora.
-          </p>
-        </div>
-      )}
       {course.sessions.map((session) => (
         <SessionCard key={session.id} session={session} onChanged={onChanged} />
       ))}
-      <NewSessionForm course={course} onCreated={onChanged} />
+      <NewSessionForm course={course} onCreated={onChanged} first={course.sessions.length === 0} />
     </div>
   );
 }

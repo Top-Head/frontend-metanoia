@@ -2,32 +2,30 @@
 
 import { useState } from "react";
 import { Search } from "lucide-react";
-import { CourseCatalog } from "@/components/courses/course-catalog";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { PageHeader } from "@/components/app/ui";
 
 export function StudentCatalog() {
   const [searchTerm, setSearchTerm] = useState("");
-  const query = useDebouncedValue(searchTerm.trim());
 
   return (
     <>
-      <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Catálogo de aulas</h1>
-          <p className="text-sm text-ink-soft">Encontre a próxima aula e peça a inscrição numa turma.</p>
-        </div>
-        <label className="flex w-full items-center rounded-xl border border-line-strong bg-panel px-3 shadow-card focus-within:border-primary focus-within:ring-1 focus-within:ring-primary lg:max-w-sm">
-          <Search size={18} className="shrink-0 text-ink-faint" />
-          <input
-            type="search"
-            aria-label="Buscar aulas"
-            placeholder="Ex.: React, oratória, finanças"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            className="w-full bg-transparent px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-faint"
-          />
-        </label>
-      </div>
+      <PageHeader
+        title="Catálogo de aulas"
+        description="Encontre a próxima aula e peça a inscrição numa turma."
+        actions={
+          <label className="relative block w-full sm:w-80">
+            <span className="sr-only">Buscar aulas</span>
+            <Search size={16} aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+            <input
+              type="search"
+              placeholder="Ex.: React, oratória, finanças"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              className="h-10 w-full rounded-md border border-line-strong bg-panel pl-9 pr-3 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-primary focus:ring-2 focus:ring-primary/15"
+            />
+          </label>
+        }
+      />
 
       {/* <CourseCatalog
         query={query}
