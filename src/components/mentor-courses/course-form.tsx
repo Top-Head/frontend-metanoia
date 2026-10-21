@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { CalendarDays, ImageIcon, MapPin, Monitor, Tag, User, Users } from "lucide-react";
 import { CourseCover } from "@/components/courses/course-cover";
 import toast from "react-hot-toast";
-import { Button } from "@/components/ui/button";
+import { Spinner, buttonClass } from "@/components/app/ui";
 import FormInput from "@/components/ui/form-input";
 import { Select } from "@/components/ui/select";
 import { useApiQuery } from "@/hooks/useApiQuery";
@@ -33,8 +33,8 @@ function Segmented<T extends string>({
 }) {
   return (
     <div>
-      <p className="mb-2 text-sm font-bold text-ink">{label}</p>
-      <div role="radiogroup" aria-label={label} className="grid grid-cols-2 gap-1 rounded-xl bg-canvas p-1">
+      <p className="mb-2 text-sm font-semibold text-ink">{label}</p>
+      <div role="radiogroup" aria-label={label} className="grid grid-cols-2 gap-1 rounded-md bg-tone p-1">
         {options.map((option) => (
           <button
             key={option.value}
@@ -43,8 +43,8 @@ function Segmented<T extends string>({
             aria-checked={value === option.value}
             onClick={() => onChange(option.value)}
             className={clsx(
-              "flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all",
-              value === option.value ? "bg-panel text-primary shadow-card" : "text-ink-soft hover:text-ink"
+              "flex h-9 items-center justify-center gap-2 rounded text-sm font-semibold transition-colors",
+              value === option.value ? "bg-panel text-ink" : "text-ink-soft hover:text-ink"
             )}
           >
             {option.icon}
@@ -158,7 +158,7 @@ export function CourseForm({ initial, submitLabel, onSubmit }: CourseFormProps) 
       </div>
 
       <div>
-        <label htmlFor="course-description" className="mb-2 block text-sm font-bold text-ink">
+        <label htmlFor="course-description" className="mb-2 block text-sm font-semibold text-ink">
           Descrição
         </label>
         <textarea
@@ -255,11 +255,11 @@ export function CourseForm({ initial, submitLabel, onSubmit }: CourseFormProps) 
         <CourseCover
           image={image.trim()}
           categorySlug={categories.data?.find((item) => String(item.id) === category)?.slug}
-          className="h-24 rounded-xl"
+          className="h-24 rounded-md"
         />
       </div>
 
-      <div className="rounded-xl border border-line bg-canvas p-4">
+      <div className="rounded-md bg-tone p-4">
         <label className="flex cursor-pointer items-center gap-3">
           <input
             type="checkbox"
@@ -268,7 +268,7 @@ export function CourseForm({ initial, submitLabel, onSubmit }: CourseFormProps) 
             className="size-5 rounded accent-primary"
           />
           <span>
-            <span className="block text-sm font-bold text-ink">Aula gratuita</span>
+            <span className="block text-sm font-semibold text-ink">Aula gratuita</span>
             <span className="block text-xs text-ink-soft">A aprovação do mentor confirma a inscrição.</span>
           </span>
         </label>
@@ -290,9 +290,12 @@ export function CourseForm({ initial, submitLabel, onSubmit }: CourseFormProps) 
         )}
       </div>
 
-      <Button type="submit" size="lg" isLoading={isSubmitting} className="w-full sm:w-auto">
-        {submitLabel}
-      </Button>
+      <div className="flex justify-end pt-2">
+        <button type="submit" disabled={isSubmitting} className={buttonClass("primary", "md", "w-full sm:w-auto")}>
+          {isSubmitting && <Spinner />}
+          {submitLabel}
+        </button>
+      </div>
     </form>
   );
 }

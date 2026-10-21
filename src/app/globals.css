@@ -28,6 +28,17 @@
   --color-warning: #f59e0b;
   --color-warning-soft: #fffbeb;
   --color-danger: #ef4444;
+  --color-danger-soft: #fdecec;
+
+  /* Área de trabalho (painéis e chat) */
+  --color-rail: #0d131b;
+  --color-rail-raised: #1a2330;
+  --color-rail-ink: #e6ebf2;
+  --color-rail-muted: #8b97a8;
+  --color-tone: #eef1f5;
+  --color-primary-soft: #e8f0fd;
+  --color-success-ink: #047857;
+  --color-warning-ink: #b45309;
 
   /* Fontes */
   --font-display: "Lexend", sans-serif;
@@ -58,6 +69,15 @@
   --color-warning: var(--color-warning);
   --color-warning-soft: var(--color-warning-soft);
   --color-danger: var(--color-danger);
+  --color-danger-soft: var(--color-danger-soft);
+  --color-rail: var(--color-rail);
+  --color-rail-raised: var(--color-rail-raised);
+  --color-rail-ink: var(--color-rail-ink);
+  --color-rail-muted: var(--color-rail-muted);
+  --color-tone: var(--color-tone);
+  --color-primary-soft: var(--color-primary-soft);
+  --color-success-ink: var(--color-success-ink);
+  --color-warning-ink: var(--color-warning-ink);
 
   /* Fontes */
   --font-sans: var(--font-body);

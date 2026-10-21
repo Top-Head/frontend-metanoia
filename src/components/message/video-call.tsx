@@ -376,8 +376,8 @@ function LiveKitCall({
     >
       <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-3 sm:px-7">
         <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-sky-300">
-            Metanoia · sala ao vivo
+          <p className="text-[13px] font-medium text-rail-muted">
+            Sala ao vivo
           </p>
           <h2
             id="video-call-title"

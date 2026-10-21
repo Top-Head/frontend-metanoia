@@ -2,27 +2,14 @@
 
 import { useState } from "react";
 import clsx from "clsx";
-import { Download, FileText } from "lucide-react";
-import toast from "react-hot-toast";
+import { Eye, FileText } from "lucide-react";
 import type { ChatAttachment } from "@/lib/api/types";
 import { formatBytes, isImageType } from "@/lib/chat-attachments";
 import { getAttachmentUrl } from "@/services/message.service";
+import { openAttachmentViewer } from "./attachment-viewer";
 
-// A URL presignada expira; pede uma nova à API antes de abrir.
-async function openAttachment(attachment: ChatAttachment) {
-  const tab = window.open("", "_blank");
-  try {
-    const { url } = await getAttachmentUrl(attachment.id);
-    if (tab) {
-      tab.opener = null;
-      tab.location.href = url;
-    } else {
-      window.location.assign(url);
-    }
-  } catch (error) {
-    tab?.close();
-    toast.error(error instanceof Error ? error.message : "Não foi possível abrir o anexo.");
-  }
+export function openAttachment(attachment: ChatAttachment) {
+  openAttachmentViewer(attachment);
 }
 
 function ImageAttachment({ attachment, own }: { attachment: ChatAttachment; own: boolean }) {
@@ -43,7 +30,7 @@ function ImageAttachment({ attachment, own }: { attachment: ChatAttachment; own:
     <button
       type="button"
       onClick={() => void openAttachment(attachment)}
-      aria-label={`Abrir imagem ${attachment.filename}`}
+      aria-label={`Ver imagem ${attachment.filename}`}
       className={clsx(
         "block overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2",
         own ? "bg-white/10 focus-visible:outline-white" : "bg-canvas focus-visible:outline-primary"
@@ -69,13 +56,13 @@ function FileAttachment({ attachment, own }: { attachment: ChatAttachment; own: 
         "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
         own
           ? "bg-white/15 hover:bg-white/25 focus-visible:outline-white"
-          : "bg-canvas hover:bg-slate-100 focus-visible:outline-primary"
+          : "bg-canvas hover:bg-tone focus-visible:outline-primary"
       )}
     >
       <span
         className={clsx(
           "flex size-9 shrink-0 items-center justify-center rounded-lg",
-          own ? "bg-white/20 text-white" : "bg-primary/10 text-primary"
+          own ? "bg-white/20 text-white" : "bg-primary-soft text-primary"
         )}
       >
         <FileText size={18} aria-hidden="true" />
@@ -86,7 +73,7 @@ function FileAttachment({ attachment, own }: { attachment: ChatAttachment; own: 
           {formatBytes(attachment.size)}
         </span>
       </span>
-      <Download
+      <Eye
         size={16}
         aria-hidden="true"
         className={clsx("shrink-0", own ? "text-white/80" : "text-ink-soft")}

@@ -3,12 +3,11 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import { Pencil, Search, Sparkles, Target } from "lucide-react";
+import { Pencil, Search } from "lucide-react";
 import toast from "react-hot-toast";
-import { CourseCard, CourseCardSkeleton } from "@/components/courses/course-card";
-import { Button } from "@/components/ui/button";
+import { RecommendationList } from "@/components/app/recommendation-list";
+import { EmptyNote, ErrorNote, PageHeader, Skeleton, Spinner, buttonClass } from "@/components/app/ui";
 import { Select } from "@/components/ui/select";
-import { EmptyState, ErrorState } from "@/components/ui/states";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { useAuth } from "@/hooks/useAuth";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -58,16 +57,16 @@ function ProfileEditor({
   }
 
   const field =
-    "w-full rounded-lg border border-line-strong bg-panel px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-primary focus:ring-1 focus:ring-primary";
+    "w-full rounded-md border border-line-strong bg-panel px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-primary focus:ring-1 focus:ring-primary";
 
   return (
     <form onSubmit={submit} className="space-y-4">
       <div>
-        <label htmlFor="lp-goals" className="mb-1.5 block text-sm font-bold text-ink">Objetivos</label>
+        <label htmlFor="lp-goals" className="mb-1.5 block text-sm font-semibold text-ink">Objetivos</label>
         <textarea id="lp-goals" rows={2} value={goals} onChange={(e) => setGoals(e.target.value)} className={clsx(field, "resize-y")} placeholder="Ex.: conseguir o primeiro emprego como programador" />
       </div>
       <div>
-        <label htmlFor="lp-topics" className="mb-1.5 block text-sm font-bold text-ink">Temas de interesse</label>
+        <label htmlFor="lp-topics" className="mb-1.5 block text-sm font-semibold text-ink">Temas de interesse</label>
         <input id="lp-topics" value={topicsText} onChange={(e) => setTopicsText(e.target.value)} className={field} placeholder="Ex.: React, inglês para entrevistas" />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -88,12 +87,17 @@ function ProfileEditor({
         />
       </div>
       <div>
-        <label htmlFor="lp-availability" className="mb-1.5 block text-sm font-bold text-ink">Disponibilidade</label>
+        <label htmlFor="lp-availability" className="mb-1.5 block text-sm font-semibold text-ink">Disponibilidade</label>
         <input id="lp-availability" value={availability} onChange={(e) => setAvailability(e.target.value)} className={field} placeholder="Ex.: noites durante a semana" />
       </div>
       <div className="flex gap-2">
-        <Button type="submit" isLoading={isSaving}>Guardar</Button>
-        <Button type="button" variant="ghost" onClick={onCancel} disabled={isSaving}>Cancelar</Button>
+        <button type="submit" disabled={isSaving} className={buttonClass("primary")}>
+          {isSaving && <Spinner />}
+          Guardar
+        </button>
+        <button type="button" onClick={onCancel} disabled={isSaving} className={buttonClass("quiet")}>
+          Cancelar
+        </button>
       </div>
     </form>
   );
@@ -106,41 +110,32 @@ function ProfileSummary({ profile, onEdit }: { profile: LearningProfile; onEdit:
   ];
 
   return (
-    <div>
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <p className="flex items-center gap-2 font-bold text-ink">
-          <Target size={18} className="text-primary" />
-          O seu perfil de aprendizagem
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+      <div>
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-[13px] font-medium text-rail-muted">O que quer alcançar</h2>
+          <button type="button" onClick={onEdit} className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-white hover:underline">
+            <Pencil size={13} aria-hidden="true" />
+            Ajustar
+          </button>
+        </div>
+        <p className="mt-2 font-display text-[22px] font-semibold leading-snug tracking-[-0.01em] text-white">
+          {profile.goals || "Ainda sem objetivo escrito. Ajuste o perfil para o acrescentar."}
         </p>
-        <button type="button" onClick={onEdit} className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline">
-          <Pencil size={14} />
-          Ajustar
-        </button>
+        {topics.length > 0 && <p className="mt-4 text-sm text-rail-muted">{topics.join(" · ")}</p>}
       </div>
-      {profile.goals && <p className="mb-4 text-sm leading-relaxed text-ink">{profile.goals}</p>}
-      <dl className="grid gap-3 text-sm sm:grid-cols-3">
-        <div className="rounded-xl bg-canvas p-3">
-          <dt className="text-xs text-ink-faint">Nível</dt>
-          <dd className="font-bold text-ink">{LEVEL_LABEL[profile.level ?? "UNKNOWN"]}</dd>
-        </div>
-        <div className="rounded-xl bg-canvas p-3">
-          <dt className="text-xs text-ink-faint">Modalidade</dt>
-          <dd className="font-bold text-ink">{PREFERRED_MODALITY_LABEL[profile.preferred_modality ?? "ANY"]}</dd>
-        </div>
-        <div className="rounded-xl bg-canvas p-3">
-          <dt className="text-xs text-ink-faint">Disponibilidade</dt>
-          <dd className="truncate font-bold text-ink">{profile.availability || "—"}</dd>
-        </div>
+      <dl className="grid grid-cols-3 gap-px self-start overflow-hidden rounded-md bg-rail-raised text-sm lg:grid-cols-1">
+        {[
+          ["Nível", LEVEL_LABEL[profile.level ?? "UNKNOWN"]],
+          ["Modalidade", PREFERRED_MODALITY_LABEL[profile.preferred_modality ?? "ANY"]],
+          ["Disponibilidade", profile.availability || "Não indicada"],
+        ].map(([term, value]) => (
+          <div key={term} className="bg-rail px-4 py-3 lg:flex lg:items-baseline lg:justify-between lg:gap-4">
+            <dt className="text-xs text-rail-muted">{term}</dt>
+            <dd className="mt-1 truncate font-semibold text-white lg:mt-0">{value}</dd>
+          </div>
+        ))}
       </dl>
-      {topics.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {topics.map((topic) => (
-            <span key={topic} className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-              {topic}
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -158,100 +153,83 @@ export function ForYou() {
   const hasProfile = Boolean(profile.data);
 
   return (
-    <div>
-      <div className="mb-8">
-        <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-primary">Área do aluno</p>
-        <h1 className="text-3xl font-bold tracking-tight text-ink">Para você</h1>
-        <p className="mt-1 text-sm text-ink-soft">Aulas escolhidas a partir dos seus objetivos.</p>
-      </div>
+    <>
+      <PageHeader title="Para você" description="Aulas escolhidas a partir do que quer aprender, do seu nível e de quando pode estudar." />
 
-      <section className="mb-10 rounded-2xl border border-line bg-panel p-6 shadow-card">
+      <section aria-label="Perfil de aprendizagem" className="mb-10">
         {profile.isLoading || !studentId ? (
-          <span className="block h-24 animate-pulse rounded-xl bg-line" />
+          <Skeleton className="h-40" />
         ) : profile.error ? (
-          <ErrorState message={profile.error.message} onRetry={profile.reload} />
+          <ErrorNote message={profile.error.message} onRetry={profile.reload} />
         ) : profile.data ? (
           isEditing ? (
-            <ProfileEditor
-              profile={profile.data}
-              onCancel={() => setIsEditing(false)}
-              onSaved={(next) => {
-                profile.mutate(next);
-                setIsEditing(false);
-                setVersion((current) => current + 1);
-              }}
-            />
+            <div className="rounded-lg border border-line bg-panel p-6">
+              <h2 className="mb-4 text-base font-semibold text-ink">Ajustar o perfil de aprendizagem</h2>
+              <ProfileEditor
+                profile={profile.data}
+                onCancel={() => setIsEditing(false)}
+                onSaved={(next) => {
+                  profile.mutate(next);
+                  setIsEditing(false);
+                  setVersion((current) => current + 1);
+                }}
+              />
+            </div>
           ) : (
-            <ProfileSummary profile={profile.data} onEdit={() => setIsEditing(true)} />
+            <div className="rounded-lg bg-rail p-6 text-rail-ink md:p-8">
+              <ProfileSummary profile={profile.data} onEdit={() => setIsEditing(true)} />
+            </div>
           )
         ) : (
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Sparkles size={18} />
-              </span>
-              <div>
-                <p className="font-bold text-ink">Ainda não conhecemos os seus objetivos</p>
-                <p className="text-sm text-ink-soft">
-                  Converse 2 minutos com o assistente para receber recomendações personalizadas.
-                </p>
-              </div>
+          <div className="flex flex-col items-start gap-4 rounded-lg bg-rail p-6 text-rail-ink sm:flex-row sm:items-center sm:justify-between md:p-8">
+            <div>
+              <h2 className="font-display text-xl font-semibold text-white">Ainda não conhecemos os seus objetivos</h2>
+              <p className="mt-1 max-w-lg text-sm text-rail-muted">
+                Converse dois minutos com o assistente e as recomendações passam a seguir o que quer aprender.
+              </p>
             </div>
-            <Link
-              href="/aluno/onboarding"
-              className="shrink-0 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-strong"
-            >
-              Começar conversa
+            <Link href="/aluno/onboarding" className={buttonClass("primary")}>
+              Começar a conversa
             </Link>
           </div>
         )}
       </section>
 
-      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <h2 className="text-xl font-bold text-ink">Recomendações</h2>
+      <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <h2 className="text-base font-semibold text-ink">Recomendações</h2>
         <label className="relative block sm:w-72">
           <span className="sr-only">Refinar recomendações</span>
-          <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+          <Search size={16} aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
           <input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={hasProfile ? "Refinar (ex.: inglês)" : "O que quer aprender?"}
-            className="h-10 w-full rounded-lg border border-line-strong bg-panel pl-9 pr-3 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-primary focus:ring-1 focus:ring-primary"
+            className="h-10 w-full rounded-md border border-line-strong bg-panel pl-9 pr-3 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-primary focus:ring-2 focus:ring-primary/15"
           />
         </label>
       </div>
 
       {recommendations.isLoading ? (
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 3 }, (_, index) => (
-            <CourseCardSkeleton key={index} />
-          ))}
-        </div>
+        <Skeleton className="h-72" />
       ) : recommendations.error ? (
-        <ErrorState message={recommendations.error.message} onRetry={recommendations.reload} />
+        <ErrorNote message={recommendations.error.message} onRetry={recommendations.reload} />
       ) : recommendations.data && recommendations.data.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {recommendations.data.map((result) => (
-            <CourseCard key={result.course.id} result={result} href={`/aluno/catalogo/${result.course.id}`} />
-          ))}
-        </div>
+        <RecommendationList results={recommendations.data} />
       ) : (
-        <EmptyState
-          icon={<Sparkles size={22} />}
+        <EmptyNote
           title="Ainda sem recomendações"
-          description={
-            hasProfile || q
-              ? "Não encontrámos aulas para o seu perfil neste momento. Explore o catálogo completo."
-              : "Converse com o assistente ou escreva o que quer aprender acima."
-          }
           action={
-            <Link href="/aluno/catalogo" className="text-sm font-bold text-primary hover:underline">
+            <Link href="/aluno/catalogo" className={buttonClass("secondary")}>
               Ver todas as aulas
             </Link>
           }
-        />
+        >
+          {hasProfile || q
+            ? "Não encontrámos aulas para o seu perfil neste momento. Explore o catálogo completo."
+            : "Converse com o assistente ou escreva acima o que quer aprender."}
+        </EmptyNote>
       )}
-    </div>
+    </>
   );
 }

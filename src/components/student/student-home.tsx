@@ -2,28 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import clsx from "clsx";
-import {
-  ArrowRight,
-  CalendarDays,
-  CheckCircle2,
-  ClipboardList,
-  Compass,
-  Hourglass,
-  MessageCircleHeart,
-  Sparkles,
-} from "lucide-react";
-import { CourseCard, CourseCardSkeleton } from "@/components/courses/course-card";
+import { ChevronRight, Compass } from "lucide-react";
+import { EnrollmentTrack } from "@/components/app/enrollment-track";
+import { RecommendationList } from "@/components/app/recommendation-list";
+import { EmptyNote, ErrorNote, FigureBand, PageHeader, Skeleton, buttonClass } from "@/components/app/ui";
 import MeetingsCalendar, { type CalendarMeeting } from "@/components/dashboard/meetings-calendar";
-import { StatGrid } from "@/components/dashboard/stats";
-import { StatusBadge } from "@/components/enrollments/status-badge";
-import { EmptyState, ErrorState } from "@/components/ui/states";
-import { UserMenu } from "@/components/user-menu";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { useAuth } from "@/hooks/useAuth";
 import type { Enrollment } from "@/lib/api/types";
-import { isConfirmed, nextStepFor } from "@/lib/enrollment";
-import { formatCoursePrice } from "@/lib/format";
+import { isConfirmed } from "@/lib/enrollment";
 import { calendarWindow, expandMeetings } from "@/lib/meeting";
 import { displayName } from "@/services/auth.service";
 import { getCourse } from "@/services/course.service";
@@ -39,40 +26,31 @@ const isClosed = (enrollment: Enrollment) =>
 
 function summaryFor(pending: number, confirmed: number) {
   if (pending > 0)
-    return `${pending} ${pending === 1 ? "pedido está" : "pedidos estão"} em análise pelo mentor.`;
+    return `${pending} ${pending === 1 ? "pedido está" : "pedidos estão"} à espera da resposta do mentor.`;
   if (confirmed > 0)
-    return `${confirmed} ${confirmed === 1 ? "aula aprovada" : "aulas aprovadas"}. Consulte os próximos encontros no calendário.`;
-  return "Está tudo em dia. Que tal descobrir uma nova aula?";
+    return `Tem vaga garantida em ${confirmed} ${confirmed === 1 ? "turma" : "turmas"}. Os encontros estão na agenda.`;
+  return "Ainda não está em nenhuma turma. Escolha uma aula e peça a inscrição.";
 }
 
-function ActiveEnrollment({ enrollment }: { enrollment: Enrollment }) {
-  const isPending = enrollment.status === "PENDING";
-
+function JourneyRow({ enrollment }: { enrollment: Enrollment }) {
   return (
-    <Link
-      href={`/aluno/inscricoes/${enrollment.id}`}
-      className={clsx(
-        "flex flex-col gap-3 rounded-xl border bg-panel p-4 shadow-card transition-colors sm:flex-row sm:items-center",
-        isPending ? "border-warning/40 hover:border-warning" : "border-line-strong hover:border-primary/40"
-      )}
-    >
-      <div className="min-w-0 flex-1">
-        <p className="truncate font-bold text-ink">{enrollment.course.title}</p>
-        <p className="truncate text-xs text-ink-soft">
-          {enrollment.session.name} · {formatCoursePrice(enrollment.course)}
-        </p>
-        <p className="mt-2 text-sm text-ink-soft">{nextStepFor(enrollment)}</p>
-      </div>
-      <div className="flex shrink-0 flex-wrap items-center gap-2 sm:flex-col sm:items-end">
-        <StatusBadge kind="enrollment" status={enrollment.status} />
-        {isPending && (
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-primary">
-            A aguardar aprovação
-            <ArrowRight size={12} />
+    <li>
+      <Link
+        href={`/aluno/inscricoes/${enrollment.id}`}
+        className="group grid gap-4 px-5 py-4 transition-colors hover:bg-canvas focus-visible:bg-canvas focus-visible:outline-none md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_20px] md:items-center"
+      >
+        <span className="min-w-0">
+          <span className="block truncate text-[15px] font-semibold text-ink group-hover:text-primary">
+            {enrollment.course.title}
           </span>
-        )}
-      </div>
-    </Link>
+          <span className="block truncate text-[13px] text-ink-soft">
+            {enrollment.session.name} · {enrollment.course.category_name}
+          </span>
+        </span>
+        <EnrollmentTrack enrollment={enrollment} />
+        <ChevronRight size={18} aria-hidden="true" className="hidden text-ink-faint group-hover:text-ink md:block" />
+      </Link>
+    </li>
   );
 }
 
@@ -114,175 +92,108 @@ export default function StudentHome() {
   const pending = list.filter((item) => item.status === "PENDING").length;
   const confirmed = list.filter(isConfirmed).length;
   const [now] = useState(() => Date.now());
-  const upcoming = (meetings.data ?? []).filter(
+  const thisWeek = (meetings.data ?? []).filter(
     (meeting) => new Date(meeting.ends_at).getTime() >= now && new Date(meeting.starts_at).getTime() <= now + WEEK_MS
   ).length;
 
-  const active = list
-    .filter((item) => !isClosed(item) && !isConfirmed(item))
-    .slice(0, 4);
-
-  const stats = [
-    {
-      label: "Em análise",
-      value: pending,
-      hint: pending ? "Aguardam o mentor" : "Nenhum pedido pendente",
-      icon: Hourglass,
-    },
-    {
-      label: "Inscrições",
-      value: list.length,
-      hint: "Pedidos enviados",
-      icon: ClipboardList,
-    },
-    {
-      label: "Confirmadas",
-      value: confirmed,
-      hint: "Com vaga garantida",
-      icon: CheckCircle2,
-    },
-    {
-      label: "Próximos encontros",
-      value: upcoming,
-      hint: "Nos próximos 7 dias",
-      icon: CalendarDays,
-    },
-  ];
-
-  const recommended = recommendations.data?.slice(0, 3) ?? [];
+  const journey = list.filter((item) => !isClosed(item)).slice(0, 5);
+  const recommended = recommendations.data?.slice(0, 4) ?? [];
 
   return (
     <>
-      <div className="flex items-center justify-between gap-6">
-        <div className="min-w-0">
-          <h1 className="truncate text-2xl font-bold text-ink">
-            Olá{firstName ? `, ${firstName}` : ""}
-          </h1>
-          <p className="text-sm text-ink-soft">
-            {enrollments.data ? summaryFor(pending, confirmed) : "A carregar as suas inscrições…"}
-          </p>
-        </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <Link
-            href="/aluno/catalogo"
-            className="hidden items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-strong sm:inline-flex"
-          >
-            <Compass size={16} />
+      <PageHeader
+        title={`Olá${firstName ? `, ${firstName}` : ""}`}
+        description={enrollments.data ? summaryFor(pending, confirmed) : "A carregar as suas inscrições…"}
+        actions={
+          <Link href="/aluno/catalogo" className={buttonClass("primary")}>
+            <Compass size={16} aria-hidden="true" />
             Explorar aulas
           </Link>
-          <div className="hidden md:block">
-            <UserMenu />
-          </div>
-        </div>
-      </div>
+        }
+      />
 
-      <div className="mt-8 grid grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="min-w-0 space-y-10">
-          <StatGrid stats={stats} isLoading={enrollments.isLoading} />
+      <FigureBand
+        isLoading={enrollments.isLoading}
+        figures={[
+          { label: "À espera do mentor", value: pending, tone: "warning", note: pending ? "Pedidos em análise" : "Nenhum pendente" },
+          { label: "Vagas garantidas", value: confirmed, note: "Turmas em que está" },
+          { label: "Encontros em 7 dias", value: meetings.isLoading ? "–" : thisWeek, note: "Nas suas turmas" },
+          { label: "Pedidos enviados", value: list.length, note: "Desde o início" },
+        ]}
+      />
 
-          <section>
-            <div className="mb-4 flex items-end justify-between gap-3">
+      <div className="mt-8 grid grid-cols-1 items-start gap-6 min-[1140px]:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 space-y-8">
+          <section aria-labelledby="journey-title" className="overflow-hidden rounded-lg border border-line bg-panel">
+            <div className="flex items-baseline justify-between gap-3 px-5 pb-3 pt-5">
               <div>
-                <h2 className="text-xl font-bold text-ink">Em andamento</h2>
-                <p className="text-sm text-ink-soft">Inscrições que ainda precisam de um passo.</p>
+                <h2 id="journey-title" className="text-base font-semibold text-ink">
+                  O seu percurso
+                </h2>
+                <p className="mt-0.5 text-[13px] text-ink-soft">Cada inscrição passa por três passos até a vaga ficar garantida.</p>
               </div>
               {list.length > 0 && (
-                <Link
-                  href="/aluno/inscricoes"
-                  className="inline-flex shrink-0 items-center gap-1 text-sm font-bold text-primary hover:underline"
-                >
-                  Ver todas
-                  <ArrowRight size={14} />
+                <Link href="/aluno/inscricoes" className="shrink-0 text-[13px] font-semibold text-primary hover:underline">
+                  Todas as inscrições
                 </Link>
               )}
             </div>
-
             {enrollments.error ? (
-              <ErrorState message={enrollments.error.message} onRetry={enrollments.reload} />
+              <div className="px-5 pb-5">
+                <ErrorNote message={enrollments.error.message} onRetry={enrollments.reload} />
+              </div>
             ) : enrollments.isLoading ? (
-              <div className="space-y-3">
-                {Array.from({ length: 2 }, (_, index) => (
-                  <span key={index} className="block h-24 animate-pulse rounded-xl bg-line" />
-                ))}
+              <div className="space-y-2 px-5 pb-5">
+                <Skeleton className="h-16" />
+                <Skeleton className="h-16" />
               </div>
-            ) : list.length === 0 ? (
-              <EmptyState
-                icon={<ClipboardList size={22} />}
-                title="Ainda não tem inscrições"
-                description="Escolha uma aula no catálogo e peça a inscrição numa turma."
-                action={
-                  <Link
-                    href="/aluno/catalogo"
-                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-strong"
-                  >
-                    Explorar aulas
-                    <ArrowRight size={16} />
-                  </Link>
-                }
-              />
-            ) : active.length > 0 ? (
-              <div className="space-y-3">
-                {active.map((enrollment) => (
-                  <ActiveEnrollment key={enrollment.id} enrollment={enrollment} />
+            ) : journey.length > 0 ? (
+              <ul className="divide-y divide-line border-t border-line">
+                {journey.map((enrollment) => (
+                  <JourneyRow key={enrollment.id} enrollment={enrollment} />
                 ))}
-              </div>
+              </ul>
             ) : (
-              <p className="flex items-center gap-3 rounded-xl bg-success-soft p-4 text-sm text-ink-soft">
-                <CheckCircle2 size={18} className="shrink-0 text-success" />
-                Nenhuma inscrição à espera de si. Prepare-se para os próximos encontros!
-              </p>
+              <div className="px-5 pb-5">
+                <EmptyNote
+                  title="Ainda sem inscrições ativas"
+                  action={
+                    <Link href="/aluno/catalogo" className={buttonClass("primary")}>
+                      Explorar aulas
+                    </Link>
+                  }
+                >
+                  Escolha uma aula no catálogo e peça a inscrição numa turma. O mentor responde aqui.
+                </EmptyNote>
+              </div>
             )}
           </section>
 
-          <section>
-            <div className="mb-4 flex items-end justify-between gap-3">
-              <div>
-                <p className="mb-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                  <Sparkles size={14} />
-                  Para você
-                </p>
-                <h2 className="text-xl font-bold text-ink">Recomendado a partir dos seus objetivos</h2>
-              </div>
+          <section aria-labelledby="recommended-title">
+            <div className="mb-3 flex items-baseline justify-between gap-3">
+              <h2 id="recommended-title" className="text-base font-semibold text-ink">
+                Recomendado para os seus objetivos
+              </h2>
               {recommended.length > 0 && (
-                <Link
-                  href="/aluno/para-voce"
-                  className="inline-flex shrink-0 items-center gap-1 text-sm font-bold text-primary hover:underline"
-                >
-                  Ver todas
-                  <ArrowRight size={14} />
+                <Link href="/aluno/para-voce" className="shrink-0 text-[13px] font-semibold text-primary hover:underline">
+                  Ver mais
                 </Link>
               )}
             </div>
-
             {recommendations.isLoading ? (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
-                {Array.from({ length: 3 }, (_, index) => (
-                  <CourseCardSkeleton key={index} />
-                ))}
-              </div>
+              <Skeleton className="h-64" />
             ) : recommended.length > 0 ? (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
-                {recommended.map((result) => (
-                  <CourseCard key={result.course.id} result={result} href={`/aluno/catalogo/${result.course.id}`} />
-                ))}
-              </div>
+              <RecommendationList results={recommended} />
             ) : (
-              <div className="flex flex-col items-start gap-4 rounded-2xl bg-primary/5 p-6 sm:flex-row sm:items-center">
-                <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <MessageCircleHeart size={22} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="font-bold text-ink">Conte-nos o que quer aprender</p>
-                  <p className="text-sm text-ink-soft">
-                    Uma conversa rápida com o assistente ajuda-nos a recomendar as aulas certas para si.
+              <div className="flex flex-col items-start gap-4 rounded-lg bg-rail p-6 text-rail-ink sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-display text-lg font-semibold text-white">Conte-nos o que quer aprender</p>
+                  <p className="mt-1 max-w-md text-sm text-rail-muted">
+                    Dois minutos de conversa com o assistente chegam para recomendarmos as aulas certas.
                   </p>
                 </div>
-                <Link
-                  href="/aluno/onboarding"
-                  className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-primary-strong"
-                >
+                <Link href="/aluno/onboarding" className={buttonClass("primary")}>
                   Definir objetivos
-                  <ArrowRight size={16} />
                 </Link>
               </div>
             )}
@@ -292,7 +203,7 @@ export default function StudentHome() {
         <MeetingsCalendar
           meetings={meetings.data ?? []}
           isLoading={enrollments.isLoading || meetings.isLoading}
-          emptyText="Sem encontros agendados nas suas turmas."
+          emptyText="Quando o mentor aprovar uma inscrição, os encontros da turma aparecem aqui."
         />
       </div>
     </>

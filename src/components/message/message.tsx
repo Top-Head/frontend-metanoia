@@ -1,10 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, LayoutDashboard, RefreshCw } from "lucide-react";
+import clsx from "clsx";
+import { ArrowLeft, RefreshCw } from "lucide-react";
 import toast from "react-hot-toast";
-import { UserMenu } from "@/components/user-menu";
 import { useAuth } from "@/hooks/useAuth";
 import type { ChatMessage, ChatRoom } from "@/lib/api/types";
 import {
@@ -26,6 +25,7 @@ import Profile from "./Profile";
 import Sidebar from "./Sidebar";
 import { MessageComposer } from "./Send-sms";
 import { ChatThread } from "./sms";
+import { AttachmentViewer } from "./attachment-viewer";
 import DeleteMessageDialog from "./delete-message-dialog";
 import VideoCall from "./video-call";
 
@@ -473,67 +473,7 @@ export default function Message() {
   }
 
   return (
-    <main className="flex h-dvh min-h-[32rem] flex-col overflow-hidden bg-canvas">
-      <header className="flex h-[4.5rem] shrink-0 items-center justify-between border-b border-line bg-panel px-5 sm:px-7">
-        <div className="flex min-w-0 items-center gap-3">
-          <Link
-            href={isMentor ? "/dashboard" : "/aluno"}
-            aria-label="Voltar ao painel"
-            className="hidden size-9 shrink-0 items-center justify-center rounded-lg text-ink-soft hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:flex"
-          >
-            <LayoutDashboard size={17} aria-hidden="true" />
-          </Link>
-          {selectedRoom && (
-            <button
-              type="button"
-              onClick={() => setSelectedRoomId(null)}
-              aria-label="Voltar às conversas"
-              className="flex size-9 shrink-0 items-center justify-center rounded-lg text-ink-soft hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:hidden"
-            >
-              <ArrowLeft size={18} aria-hidden="true" />
-            </button>
-          )}
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-              Espaço de aprendizagem
-            </p>
-            <h1 className="truncate text-sm font-bold text-ink sm:text-base">
-              {selectedRoom?.course_title ?? "Conversas das suas mentorias"}
-            </h1>
-          </div>
-        </div>
-        <div className="ml-3 flex shrink-0 items-center gap-2">
-          {selectedRoom && (
-            <div className="flex items-center gap-2 text-xs text-ink-soft">
-              <span
-                className={
-                  refreshing
-                    ? "size-2 animate-pulse rounded-full bg-primary"
-                    : "size-2 rounded-full bg-emerald-500"
-                }
-                aria-hidden="true"
-              />
-              <span className="hidden sm:inline">
-                {refreshing ? "A atualizar" : "Atualização automática"}
-              </span>
-              <button
-                type="button"
-                onClick={refreshMessages}
-                aria-label="Atualizar mensagens"
-                className="ml-1 flex size-8 items-center justify-center rounded-lg hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              >
-                <RefreshCw
-                  size={15}
-                  className={refreshing ? "animate-spin" : undefined}
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
-          )}
-          <UserMenu />
-        </div>
-      </header>
-
+    <div className="flex h-[calc(100dvh-6.25rem)] min-h-[30rem] flex-col overflow-hidden bg-canvas lg:h-dvh">
       <div className="flex min-h-0 flex-1">
         <Sidebar
           rooms={rooms}
@@ -553,29 +493,44 @@ export default function Message() {
             className="flex min-w-0 flex-1 flex-col bg-canvas"
             aria-label={`Conversa: ${selectedRoom.course_title}`}
           >
-            <div className="flex shrink-0 items-center gap-3 border-b border-line bg-panel px-5 py-3 sm:px-6">
-              <span
-                aria-hidden="true"
-                className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary"
+            <div className="flex h-16 shrink-0 items-center gap-3 border-b border-line bg-panel px-4 sm:px-6">
+              <button
+                type="button"
+                onClick={() => setSelectedRoomId(null)}
+                aria-label="Voltar às conversas"
+                className="flex size-9 shrink-0 items-center justify-center rounded-md text-ink-soft hover:bg-tone md:hidden"
               >
-                {selectedRoom.session_name
-                  .slice(0, 2)
-                  .toLocaleUpperCase("pt-BR")}
-              </span>
+                <ArrowLeft size={18} aria-hidden="true" />
+              </button>
               <div className="min-w-0">
-                <h2 className="truncate text-sm font-semibold text-ink">
-                  {selectedRoom.session_name}
+                <h2 className="truncate text-[15px] font-semibold text-ink">
+                  {selectedRoom.course_title}
+                  <span className="font-normal text-ink-soft"> · {selectedRoom.session_name}</span>
                 </h2>
-                <p className="truncate text-xs text-ink-soft">
+                <p className="flex items-center gap-2 truncate text-[13px] text-ink-soft">
+                  <span
+                    aria-hidden="true"
+                    className={clsx("size-1.5 shrink-0 rounded-full", refreshing ? "animate-pulse bg-primary" : "bg-success")}
+                  />
                   {isMentor
                     ? `${selectedRoom.member_count} participantes`
                     : `Mentor ${selectedRoom.mentor_name} · ${selectedRoom.member_count} participantes`}
                 </p>
               </div>
-              <div className="ml-auto">
+              <div className="ml-auto flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={refreshMessages}
+                  aria-label="Atualizar mensagens"
+                  title="Atualizar mensagens"
+                  className="flex size-9 items-center justify-center rounded-md text-ink-soft hover:bg-tone hover:text-ink"
+                >
+                  <RefreshCw size={15} className={refreshing ? "animate-spin" : undefined} aria-hidden="true" />
+                </button>
                 <VideoCall room={selectedRoom} isMentor={isMentor} />
               </div>
             </div>
+
 
             <div
               ref={scrollRef}
@@ -590,7 +545,7 @@ export default function Message() {
                   event.currentTarget.scrollTop = event.currentTarget.scrollHeight;
                 }
               }}
-              className="min-h-0 flex-1 overflow-y-auto"
+              className="min-h-0 flex-1 overflow-y-auto bg-canvas bg-[url(/chat-pattern.svg)] bg-[length:320px_320px]"
             >
               <ChatThread
                 messages={messages}
@@ -645,16 +600,17 @@ export default function Message() {
         )}
 
         {selectedRoom && (
-          <Profile room={selectedRoom} isMentor={isMentor} />
+          <Profile room={selectedRoom} isMentor={isMentor} messages={messages} />
         )}
       </div>
 
+      <AttachmentViewer roomAttachments={messages.flatMap((message) => message.attachments ?? [])} />
       <DeleteMessageDialog
         message={deleteTarget}
         deleting={deleting}
         onCancel={closeDeleteDialog}
         onConfirm={() => void confirmDelete()}
       />
-    </main>
+    </div>
   );
 }

@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { Phone, User } from "lucide-react";
 import toast from "react-hot-toast";
 import { SpecialtyPicker } from "@/components/auth/_components/register-components/specialty-picker";
-import { Button } from "@/components/ui/button";
+import { Spinner, buttonClass } from "@/components/app/ui";
 import FormInput from "@/components/ui/form-input";
 import { ApiError } from "@/lib/api/client";
 import type { Mentor, Student } from "@/lib/api/types";
@@ -33,7 +33,7 @@ function Textarea({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-2 block text-sm font-bold text-ink">
+      <label htmlFor={id} className="mb-2 block text-sm font-semibold text-ink">
         {label}
       </label>
       <textarea
@@ -124,9 +124,10 @@ export function MentorProfileForm({ initial, create = false, submitLabel, onSave
         error={errors.experience_description}
         placeholder="Onde trabalhou, há quantos anos atua, principais resultados..."
       />
-      <Button type="submit" isLoading={isSaving}>
+      <button type="submit" disabled={isSaving} className={buttonClass("primary")}>
+        {isSaving && <Spinner />}
         {submitLabel}
-      </Button>
+      </button>
     </form>
   );
 }
@@ -189,9 +190,10 @@ export function StudentProfileForm({ initial, create = false, submitLabel, onSav
         rows={3}
         placeholder="O que quer aprender ou alcançar?"
       />
-      <Button type="submit" isLoading={isSaving}>
+      <button type="submit" disabled={isSaving} className={buttonClass("primary")}>
+        {isSaving && <Spinner />}
         {submitLabel}
-      </Button>
+      </button>
     </form>
   );
 }
