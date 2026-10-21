@@ -22,6 +22,16 @@ interface ChatThreadProps {
   pendingMessage?: { content: string; fileNames: string[] } | null;
 }
 
+const EMOJI_ONLY = /^(?:\p{Extended_Pictographic}|\p{Regional_Indicator}|\p{Emoji_Modifier}|‍|️|\s)+$/u;
+const graphemes = typeof Intl !== "undefined" && "Segmenter" in Intl ? new Intl.Segmenter("pt", { granularity: "grapheme" }) : null;
+
+function isEmojiOnly(text: string) {
+  const trimmed = text.trim();
+  if (!trimmed || !EMOJI_ONLY.test(trimmed)) return false;
+  const count = graphemes ? [...graphemes.segment(trimmed.replace(/\s/g, ""))].length : trimmed.length;
+  return count <= 3;
+}
+
 function wasEdited(message: ChatMessage) {
   if (!message.updated_at) return false;
   return (
@@ -229,7 +239,12 @@ export function ChatThread({
                 )}
                 <MessageAttachments attachments={message.attachments ?? []} own={ownMessage} />
                 {body && (
-                  <p className="whitespace-pre-wrap break-words text-sm leading-6">
+                  <p
+                    className={clsx(
+                      "whitespace-pre-wrap break-words",
+                      isEmojiOnly(body) ? "text-[40px] leading-[1.15]" : "text-sm leading-6"
+                    )}
+                  >
                     {body}
                   </p>
                 )}
